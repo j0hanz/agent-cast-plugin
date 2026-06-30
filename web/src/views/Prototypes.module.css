@@ -185,5 +185,5 @@
 .crit {
   color: var(--accent-text);
   background: var(--accent-soft);
-  border-color: rgba(var(--accent-rgb), 0.25);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
 }
