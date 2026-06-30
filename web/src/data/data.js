@@ -77,25 +77,25 @@ export const TESTS = [
 ];
 
 export const MCP = [
-  { k: 'Server', v: 'agent-browser MCP' },
+  { k: 'Server', v: 'Playwright MCP' },
   { k: 'Transport', v: 'stdio' },
   { k: 'Status', v: 'Connected', pill: 'live' },
   { k: 'Uptime', v: '17m' },
   { k: 'Browser', v: 'Chrome for Testing' },
 ];
 export const MCP_TOOLS = [
-  { name: 'agent_browser_open', calls: 42 },
-  { name: 'agent_browser_screenshot', calls: 38 },
-  { name: 'agent_browser_snapshot', calls: 24 },
-  { name: 'agent_browser_eval', calls: 12 },
-  { name: 'agent_browser_click', calls: 9 },
-  { name: 'agent_browser_fill', calls: 7 },
+  { name: 'browser_navigate', calls: 42 },
+  { name: 'browser_take_screenshot', calls: 38 },
+  { name: 'browser_snapshot', calls: 24 },
+  { name: 'browser_evaluate', calls: 12 },
+  { name: 'browser_click', calls: 9 },
+  { name: 'browser_type', calls: 7 },
 ];
 export const MCP_CALLS = [
-  { id: 'mc1', ts: '00:03', msg: '<b>agent_browser_screenshot</b> → landing-hero / v4' },
-  { id: 'mc2', ts: '00:02', msg: '<b>agent_browser_eval</b> → set viewport 1440 × 900' },
-  { id: 'mc3', ts: '00:01', msg: '<b>agent_browser_open</b> → /landing-hero' },
-  { id: 'mc4', ts: '00:00', msg: '<b>agent_browser_snapshot</b> → dom' },
+  { id: 'mc1', ts: '00:03', msg: '<b>browser_take_screenshot</b> → landing-hero / v4' },
+  { id: 'mc2', ts: '00:02', msg: '<b>browser_evaluate</b> → set viewport 1440 × 900' },
+  { id: 'mc3', ts: '00:01', msg: '<b>browser_navigate</b> → /landing-hero' },
+  { id: 'mc4', ts: '00:00', msg: '<b>browser_snapshot</b> → dom' },
 ];
 
 export const SETTINGS = [

@@ -1,6 +1,6 @@
 {
   "name": "agent-cast",
   "source": "./",
-  "description": "Closed-loop frontend workflow for Claude Code: build, preview, screenshot-critique, refine, and test UIs via a bundled agent-browser MCP server.",
+  "description": "Closed-loop frontend workflow for Claude Code: build, preview, screenshot-critique, refine, and test UIs via the Playwright MCP server.",
   "version": "0.1.0"
 }

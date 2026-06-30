@@ -21,8 +21,6 @@ export const Sidebar = memo(({ active }) => (
       <div className={styles.navlabel} style={{ marginTop: 'var(--s2)' }}>System</div>
       {SYSTEM.map(n => <NavItem key={n.id} n={n} active={active} />)}
     </nav>
-    <div className="grow" />
-    <div className={styles.status} aria-label="agent-browser MCP (Connected)"><span className="pulse" /><span>agent-browser MCP</span></div>
   </aside>
 ));
 
