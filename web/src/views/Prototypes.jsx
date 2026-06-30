@@ -77,6 +77,7 @@ export function Prototypes() {
 
   return (
     <Main topbar={top}>
+      <h1 className="sr-only">Prototypes and Screenshots</h1>
       {isProtos ? (
         <>
           <div className={styles.toolbar}>

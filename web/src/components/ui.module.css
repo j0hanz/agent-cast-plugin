@@ -118,7 +118,7 @@
   max-width: 480px;
   margin: var(--s4) auto;
 }
-.empty h3 {
+.empty h2 {
   font-family: var(--font-display);
   color: var(--text);
   font-size: var(--fs-xl);

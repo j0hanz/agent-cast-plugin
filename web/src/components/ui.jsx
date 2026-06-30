@@ -21,13 +21,12 @@ export const AgentPill = memo(({ running, stage }) => running ? (
 // ponytail: Native single-select segmented control. One option is always on,
 // matching the behavior of the original ToggleGroup control.
 const SingleToggle = ({ opts, value, onChange, className, itemClass, ariaLabel }) => (
-  <div className={className} role="radiogroup" aria-label={ariaLabel}>
+  <div className={className} role="group" aria-label={ariaLabel}>
     {opts.map(o => (
       <button
         key={o}
         type="button"
-        role="radio"
-        aria-checked={value === o}
+        aria-pressed={value === o}
         className={itemClass}
         onClick={() => onChange(o)}
       >
@@ -85,7 +84,7 @@ export const Preview = memo(({ id, ver }) => {
 export const EmptyState = memo(({ icon = 'search', title = 'No results found', description = 'Try adjusting your filters.' }) => (
   <div className={styles.empty}>
     <div style={{ marginBottom: 'var(--s2)', opacity: 0.5 }}><Icon n={icon} sw={2} /></div>
-    <h3>{title}</h3>
+    <h2>{title}</h2>
     <p style={{ marginTop: 'var(--s0)' }}>{description}</p>
   </div>
 ));

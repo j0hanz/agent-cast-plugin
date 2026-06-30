@@ -18,7 +18,7 @@ export function Sandbox() {
   const top = <>Sandbox<div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
   return (
     <Main topbar={top}>
-      <div className={ui.dhead}><h2>Live sandbox</h2><span className={`${ui.pill} ${ui.live}`}>Running</span><div className="grow" />
+      <div className={ui.dhead}><h1>Live sandbox</h1><span className={`${ui.pill} ${ui.live}`}>Running</span><div className="grow" />
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>

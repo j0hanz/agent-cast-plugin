@@ -59,6 +59,7 @@ export function Tests() {
   const top = <>Tests<div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
   return (
     <Main topbar={top}>
+      <h1 className="sr-only">Tests</h1>
       <div className={styles.summary}>
         <div className={`${styles.stat} ${styles.ok}`}><div className={styles.k}>Passing</div><div className={styles.v}>{pass}</div></div>
         <div className={`${styles.stat} ${styles.bad}`}><div className={styles.k}>Failing</div><div className={styles.v}>{fail}</div></div>

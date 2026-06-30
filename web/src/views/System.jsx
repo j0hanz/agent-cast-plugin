@@ -62,7 +62,7 @@ export function System() {
   return (
     <Main topbar={top}>
       <div className={ui.dhead}>
-        <h2>System</h2>
+        <h1>System</h1>
         <span className={`${ui.pill} ${ui.live}`}>MCP connected</span>
         <span className={ui.dmeta}>Read-only · managed by the plugin</span>
       </div>

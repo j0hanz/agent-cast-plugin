@@ -54,7 +54,7 @@ export function Detail({ id }) {
   </>;
   return (
     <Main topbar={top}>
-      <div className={ui.dhead}>{p.name}<span className={`${ui.pill} ${ui[p.status]}`}>{cap(p.status)}</span>
+      <div className={ui.dhead}><h1>{p.name}</h1><span className={`${ui.pill} ${ui[p.status]}`}>{cap(p.status)}</span>
         <span className={ui.dmeta}>{dev} · {VIEWPORTS[dev]}</span><div className="grow" />
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={handleDevChange} />
       </div>
