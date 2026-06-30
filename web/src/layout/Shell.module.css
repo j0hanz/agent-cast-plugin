@@ -145,7 +145,6 @@ nav {
 }
 .wrap {
   max-width: 1240px;
-  gap: var(--s4);
 }
 
 /* ---------- responsive: sidebar collapse ---------- */

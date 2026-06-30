@@ -43,7 +43,6 @@
   --shadow-inset:inset 0 1px 0 rgba(255,255,255,.02); /* top hairline on raised chrome */
   /* ---- z-index scale — no magic numbers ---- */
   --z-nav:10; --z-skip:60;
-  --thumb:var(--surface-2);
 }
 :root{color-scheme:dark;}
 *{box-sizing:border-box;margin:0;padding:0;}

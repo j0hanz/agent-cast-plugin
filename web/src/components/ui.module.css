@@ -229,7 +229,7 @@
 /* ---------- thumb frame look (composed by Prototypes/Screenshots) ---------- */
 .thumbFrame {
   aspect-ratio: 16 / 10;
-  background: var(--thumb);
+  background: var(--surface-2);
   display: grid;
   place-items: center;
   position: relative;
