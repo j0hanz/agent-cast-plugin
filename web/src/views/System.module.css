@@ -3,7 +3,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--s3);
-  align-items: start; /* cards keep their own height instead of stretching to match a taller row-mate */
+  align-items: stretch; /* both cards in a row match height, sized to the taller one */
 }
 
 @media (max-width: 47.5em) {
