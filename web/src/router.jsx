@@ -3,7 +3,6 @@ import { NAV, SYSTEM, PROTOTYPES } from './data/data.js';
 import { Prototypes } from './views/Prototypes.jsx';
 import { Detail } from './views/Detail.jsx';
 import { Sandbox } from './views/Sandbox.jsx';
-import { Screenshots } from './views/Screenshots.jsx';
 import { Tests } from './views/Tests.jsx';
 import { System } from './views/System.jsx';
 import { NotFound } from './views/NotFound.jsx';
@@ -11,7 +10,6 @@ import { NotFound } from './views/NotFound.jsx';
 const ROUTES = {
   prototypes: Prototypes,
   sandbox: Sandbox,
-  screenshots: Screenshots,
   tests: Tests,
   system: System,
 };

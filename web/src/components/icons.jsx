@@ -14,20 +14,12 @@ const PATHS = {
     <path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
     <path d="m3.3 7 8.7 5 8.7-5M12 22V12" />
   </>,
-  screenshots: <>
-    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z" />
-    <circle cx="12" cy="13" r="3.5" />
-  </>,
   tests: <>
     <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
   </>,
   server: <>
     <rect x="2" y="3" width="20" height="6" rx="2" /><rect x="2" y="13" width="20" height="6" rx="2" />
     <path d="M6 6h.01M6 16h.01" />
-  </>,
-  settings: <>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8M4.6 9a1.6 1.6 0 0 0-.3-1.8" />
   </>,
   back: <path d="M15 18l-6-6 6-6" />,
   search: <><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></>,

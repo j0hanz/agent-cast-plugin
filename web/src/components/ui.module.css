@@ -448,7 +448,7 @@
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), .12);
 }
 
-/* ---------- status pill (Prototypes/Detail/Tests/Sandbox/Mcp) ---------- */
+/* ---------- status pill (Prototypes/Detail/Tests/Sandbox/System) ---------- */
 .pill {
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -478,7 +478,7 @@
 .draft::before { background: var(--mut); }
 .draft { color: var(--dim); background: var(--surface-2); } /* idle, not a warning — keeps amber reserved for live */
 
-/* ---------- switch (Settings on/off) ---------- */
+/* ---------- switch (System on/off) ---------- */
 .switch {
   width: 36px;
   height: 20px;
@@ -513,7 +513,7 @@
   background: var(--accent);
 }
 
-/* ---------- key/value row (Sandbox/Settings/Mcp) ---------- */
+/* ---------- key/value row (Sandbox/System) ---------- */
 .kv {
   display: flex;
   justify-content: space-between;
@@ -535,7 +535,7 @@
   font-family: var(--font-mono);
 }
 
-/* ---------- log row (Sandbox/Mcp) ---------- */
+/* ---------- log row (Sandbox/System) ---------- */
 .logrow {
   display: flex;
   gap: var(--s2);
@@ -564,7 +564,7 @@
   text-shadow: 0 0 8px rgba(var(--accent-rgb), .35);
 }
 
-/* ---------- misc shared text utility (Tests/Mcp) ---------- */
+/* ---------- misc shared text utility (Tests/System) ---------- */
 .muted {
   color: var(--mut);
 }
@@ -586,7 +586,7 @@
   border-radius: var(--r-sm);
 }
 
-/* ---------- page header + 2-col layout (Detail/Sandbox/Settings/Mcp) ---------- */
+/* ---------- page header + 2-col layout (Detail/Sandbox/System) ---------- */
 .dhead {
   display: flex;
   align-items: center;
