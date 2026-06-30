@@ -11,8 +11,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-/* Recent calls spans both columns */
-.span2 {
-  grid-column: 1 / -1;
-}

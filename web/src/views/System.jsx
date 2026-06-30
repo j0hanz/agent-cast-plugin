@@ -81,8 +81,7 @@ export function System() {
           {MCP_TOOLS.map(t => <McpToolRow key={t.name} t={t} />)}
         </Panel>
 
-        {/* Recent calls spans both columns */}
-        <Panel title="Recent calls" className={styles.span2}>
+        <Panel title="Recent calls">
           {MCP_CALLS.length ? MCP_CALLS.map(c => <McpCallRow key={`${c.ts}-${c.tool}`} c={c} />) : <EmptyState icon="search" title="No recent calls" description="No MCP calls have been made yet." />}
         </Panel>
       </div>
