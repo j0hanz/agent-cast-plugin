@@ -3,7 +3,7 @@ import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
 import { AgentPill, Chips, SearchBox, EmptyState } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
+import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
 import styles from './Prototypes.module.css';
 import ui from '../components/ui.module.css';
 
@@ -27,7 +27,7 @@ const ScreenshotCard = memo(({ s }) => {
           : <img className={ui.shotImg} src={screenshotSrc(s.protoId, s.ver)} alt={`${s.proto} — ${s.stage} capture, ${s.ver}`} onError={() => setBroken(true)} />}
       </div>
       <div className={styles.smeta}><div className={styles.sname}>{s.proto}</div>
-        <div className={styles.srow}><span className={`${styles.tag} ${s.stage === 'critique' ? styles.crit : ''}`}>{s.stage}</span><span>{s.ver} · {s.time}</span></div></div>
+        <div className={styles.srow}><span className={`${styles.tag} ${s.stage === 'critique' ? styles.crit : ''}`}>{s.stage}</span><span>{s.ver} · {relativeTime(s.capturedAt)}</span></div></div>
     </a>
   );
 });

@@ -2,7 +2,10 @@
 // 'live' (data.js picks this by default). Edit freely for CSS/layout work; the
 // shape must stay in sync with live.js (enforced by data.check.mjs).
 
-export const AGENT = { running: true, stage: 'screenshot-critique' };
+// Minutes-ago offsets so capturedAt (and anything derived from it, e.g.
+// AGENT) stays freshly "2m ago" etc. every time this loads, instead of a
+// frozen date that goes stale the day after it's written.
+const ago = (mins) => new Date(Date.now() - mins * 60_000).toISOString();
 
 export const PROTOTYPES = [
   { id: 'landing-hero', name: 'Landing hero', device: 'Desktop', status: 'live' },
@@ -28,14 +31,14 @@ export const FINDINGS = [
 ];
 
 export const SCREENSHOTS = [
-  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'critique', ver: 'v4', time: 'just now' },
-  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'preview', ver: 'v3', time: '2m' },
-  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'critique', ver: 'v5', time: '6m' },
-  { protoId: 'pricing-page', proto: 'Pricing page', kind: 'desktop', stage: 'preview', ver: 'v2', time: '11m' },
-  { protoId: 'onboarding', proto: 'Onboarding', kind: 'mobile', stage: 'preview', ver: 'v1', time: '14m' },
-  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'preview', ver: 'v4', time: '18m' },
-  { protoId: 'settings-panel', proto: 'Settings panel', kind: 'desktop', stage: 'critique', ver: 'v2', time: '22m' },
-  { protoId: 'dashboard-shell', proto: 'Dashboard shell', kind: 'desktop', stage: 'preview', ver: 'v3', time: '27m' },
+  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'critique', ver: 'v4', capturedAt: ago(0) },
+  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'preview', ver: 'v3', capturedAt: ago(2) },
+  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'critique', ver: 'v5', capturedAt: ago(6) },
+  { protoId: 'pricing-page', proto: 'Pricing page', kind: 'desktop', stage: 'preview', ver: 'v2', capturedAt: ago(11) },
+  { protoId: 'onboarding', proto: 'Onboarding', kind: 'mobile', stage: 'preview', ver: 'v1', capturedAt: ago(14) },
+  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'preview', ver: 'v4', capturedAt: ago(18) },
+  { protoId: 'settings-panel', proto: 'Settings panel', kind: 'desktop', stage: 'critique', ver: 'v2', capturedAt: ago(22) },
+  { protoId: 'dashboard-shell', proto: 'Dashboard shell', kind: 'desktop', stage: 'preview', ver: 'v3', capturedAt: ago(27) },
 ];
 
 export const SESSION = [
