@@ -27,9 +27,9 @@ const ScreenshotCard = memo(({ s }) => (
 
 // ---- Sub-tab switcher ----
 const SubTabs = memo(({ active, onChange }) => (
-  <div className={styles.subtabs} role="tablist" aria-label="View mode">
+  <div className={styles.subtabs} role="group" aria-label="View mode">
     {['Prototypes', 'Screenshots'].map(t => (
-      <button key={t} role="tab" aria-selected={active === t}
+      <button key={t} aria-pressed={active === t}
         className={`${styles.subtab} ${active === t ? styles.subtabActive : ''}`}
         onClick={() => onChange(t)}>{t}</button>
     ))}
