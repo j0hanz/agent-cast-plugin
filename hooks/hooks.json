@@ -1,0 +1,17 @@
+{
+  "description": "Starts the AgentCast web UI automatically so it's reachable as soon as the session begins.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/start-web.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
