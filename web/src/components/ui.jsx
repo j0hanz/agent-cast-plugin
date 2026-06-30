@@ -6,7 +6,7 @@ import { Icon } from './icons.jsx';
 import styles from './ui.module.css';
 
 export const RichText = memo(({ text = '' }) =>
-  <span dangerouslySetInnerHTML={{ __html: text }} />
+  <span>{text.split(/<\/?b>/).map((part, i) => i % 2 ? <b key={i}>{part}</b> : part)}</span>
 );
 
 export const AgentPill = memo(({ running, stage }) => running ? (
