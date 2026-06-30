@@ -29,6 +29,7 @@
   padding-bottom: var(--s1);
 }
 .ver {
+  position: relative;
   flex: 1;
   min-width: 100px;
   aspect-ratio: 16/10;
@@ -50,6 +51,18 @@
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15),
               inset 0 1px 0 rgba(var(--accent-rgb), 0.1);
 }
+/* mini viewfinder corners on the current capture — same bracket technique as
+   .thumbBracket, scaled down, reserved for the active frame only */
+.ver.cur::before, .ver.cur::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 0 solid var(--accent);
+  opacity: 0.6;
+}
+.ver.cur::before { top: 4px; left: 4px; border-top-width: 1.5px; border-left-width: 1.5px; }
+.ver.cur::after { bottom: 4px; right: 4px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
 
 .vstep {
   position: relative;
