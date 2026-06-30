@@ -70,15 +70,15 @@ export function System() {
       {/* Single unified 2-col grid — settings then MCP panels, all flowing together */}
       <div className={styles.grid}>
         {/* Settings rows */}
-        {SETTINGS.map(g => <SettingGroup key={g.group} g={g} />)}
+        {SETTINGS.length ? SETTINGS.map(g => <SettingGroup key={g.group} g={g} />) : <Panel title="Settings"><EmptyState icon="settings" title="No settings" description="No configuration settings found." /></Panel>}
 
         {/* MCP rows — continue in the same grid */}
         <Panel title="Server">
-          {MCP.map(s => <McpStatRow key={s.k} s={s} />)}
+          {MCP.length ? MCP.map(s => <McpStatRow key={s.k} s={s} />) : <EmptyState icon="server" title="No server info" description="No server information available." />}
         </Panel>
 
         <Panel title="Exposed tools" count={MCP_TOOLS.length}>
-          {MCP_TOOLS.map(t => <McpToolRow key={t.name} t={t} />)}
+          {MCP_TOOLS.length ? MCP_TOOLS.map(t => <McpToolRow key={t.name} t={t} />) : <EmptyState icon="tool" title="No tools" description="No tools exposed." />}
         </Panel>
 
         <Panel title="Recent calls">

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Main } from '../layout/Shell.jsx';
-import { AgentPill } from '../components/ui.jsx';
+import { AgentPill, EmptyState } from '../components/ui.jsx';
 import { TESTS, AGENT } from '../data/data.js';
 import styles from './Tests.module.css';
 import ui from '../components/ui.module.css';
@@ -69,7 +69,7 @@ export function Tests() {
         <div className={ui.ptitle}>Test runs <span className={ui.c}>last {TESTS.length} prototypes</span></div>
         <div>
           <div className={`${styles.trow} ${styles.head}`}><span>Prototype</span><span>Checks</span><span>Result</span><span className={styles.right}>Status</span></div>
-          {TESTS.map(t => <TestRow key={t.name} t={t} />)}
+          {TESTS.length ? TESTS.map(t => <TestRow key={t.name} t={t} />) : <EmptyState icon="tests" title="No tests" description="No test runs have been recorded." />}
         </div>
       </div>
     </Main>

@@ -25,7 +25,7 @@ export function Sandbox() {
         <Preview id="landing-hero" ver={VERSIONS[VERSIONS.length - 1]} />
         <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 'var(--s4)' }}>
           <Panel title="Session">
-            {SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>)}
+            {SESSION.length ? SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>) : <EmptyState icon="sandbox" title="No session data" description="The session hasn't started or no data was captured." />}
           </Panel>
           <Panel title="Live log" style={{ overflow: 'hidden' }}>
             {LOG.length ? LOG.map(l => <LogRow key={l.id} l={l} />) : <EmptyState icon="search" title="No log entries" description="Nothing has happened in this session yet." />}
