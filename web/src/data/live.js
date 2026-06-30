@@ -15,7 +15,10 @@
 // runtime), which means this file's top-level code always evaluates — even
 // in mock mode. Guard the fetch on the actual selected mode so mock mode
 // stays 100% synchronous with zero network calls, as designed.
+const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg, err); };
+
 let state = {};
+let mcpCalls = [];
 if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
   try {
     const res = await fetch('/state.json');
@@ -23,9 +26,36 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
   } catch (err) {
     // Always taken under plain `node` (data.check.mjs) — only worth a warning
     // when a real browser session expected a manifest and didn't get one.
-    if (typeof window !== 'undefined') console.warn('live.js: no usable state.json, falling back to empty state', err);
+    warn('live.js: no usable state.json, falling back to empty state', err);
+  }
+
+  // hooks/log-mcp-call.mjs appends one JSON line per Playwright MCP call —
+  // JSONL, not a shared array, so concurrent hook processes can't race each
+  // other the way a read-modify-write of one big array would.
+  try {
+    const res = await fetch('/mcp-calls.jsonl');
+    if (res.ok) {
+      mcpCalls = (await res.text())
+        .split('\n')
+        .filter(Boolean)
+        .flatMap(line => {
+          try { return [JSON.parse(line)]; } catch { return []; } // skip malformed lines, don't crash the module
+        });
+    }
+  } catch (err) {
+    warn('live.js: no usable mcp-calls.jsonl, falling back to empty log', err);
   }
 }
+
+// Aggregate {name, calls} counts derived from the raw log — same "derive,
+// don't separately track" pattern data.js uses for AGENT. Not exported:
+// would break data.check.mjs's mock/live key-parity check (mock.js has no
+// matching export), and importing it from data.js would be circular
+// (data.js already imports this module). Verified via browser testing.
+const deriveMcpTools = (calls) => {
+  const counts = calls.reduce((acc, c) => (acc[c.tool] = (acc[c.tool] || 0) + 1, acc), {});
+  return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
+};
 
 export const PROTOTYPES = [];
 export const VERSIONS = [];
@@ -36,6 +66,6 @@ export const SESSION = [];
 export const LOG = [];
 export const TESTS = [];
 export const MCP = [];
-export const MCP_TOOLS = [];
-export const MCP_CALLS = [];
+export const MCP_CALLS = mcpCalls;
+export const MCP_TOOLS = deriveMcpTools(mcpCalls);
 export const SETTINGS = [];

@@ -2,3 +2,4 @@ node_modules
 dist
 public/screenshots
 public/state.json
+public/mcp-calls.jsonl

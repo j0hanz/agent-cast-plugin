@@ -1,5 +1,5 @@
 {
-  "description": "Starts the AgentCast web UI automatically so it's reachable as soon as the session begins.",
+  "description": "Starts the AgentCast web UI automatically and logs Playwright MCP calls for the dashboard.",
   "hooks": {
     "SessionStart": [
       {
@@ -9,6 +9,18 @@
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/start-web.sh",
             "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__playwright__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/log-mcp-call.mjs",
+            "timeout": 10
           }
         ]
       }

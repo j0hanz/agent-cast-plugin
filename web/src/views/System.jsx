@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { Switch } from '@base-ui/react/switch';
 import { Main } from '../layout/Shell.jsx';
-import { AgentPill, EmptyState, Panel, RichText } from '../components/ui.jsx';
-import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT } from '../data/data.js';
+import { AgentPill, EmptyState, Panel } from '../components/ui.jsx';
+import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT, relativeTime } from '../data/data.js';
 import ui from '../components/ui.module.css';
 import styles from './System.module.css';
 
@@ -14,12 +14,17 @@ const McpToolRow = memo(({ t }) => (
   </div>
 ));
 
-const McpCallRow = memo(({ c }) => (
-  <div className={ui.logrow}>
-    <span className={ui.ts}>{c.ts}</span>
-    <span className={ui.msg}><RichText text={c.msg} /></span>
-  </div>
-));
+// Generic display — no per-tool formatting, since the Playwright MCP server
+// is a third-party package this repo doesn't control the tool surface of.
+const McpCallRow = memo(({ c }) => {
+  const args = JSON.stringify(c.input);
+  return (
+    <div className={ui.logrow}>
+      <span className={ui.ts}>{relativeTime(c.ts)}</span>
+      <span className={ui.msg}><b>{c.tool}</b> {args.length > 60 ? args.slice(0, 60) + '…' : args}</span>
+    </div>
+  );
+});
 
 const McpStatRow = memo(({ s }) => (
   <div className={ui.kv}>
@@ -95,7 +100,7 @@ export function System() {
 
         {/* Recent calls spans both columns */}
         <Panel title="Recent calls" className={styles.span2}>
-          {MCP_CALLS.length ? MCP_CALLS.map(c => <McpCallRow key={c.id} c={c} />) : <EmptyState icon="search" title="No recent calls" description="No MCP calls have been made yet." />}
+          {MCP_CALLS.length ? MCP_CALLS.map(c => <McpCallRow key={`${c.ts}-${c.tool}`} c={c} />) : <EmptyState icon="search" title="No recent calls" description="No MCP calls have been made yet." />}
         </Panel>
       </div>
     </Main>

@@ -80,10 +80,10 @@ export const MCP_TOOLS = [
   { name: 'browser_type', calls: 7 },
 ];
 export const MCP_CALLS = [
-  { id: 'mc1', ts: '00:03', msg: '<b>browser_take_screenshot</b> → landing-hero / v4' },
-  { id: 'mc2', ts: '00:02', msg: '<b>browser_evaluate</b> → set viewport 1440 × 900' },
-  { id: 'mc3', ts: '00:01', msg: '<b>browser_navigate</b> → /landing-hero' },
-  { id: 'mc4', ts: '00:00', msg: '<b>browser_snapshot</b> → dom' },
+  { ts: ago(0), tool: 'browser_take_screenshot', input: { filename: 'landing-hero-v4.png' } },
+  { ts: ago(1), tool: 'browser_evaluate', input: { viewport: '1440x900' } },
+  { ts: ago(2), tool: 'browser_navigate', input: { url: '/landing-hero' } },
+  { ts: ago(3), tool: 'browser_snapshot', input: {} },
 ];
 
 export const SETTINGS = [
