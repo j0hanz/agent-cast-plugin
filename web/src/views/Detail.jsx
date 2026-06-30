@@ -40,7 +40,7 @@ export function Detail({ id }) {
     <nav aria-label="breadcrumb">
       <ol className={styles.crumbList}>
         <li>
-          <a href="#/prototypes" className={styles.crumbLink} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <a href="#/prototypes" className={styles.crumbLink} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s0)' }}>
             <Icon n="back" sw={2.2} style={{ width: 14, height: 14 }} />
             Prototypes
           </a>
@@ -58,7 +58,7 @@ export function Detail({ id }) {
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('detail', v), [setSeg])} />
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s4)', minWidth: 0 }}>
+        <div className={ui.rail} style={{ minWidth: 0 }}>
           <Preview id={p.id} />
           <Panel title="Captured versions" count={`${VERSIONS.length} iterations`}>
             <div className={styles.versions}>{VERSIONS.map((v, i) => {

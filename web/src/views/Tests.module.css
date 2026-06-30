@@ -45,9 +45,9 @@
   grid-template-columns: 1.5fr .8fr 1.6fr 108px;
   gap: var(--s3);
   align-items: center;
-  padding: 12px var(--s3);
+  padding: var(--s2) var(--s3);
   font-size: var(--fs-md);
-  transition: background 0.2s ease;
+  transition: background var(--dur) ease;
 }
 .trow:nth-child(even):not(.head) {
   background: rgba(255, 255, 255, 0.015);
@@ -65,7 +65,7 @@
   text-transform: uppercase;
   letter-spacing: .08em;
   font-weight: 600;
-  padding: 11px var(--s3);
+  padding: var(--s2) var(--s3);
 }
 .trow.head:hover {
   background: none;
@@ -95,7 +95,7 @@
   height: 100%;
   background: var(--ok);
   border-radius: var(--r-xs);
-  transition: width 0.3s var(--ease);
+  transition: width var(--dur-md) var(--ease);
 }
 .ratio span.part {
   background: var(--bad);

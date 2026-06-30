@@ -86,6 +86,7 @@
   70%  { box-shadow: 0 0 0 8px rgba(var(--accent-rgb), 0); }
   100% { box-shadow: 0 0 0 0   rgba(var(--accent-rgb), 0); }
 }
+@media (prefers-reduced-motion: reduce) { .liveDot { animation: none; } }
 
 .meta {
   padding: var(--s2) var(--s3) var(--s3);
