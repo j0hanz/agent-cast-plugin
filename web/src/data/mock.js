@@ -88,16 +88,13 @@ export const MCP_CALLS = [
 
 // Switches were removed (along with their labels) — nothing here is actually
 // configurable, so showing disabled toggles implying otherwise was dishonest.
-// Only facts that are actually true today are listed.
+// One card, not three near-empty ones — these are five flat facts with no
+// functional distinction between them now that none are toggleable.
 export const SETTINGS = [
-  { group: 'Capture', items: [
+  { group: 'Environment', items: [
     { k: 'Default viewport', v: '1440 × 900' },
     { k: 'Image format', v: 'PNG' },
-  ] },
-  { group: 'Sandbox', items: [
     { k: 'Dev server port', v: ':5173' },
-  ] },
-  { group: 'Appearance', items: [
     { k: 'Theme', v: 'Graphite' },
     { k: 'Accent', v: 'Amber' },
   ] },
