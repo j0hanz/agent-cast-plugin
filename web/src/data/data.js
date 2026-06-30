@@ -18,6 +18,9 @@ export const {
 
 export const cap = s => s ? s[0].toUpperCase() + s.slice(1) : '';
 export const deviceIcon = d => (d === 'Mobile' ? 'mobile' : 'monitor');
+// Captures live in web/public/screenshots/ (gitignored, served by Vite as static
+// files) — write one there with this exact name and it renders, nothing to register.
+export const screenshotSrc = (protoId, ver) => `/screenshots/${protoId}-${ver}.png`;
 export const STATUS_OF = { All: null, Live: 'live', Drafts: 'draft', Passed: 'passed', Failed: 'failed' };
 export const VIEWPORTS = { Desktop: '1440×900', Tablet: '834×1112', Mobile: '390×844' };
 

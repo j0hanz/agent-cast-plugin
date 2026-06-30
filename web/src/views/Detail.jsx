@@ -60,7 +60,7 @@ export function Detail({ id }) {
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>
         <div className={ui.rail} style={{ minWidth: 0 }}>
-          <Preview id={p.id} />
+          <Preview id={p.id} ver={VERSIONS[VERSIONS.length - 1]} />
           <Panel title="Captured versions" count={`${VERSIONS.length} iterations`}>
             <div className={styles.versions}>{VERSIONS.map((v, i) => {
               const curr = i === VERSIONS.length - 1;

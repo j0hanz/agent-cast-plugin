@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { Toggle } from '@base-ui/react/toggle';
 import { Input } from '@base-ui/react/input';
 import { Icon } from './icons.jsx';
+import { screenshotSrc } from '../data/data.js';
 import styles from './ui.module.css';
 
 // Assumes well-formed, non-nested, alternating <b>/</b> pairs — not an HTML parser.
@@ -45,25 +46,34 @@ export const Panel = memo(({ title, count, children, className, style }) =>
   </div>
 );
 
-export const Preview = memo(({ id }) => (
-  <div className={styles.preview}>
-    <div className={styles.chrome}>
-      <div className={styles.dots}><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /></div>
-      <div className={styles.url}>localhost:5173 / {id}</div>
-      <div className={styles.viewportIndicator}><span className={styles.recDot} aria-hidden="true" />Capture region</div>
+export const Preview = memo(({ id, ver }) => {
+  const [broken, setBroken] = useState(false);
+  const showImg = Boolean(ver) && !broken;
+  return (
+    <div className={styles.preview}>
+      <div className={styles.chrome}>
+        <div className={styles.dots}><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /></div>
+        <div className={styles.url}>localhost:5173 / {id}</div>
+        <div className={styles.viewportIndicator}><span className={styles.recDot} aria-hidden="true" />Capture region</div>
+      </div>
+      <div className={styles.shot}>
+        {showImg && (
+          <img className={styles.shotImg} src={screenshotSrc(id, ver)} alt={`${id} screenshot preview`} onError={() => setBroken(true)} />
+        )}
+        <div className={styles.cropLT} aria-hidden="true"></div>
+        <div className={styles.cropRT} aria-hidden="true"></div>
+        <div className={styles.cropLB} aria-hidden="true"></div>
+        <div className={styles.cropRB} aria-hidden="true"></div>
+        <div className={styles.crosshair} aria-hidden="true"></div>
+        <div className={styles.gridOverlay} aria-hidden="true"></div>
+        {!showImg && <>
+          <Icon n="monitor" sw={1.4} />
+          <span className={styles.calibrationText}>Screenshot preview</span>
+        </>}
+      </div>
     </div>
-    <div className={styles.shot}>
-      <div className={styles.cropLT} aria-hidden="true"></div>
-      <div className={styles.cropRT} aria-hidden="true"></div>
-      <div className={styles.cropLB} aria-hidden="true"></div>
-      <div className={styles.cropRB} aria-hidden="true"></div>
-      <div className={styles.crosshair} aria-hidden="true"></div>
-      <div className={styles.gridOverlay} aria-hidden="true"></div>
-      <Icon n="monitor" sw={1.4} />
-      <span className={styles.calibrationText}>Screenshot preview</span>
-    </div>
-  </div>
-));
+  );
+});
 
 export const EmptyState = memo(({ icon = 'search', title = 'No results found', description = 'Try adjusting your filters.' }) => (
   <div className={styles.empty}>

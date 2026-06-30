@@ -1,9 +1,9 @@
-import { memo, useMemo, useCallback } from 'react';
+import { memo, useMemo, useCallback, useState } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
 import { AgentPill, Chips, SearchBox, EmptyState } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { cap, deviceIcon, filterPrototypes, filterScreenshots, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
+import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
 import styles from './Prototypes.module.css';
 import ui from '../components/ui.module.css';
 
@@ -17,13 +17,20 @@ const PrototypeCard = memo(({ p }) => (
 ));
 
 // ---- Screenshot card (inlined from Screenshots view) ----
-const ScreenshotCard = memo(({ s }) => (
-  <a className={styles.sc} href={'#/prototype/' + s.protoId}>
-    <div className={styles.sthumb}><Icon n={s.kind === 'mobile' ? 'mobile' : 'monitor'} sw={1.5} /></div>
-    <div className={styles.smeta}><div className={styles.sname}>{s.proto}</div>
-      <div className={styles.srow}><span className={`${styles.tag} ${s.stage === 'critique' ? styles.crit : ''}`}>{s.stage}</span><span>{s.ver} · {s.time}</span></div></div>
-  </a>
-));
+const ScreenshotCard = memo(({ s }) => {
+  const [broken, setBroken] = useState(false);
+  return (
+    <a className={styles.sc} href={'#/prototype/' + s.protoId}>
+      <div className={styles.sthumb}>
+        {broken
+          ? <Icon n={s.kind === 'mobile' ? 'mobile' : 'monitor'} sw={1.5} />
+          : <img className={ui.shotImg} src={screenshotSrc(s.protoId, s.ver)} alt={`${s.proto} — ${s.stage} capture, ${s.ver}`} onError={() => setBroken(true)} />}
+      </div>
+      <div className={styles.smeta}><div className={styles.sname}>{s.proto}</div>
+        <div className={styles.srow}><span className={`${styles.tag} ${s.stage === 'critique' ? styles.crit : ''}`}>{s.stage}</span><span>{s.ver} · {s.time}</span></div></div>
+    </a>
+  );
+});
 
 // ---- Sub-tab switcher ----
 const SubTabs = memo(({ active, onChange }) => (

@@ -252,6 +252,15 @@
   z-index: 2;
 }
 
+/* Real capture, filling the frame behind the viewfinder chrome */
+.shotImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ---------- interactive lift (composed by Prototypes .card / Screenshots .sc) ---------- */
 .lift:hover {
   border-color: var(--accent);
@@ -287,6 +296,7 @@
   opacity: 0.4;
   pointer-events: none;
   transition: all var(--dur-md) var(--ease);
+  z-index: 1; /* stay above .shotImg regardless of DOM order */
 }
 .thumbBracket::before {
   top: 12px; left: 12px;

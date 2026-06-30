@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { SESSION, LOG, AGENT } from '../data/data.js';
+import { SESSION, LOG, AGENT, VERSIONS } from '../data/data.js';
 import ui from '../components/ui.module.css';
 
 const LogRow = memo(({ l }) => (
@@ -22,7 +22,7 @@ export function Sandbox() {
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>
-        <Preview id="landing-hero" />
+        <Preview id="landing-hero" ver={VERSIONS[VERSIONS.length - 1]} />
         <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 'var(--s4)' }}>
           <Panel title="Session">
             {SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>)}
