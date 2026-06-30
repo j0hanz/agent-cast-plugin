@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/log-session.mjs",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/log-session.sh",
             "timeout": 10
           }
         ]
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/log-mcp-call.mjs",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/log-mcp-call.sh",
             "timeout": 10
           }
         ]
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/update-state.mjs",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/update-state.sh",
             "timeout": 10
           }
         ]
