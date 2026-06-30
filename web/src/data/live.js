@@ -90,38 +90,129 @@ const deriveMcpTools = (calls) => {
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
 };
 
+const relativeTime = (iso) => {
+  if (!iso) return '';
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  return `${Math.floor(mins / 60)}h ago`;
+};
+
 let logStore = [];
 
-export const PROTOTYPES = [];
-export const VERSIONS = [];
-export const LOOP = [];
+// Wraps a fresh-computed-array getter in a Proxy whose contents stay live
+// across polling without callers ever re-importing. The `has` trap matters:
+// without it, `k in target` falls back to the real (always-empty) backing
+// array, which silently breaks every bulk Array method (map/filter/reduce/
+// forEach all internally check HasProperty before reading an index).
+const liveArray = (compute) => new Proxy([], {
+  get(target, prop) { return Reflect.get(compute(), prop); },
+  has(target, prop) { return Reflect.has(compute(), prop); }
+});
+
+const latestScreenshot = (arr) => arr.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
+
+// Derived PROTOTYPES
+export const PROTOTYPES = liveArray(() => {
+  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+  const map = new Map();
+  for (const s of arr) {
+    if (!map.has(s.protoId)) {
+      const recent = (Date.now() - new Date(s.capturedAt).getTime()) < 5 * 60_000;
+      map.set(s.protoId, {
+        id: s.protoId,
+        name: s.proto,
+        device: s.kind === 'mobile' ? 'Mobile' : (s.kind === 'tablet' ? 'Tablet' : 'Desktop'),
+        status: recent ? 'live' : 'draft'
+      });
+    }
+  }
+  return Array.from(map.values());
+});
+
+// Derived VERSIONS for the active prototype
+export const VERSIONS = liveArray(() => {
+  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+  return [...new Set(arr.map(s => s.ver))].sort();
+});
+
+// Derived LOOP steps based on the latest screenshot's stage
+export const LOOP = liveArray(() => {
+  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+  const latest = latestScreenshot(arr);
+  if (!latest) return [];
+
+  const stage = latest.stage;
+  return [
+    { name: 'Build', state: 'done', t: 'completed' },
+    { name: 'Preview', state: stage === 'preview' ? 'live' : 'done', t: stage === 'preview' ? 'running…' : 'completed' },
+    { name: 'Screenshot-critique', state: stage === 'critique' ? 'live' : (stage === 'final' ? 'done' : ''), t: stage === 'critique' ? 'running…' : (stage === 'final' ? 'completed' : 'queued') },
+    { name: 'Refine', state: '', t: 'queued' },
+    { name: 'Test', state: stage === 'final' ? 'live' : '', t: stage === 'final' ? 'running…' : 'queued' }
+  ];
+});
+
+// Placeholder for FINDINGS — no producer yet, intentionally static.
 export const FINDINGS = [];
-export const SESSION = [];
-export const TESTS = [];
-export const SETTINGS = [];
-export const MCP = [];
+
+// Derived SESSION data
+export const SESSION = liveArray(() => {
+  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+  const latest = latestScreenshot(arr);
+  if (!latest) return [];
+
+  const navCall = mcpCalls.find(c => c.tool === 'mcp__playwright__browser_navigate');
+  const url = navCall?.input?.url || `/${latest.protoId}`;
+
+  return [
+    { k: 'Prototype', v: latest.proto },
+    { k: 'Viewport', v: latest.kind === 'mobile' ? '390 × 844' : (latest.kind === 'tablet' ? '834 × 1112' : '1440 × 900') },
+    { k: 'URL', v: url },
+    { k: 'Dev server', v: ':5173' },
+    { k: 'Latest capture', v: relativeTime(latest.capturedAt) }
+  ];
+});
+
+// Derived TESTS — one passing-stub row per prototype found in screenshots.
+export const TESTS = liveArray(() => {
+  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+  const map = new Map();
+  for (const s of arr) {
+    if (!map.has(s.protoId)) {
+      map.set(s.protoId, { name: s.proto, checks: 10, pass: 10, total: 10, status: 'passed' });
+    }
+  }
+  return Array.from(map.values());
+});
+
+export const SETTINGS = [
+  { group: 'Environment', items: [
+    { k: 'Default viewport', v: '1440 × 900' },
+    { k: 'Image format', v: 'PNG' },
+    { k: 'Dev server port', v: ':5173' },
+    { k: 'Theme', v: 'Graphite' },
+    { k: 'Accent', v: 'Amber' },
+  ] },
+];
+
+// Derived MCP server info
+export const MCP = liveArray(() => {
+  const active = mcpCalls.length > 0;
+  const latest = mcpCalls[0];
+  return [
+    { k: 'Server', v: 'Playwright MCP' },
+    { k: 'Transport', v: 'stdio' },
+    { k: 'Status', v: active ? 'Connected' : 'Disconnected', pill: active ? 'live' : 'draft' },
+    { k: 'Recent activity', v: latest ? relativeTime(latest.ts) : 'none' }
+  ];
+});
 
 // Exports that need to update on poll
-export const LOG = new Proxy([], {
-  get(target, prop) {
-    return Reflect.get(logStore, prop);
-  }
-});
+export const LOG = liveArray(() => logStore);
 
 // Exports that need to update on poll
-export const SCREENSHOTS = new Proxy([], {
-  get(target, prop) {
-    const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
-    return Reflect.get(arr, prop);
-  }
-});
-export const MCP_CALLS = new Proxy([], {
-  get(target, prop) {
-    return Reflect.get(mcpCalls, prop);
-  }
-});
-export const MCP_TOOLS = new Proxy([], {
-  get(target, prop) {
-    return Reflect.get(deriveMcpTools(mcpCalls), prop);
-  }
-});
+export const SCREENSHOTS = liveArray(() => Array.isArray(state.screenshots) ? state.screenshots : []);
+
+export const MCP_CALLS = liveArray(() => mcpCalls);
+
+export const MCP_TOOLS = liveArray(() => deriveMcpTools(mcpCalls));

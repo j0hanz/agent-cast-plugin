@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { SESSION, LOG, AGENT, VERSIONS } from '../data/data.js';
+import { SESSION, LOG, AGENT, VERSIONS, SCREENSHOTS, latestScreenshot } from '../data/data.js';
 import ui from '../components/ui.module.css';
 
 const LogRow = memo(({ l }) => (
@@ -16,13 +16,20 @@ export function Sandbox() {
   const dev = useUI(s => s.seg.sandbox) || 'Desktop';
   const setSeg = useUI(s => s.setSeg);
   const top = <>Sandbox<div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
+
+  // Resolve active prototype/version by capturedAt, not array position —
+  // screenshot order isn't guaranteed chronological.
+  const latest = latestScreenshot(SCREENSHOTS);
+  const activeProtoId = latest?.protoId || 'landing-hero';
+  const activeVer = latest?.ver || 'v1';
+
   return (
     <Main topbar={top}>
       <div className={ui.dhead}><h1>Live sandbox</h1><span className={`${ui.pill} ${ui.live}`}>Running</span><div className="grow" />
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>
-        <Preview id="landing-hero" ver={VERSIONS[VERSIONS.length - 1]} />
+        <Preview id={activeProtoId} ver={activeVer} />
         <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 'var(--s4)' }}>
           <Panel title="Session">
             {SESSION.length ? SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>) : <EmptyState icon="sandbox" title="No session data" description="The session hasn't started or no data was captured." />}

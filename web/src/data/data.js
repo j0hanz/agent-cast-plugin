@@ -38,8 +38,12 @@ export const relativeTime = (iso) => {
 // get stuck stale. Derive it from the most recent real capture instead:
 // can't drift because nothing has to remember to reset it.
 const AGENT_FRESH_MS = 5 * 60_000;
+// Position-based shortcuts (SCREENSHOTS[0]/.at(-1)) are wrong — array order
+// isn't guaranteed chronological, so "latest" must compare capturedAt.
+export const latestScreenshot = (screenshots) =>
+  screenshots.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
 export const deriveAgent = (screenshots) => {
-  const latest = screenshots.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
+  const latest = latestScreenshot(screenshots);
   const fresh = latest?.capturedAt && (Date.now() - new Date(latest.capturedAt).getTime() < AGENT_FRESH_MS);
   return fresh ? { running: true, stage: latest.stage } : { running: false, stage: '' };
 };
@@ -71,8 +75,8 @@ export const filterScreenshots = (filter = 'All', query = '') => {
   return SCREENSHOTS.filter(s => (filter === 'All' || s.proto === filter) && (!q || s.proto.toLowerCase().includes(q)));
 };
 // M2: derived from data so filter stays in sync when prototypes are renamed.
+const screenshotProtos = () => ['All', ...new Set(SCREENSHOTS.map(s => s.proto))];
 export const SCREENSHOT_PROTOS = new Proxy([], {
-  get(target, prop) {
-    return Reflect.get(['All', ...new Set(SCREENSHOTS.map(s => s.proto))], prop);
-  }
+  get(target, prop) { return Reflect.get(screenshotProtos(), prop); },
+  has(target, prop) { return Reflect.has(screenshotProtos(), prop); }
 });
