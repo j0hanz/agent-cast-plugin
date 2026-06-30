@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Switch } from '@base-ui/react/switch';
 import { Main } from '../layout/Shell.jsx';
 import { AgentPill, EmptyState, Panel } from '../components/ui.jsx';
 import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT, relativeTime } from '../data/data.js';
@@ -36,35 +35,19 @@ const McpStatRow = memo(({ s }) => (
 ));
 
 // ---- Settings rows ----
-const SettingItem = memo(({ it, groupId }) => {
-  const descId = `${groupId}-readonly-note`;
-  const isToggle = 'on' in it;
-  return (
-    <div className={ui.kv} style={isToggle ? { opacity: 0.65 } : undefined}>
-      <span className={ui.k}>{it.k}</span>
-      {isToggle
-        ? <Switch.Root className={ui.switch} checked={it.on} disabled readOnly aria-describedby={descId}>
-            <Switch.Thumb className={ui.switchThumb} />
-          </Switch.Root>
-        : <span className={ui.v}>{it.v}</span>}
-    </div>
-  );
-});
+// No toggles here — nothing in this panel is actually configurable yet.
+const SettingItem = memo(({ it }) => (
+  <div className={ui.kv}>
+    <span className={ui.k}>{it.k}</span>
+    <span className={ui.v}>{it.v}</span>
+  </div>
+));
 
-const SettingGroup = memo(({ g }) => {
-  const groupId = g.group.toLowerCase().replace(/\s+/g, '-');
-  const descId = `${groupId}-readonly-note`;
-  return (
-    <Panel title={g.group}>
-      {g.items.map(it => <SettingItem key={it.k} it={it} groupId={groupId} />)}
-      {g.items.some(it => 'on' in it)
-        ? <p id={descId} className={styles.note}>
-            Managed by the plugin — change in Claude Code settings.
-          </p>
-        : null}
-    </Panel>
-  );
-});
+const SettingGroup = memo(({ g }) => (
+  <Panel title={g.group}>
+    {g.items.map(it => <SettingItem key={it.k} it={it} />)}
+  </Panel>
+));
 
 // ---- Root view ----
 export function System() {

@@ -488,41 +488,6 @@
 .draft::before { background: var(--mut); }
 .draft { color: var(--dim); background: var(--surface-2); } /* idle, not a warning — keeps amber reserved for live */
 
-/* ---------- switch (System on/off) ---------- */
-.switch {
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
-  background: var(--surface-2);
-  border: 0;
-  position: relative;
-  flex: none;
-  padding: 0;
-  cursor: pointer;
-  transition: all var(--dur) var(--ease);
-}
-.switch[data-checked] {
-  background: var(--accent-soft);
-}
-.switch[data-disabled] {
-  opacity: .5;
-  cursor: not-allowed;
-}
-.switchThumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--dim);
-  transition: transform var(--dur) var(--ease), background 0.2s ease;
-}
-.switch[data-checked] .switchThumb {
-  transform: translateX(16px);
-  background: var(--accent);
-}
-
 /* ---------- key/value row (Sandbox/System) ---------- */
 .kv {
   display: flex;

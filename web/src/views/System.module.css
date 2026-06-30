@@ -16,12 +16,3 @@
 .span2 {
   grid-column: 1 / -1;
 }
-
-/* ---- footnote on managed settings ---- */
-.note {
-  font-size: var(--fs-xs);
-  color: var(--mut);
-  margin-top: var(--s2);
-  font-family: var(--font-body);
-  line-height: 1.5;
-}

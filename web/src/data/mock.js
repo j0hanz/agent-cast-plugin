@@ -86,20 +86,16 @@ export const MCP_CALLS = [
   { ts: ago(3), tool: 'browser_snapshot', input: {} },
 ];
 
+// Switches were removed (along with their labels) — nothing here is actually
+// configurable, so showing disabled toggles implying otherwise was dishonest.
+// Only facts that are actually true today are listed.
 export const SETTINGS = [
   { group: 'Capture', items: [
     { k: 'Default viewport', v: '1440 × 900' },
     { k: 'Image format', v: 'PNG' },
-    { k: 'Full-page capture', on: false },
-  ] },
-  { group: 'Loop', items: [
-    { k: 'Auto-refine on critique', on: true },
-    { k: 'Stop after', v: '4 iterations' },
-    { k: 'Run tests after refine', on: true },
   ] },
   { group: 'Sandbox', items: [
     { k: 'Dev server port', v: ':5173' },
-    { k: 'Reuse browser session', on: true },
   ] },
   { group: 'Appearance', items: [
     { k: 'Theme', v: 'Graphite' },
