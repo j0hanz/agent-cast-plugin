@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Switch } from '@base-ui/react/switch';
 import { Main } from '../layout/Shell.jsx';
-import { AgentPill, Panel, RichText } from '../components/ui.jsx';
+import { AgentPill, EmptyState, Panel, RichText } from '../components/ui.jsx';
 import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT } from '../data/data.js';
 import ui from '../components/ui.module.css';
 import styles from './System.module.css';
@@ -95,7 +95,7 @@ export function System() {
 
         {/* Recent calls spans both columns */}
         <Panel title="Recent calls" className={styles.span2}>
-          {MCP_CALLS.map(c => <McpCallRow key={c.id} c={c} />)}
+          {MCP_CALLS.length ? MCP_CALLS.map(c => <McpCallRow key={c.id} c={c} />) : <EmptyState icon="search" title="No recent calls" description="No MCP calls have been made yet." />}
         </Panel>
       </div>
     </Main>

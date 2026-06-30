@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.jsx';
-import { AgentPill, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
+import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
 import { SESSION, LOG, AGENT } from '../data/data.js';
 import ui from '../components/ui.module.css';
@@ -28,7 +28,7 @@ export function Sandbox() {
             {SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>)}
           </Panel>
           <Panel title="Live log" style={{ overflow: 'hidden' }}>
-            {LOG.map(l => <LogRow key={l.id} l={l} />)}
+            {LOG.length ? LOG.map(l => <LogRow key={l.id} l={l} />) : <EmptyState icon="search" title="No log entries" description="Nothing has happened in this session yet." />}
           </Panel>
         </div>
       </div>

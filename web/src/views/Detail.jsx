@@ -27,6 +27,7 @@ const FindingRow = memo(({ f }) => (
 export function Detail({ id }) {
   const segDetail = useUI(s => s.seg.detail);
   const setSeg = useUI(s => s.setSeg);
+  const handleDevChange = useCallback(v => setSeg('detail', v), [setSeg]);
   const p = PROTOTYPES.find(x => x.id === id);
   if (!p) {
     return (
@@ -55,7 +56,7 @@ export function Detail({ id }) {
     <Main topbar={top}>
       <div className={ui.dhead}>{p.name}<span className={`${ui.pill} ${ui[p.status]}`}>{cap(p.status)}</span>
         <span className={ui.dmeta}>{dev} · {VIEWPORTS[dev]}</span><div className="grow" />
-        <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('detail', v), [setSeg])} />
+        <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={handleDevChange} />
       </div>
       <div className={ui.cols} style={{ alignItems: 'stretch' }}>
         <div className={ui.rail} style={{ minWidth: 0 }}>
@@ -72,7 +73,7 @@ export function Detail({ id }) {
             <div className={styles.vstep}>{LOOP.map(s => <StepRow key={s.name} s={s} />)}</div>
           </Panel>
           <Panel title="Critique findings" count={`${FINDINGS.length} open`} style={{ overflow: 'hidden' }}>
-            {FINDINGS.map(f => <FindingRow key={f.loc} f={f} />)}
+            {FINDINGS.length ? FINDINGS.map(f => <FindingRow key={f.loc} f={f} />) : <EmptyState icon="search" title="No findings" description="This prototype has no open critique findings." />}
           </Panel>
         </div>
       </div>
