@@ -1,7 +1,4 @@
 import { memo, useState } from 'react';
-import { ToggleGroup } from '@base-ui/react/toggle-group';
-import { Toggle } from '@base-ui/react/toggle';
-import { Input } from '@base-ui/react/input';
 import { Icon } from './icons.jsx';
 import { screenshotSrc } from '../data/data.js';
 import styles from './ui.module.css';
@@ -21,13 +18,23 @@ export const AgentPill = memo(({ running, stage }) => running ? (
 
 
 
-// ponytail: ToggleGroup is always-array, even in single-select mode, and
-// clicking the active item emits [] (deselect). Seg/Chips are segmented
-// controls — one option is always on — so an empty next value is ignored.
+// ponytail: Native single-select segmented control. One option is always on,
+// matching the behavior of the original ToggleGroup control.
 const SingleToggle = ({ opts, value, onChange, className, itemClass, ariaLabel }) => (
-  <ToggleGroup className={className} value={[value]} onValueChange={next => next.length && onChange(next[0])} aria-label={ariaLabel}>
-    {opts.map(o => <Toggle key={o} value={o} className={itemClass}>{o}</Toggle>)}
-  </ToggleGroup>
+  <div className={className} role="radiogroup" aria-label={ariaLabel}>
+    {opts.map(o => (
+      <button
+        key={o}
+        type="button"
+        role="radio"
+        aria-checked={value === o}
+        className={itemClass}
+        onClick={() => onChange(o)}
+      >
+        {o}
+      </button>
+    ))}
+  </div>
 );
 
 export const Seg = memo(p => <SingleToggle {...p} className={styles.seg} ariaLabel={p['aria-label'] || "Select viewport"} />);
@@ -35,7 +42,7 @@ export const Chips = memo(p => <SingleToggle {...p} opts={p.labels} className={s
 
 export const SearchBox = memo(({ value, onChange, placeholder = "Search…" }) => (
   <div className={styles.search}><Icon n="search" sw={2} />
-    <Input placeholder={placeholder} aria-label="Search" value={value} onValueChange={onChange} />
+    <input placeholder={placeholder} aria-label="Search" value={value} onChange={e => onChange(e.target.value)} />
   </div>
 ));
 

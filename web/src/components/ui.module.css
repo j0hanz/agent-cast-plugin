@@ -412,7 +412,7 @@
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
-.seg button[data-pressed] {
+.seg button[aria-checked="true"] {
   background: var(--accent);
   color: var(--bg);
   box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.35);
@@ -452,7 +452,7 @@
 .chip:active {
   transform: translateY(0) scale(0.96);
 }
-.chip[data-pressed] {
+.chip[aria-checked="true"] {
   background: var(--accent-soft);
   color: var(--accent-text);
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), .12);
