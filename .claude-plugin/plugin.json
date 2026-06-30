@@ -1,0 +1,6 @@
+{
+  "name": "agent-cast",
+  "version": "0.1.0",
+  "description": "Closed-loop frontend workflow for Claude Code: build, preview, screenshot-critique, refine, and test UIs via a bundled agent-browser MCP server.",
+  "author": "golfarenlj@gmail.com"
+}

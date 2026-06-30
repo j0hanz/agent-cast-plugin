@@ -1,0 +1,27 @@
+/* ---- single unified 2-column grid ---- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s3);
+  align-items: stretch;
+}
+
+@media (max-width: 47.5em) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Recent calls spans both columns */
+.span2 {
+  grid-column: 1 / -1;
+}
+
+/* ---- footnote on managed settings ---- */
+.note {
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  margin-top: var(--s2);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}

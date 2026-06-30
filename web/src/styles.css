@@ -1,0 +1,117 @@
+/* AgentCast control center — global: design tokens, reset, true app-wide chrome.
+   Everything component/view-specific lives in colocated *.module.css files —
+   see src/components/ui.module.css for the "used by 2+ files" shared primitives. */
+:root{
+  /* ---- color: neutral graphite chrome, amber phosphor reserved for the live signal + viewfinder reticle ---- */
+  --bg:#0b0c0d; --surface:#15171a; --surface-2:#1e2125;
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.12); /* structural lines stay neutral so amber reads as "live" */
+  --text:#f4f6f7; --dim:#c8cdd2; --mut:#969ca6; /* WCAG AA: >=4.5:1 on --surface (mut ~7:1) */
+  --accent:#f5a524; --accent-text:#f8c069; --accent-soft:rgba(var(--accent-rgb),.08);
+  --ok:#34d399; --warn:#fb923c; --bad:#f87171; /* warn shifted to orange so it never reads as the amber live-accent */
+  /* rgb channels — for rgba() tints derived from the colors above */
+  --accent-rgb:245, 165, 36; --bg-rgb:11, 12, 13;
+  --ok-rgb:52, 211, 153; --warn-rgb:251, 146, 60; --bad-rgb:248, 113, 113;
+  /* ---- type families ---- */
+  --font-display:"Space Grotesk",sans-serif; /* headings, labels, chrome */
+  --font-body:"IBM Plex Sans",system-ui,sans-serif; /* prose */
+  --font-mono:"JetBrains Mono",monospace; /* readouts, timestamps, code */
+  /* ---- type scale: every text size in the app maps to one of these ---- */
+  --fs-2xs:.625rem;   /* 10px — micro labels, calibration */
+  --fs-xs:.6875rem;   /* 11px — readouts, timestamps, locs */
+  --fs-sm:.75rem;     /* 12px — chips, pills, meta */
+  --fs-md:.8125rem;   /* 13px — default UI text */
+  --fs-base:.875rem;  /* 14px — body root, card titles */
+  --fs-lg:.9375rem;   /* 15px — brand wordmark */
+  --fs-xl:1.05rem;    /* 17px — h3, empty-state heading */
+  --fs-2xl:1.75rem;   /* 28px — stat value */
+  --fs-3xl:2.25rem;   /* 36px — critical stat value */
+  --fs-h1:clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+  --fs-h2:clamp(1.2rem, 1.8vw + 0.4rem, 1.45rem); /* also used by in-page .dhead headers */
+  /* ---- radius ---- */
+  --r-xs:4px; --r-sm:6px; --r:10px; --r-lg:16px;
+  /* ---- space: 4px scale — all gap/padding/margin map to these ---- */
+  --s0:4px; --s1:8px; --s2:12px; --s3:16px; --s4:24px; --s5:32px;
+  /* ---- sizing: control row height + icon scale ---- */
+  --h-control:36px;   /* search / agent pill / back button row */
+  --icon-sm:16px;     /* nav, search, back, brand mark */
+  --icon-lg:28px;     /* card thumbnail glyph */
+  --icon-xl:40px;     /* screenshot reticle glyph */
+  --dot:8px;          /* every status / pulse dot */
+  /* ---- motion: one easing curve + two durations for the whole app ---- */
+  --ease:cubic-bezier(0.16,1,0.3,1); --dur:.2s; --dur-md:.24s;
+  /* ---- elevation ---- */
+  --shadow-inset:inset 0 1px 0 rgba(255,255,255,.02); /* top hairline on raised chrome */
+  /* ---- z-index scale — no magic numbers ---- */
+  --z-nav:10; --z-skip:60;
+  --thumb:var(--surface-2);
+}
+:root{color-scheme:dark;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-body);
+  background-color:var(--bg);
+  background-image: radial-gradient(at 0% 0%, rgba(var(--accent-rgb), 0.04) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, rgba(var(--accent-rgb), 0.02) 0px, transparent 50%);
+  background-attachment: fixed;
+  color:var(--text);
+  font-size:var(--fs-base);line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+#root{height:100%;}
+svg{display:block;} a{color:inherit;text-decoration:none;}
+h1, h2, h3{font-family:var(--font-display);font-weight:700;letter-spacing:-0.02em;text-wrap:balance;}
+h1{font-size:var(--fs-h1);line-height:1.2;letter-spacing:-0.03em;}
+h2{font-size:var(--fs-h2);line-height:1.25;letter-spacing:-0.02em;}
+h3{font-size:var(--fs-xl);line-height:1.3;}
+
+/* --- Accessibility Utilities --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 20px;
+  background: var(--accent);
+  color: var(--bg);
+  padding: var(--s2) var(--s4);
+  border-radius: var(--r-sm);
+  z-index: var(--z-skip);
+  font-family: var(--font-display);
+  font-weight: 600;
+  transition: top var(--dur) var(--ease);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.skip-to-content:focus {
+  top: 20px;
+  outline: none;
+}
+
+.app{display:grid;grid-template-columns:232px 1fr;height:100dvh;}
+
+/* shared layout utility — used in every view topbar to push AgentPill/Avatar right,
+   and in Shell.jsx's sidebar to push status to the bottom. One rule, not two. */
+.grow{flex:1;}
+
+/* status pulse — used by both layout/Shell.jsx (sidebar status) and components/ui.jsx (AgentPill) */
+.pulse{width:var(--dot);height:var(--dot);border-radius:50%;background:var(--ok);flex:none;animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(var(--ok-rgb),.45)}70%{box-shadow:0 0 0 6px rgba(var(--ok-rgb),0)}100%{box-shadow:0 0 0 0 rgba(var(--ok-rgb),0)}}
+@media (prefers-reduced-motion: reduce){ .pulse{animation:none} }
+
+/* ---------- responsive: sidebar collapse (the .app-level part only) ---------- */
+@media (max-width:53.75em){ /* 860px -> 53.75em */
+  .app{grid-template-columns:64px 1fr;}
+}

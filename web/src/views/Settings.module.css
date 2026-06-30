@@ -1,0 +1,12 @@
+.setgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s4);
+  align-items: start;
+}
+@media(max-width: 47.5em) {
+  .setgrid {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+  }
+}
