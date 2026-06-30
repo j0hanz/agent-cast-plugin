@@ -17,5 +17,5 @@ const subscribe = (l) => { listeners.add(l); return () => listeners.delete(l); }
 const getSnapshot = () => state;
 
 export function useUI(selector) {
-  return selector(useSyncExternalStore(subscribe, getSnapshot));
+  return useSyncExternalStore(subscribe, () => selector(state));
 }
