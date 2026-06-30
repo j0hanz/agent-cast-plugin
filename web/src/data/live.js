@@ -19,31 +19,64 @@ const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg
 
 let state = {};
 let mcpCalls = [];
-if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
+const loadState = async () => {
+  let changed = false;
   try {
     const res = await fetch('/state.json');
-    if (res.ok) state = await res.json();
+    if (res.ok) {
+      const newState = await res.json();
+      if (Array.isArray(newState.screenshots)) {
+        state = newState;
+        changed = true;
+      }
+    }
   } catch (err) {
-    // Always taken under plain `node` (data.check.mjs) — only worth a warning
-    // when a real browser session expected a manifest and didn't get one.
     warn('live.js: no usable state.json, falling back to empty state', err);
   }
 
-  // hooks/log-mcp-call.mjs appends one JSON line per Playwright MCP call —
-  // JSONL, not a shared array, so concurrent hook processes can't race each
-  // other the way a read-modify-write of one big array would.
   try {
     const res = await fetch('/mcp-calls.jsonl');
     if (res.ok) {
-      mcpCalls = (await res.text())
+      const newCalls = (await res.text())
         .split('\n')
         .filter(Boolean)
         .flatMap(line => {
-          try { return [JSON.parse(line)]; } catch { return []; } // skip malformed lines, don't crash the module
+          try { return [JSON.parse(line)]; } catch { return []; }
         });
+      mcpCalls = newCalls;
+      changed = true;
     }
   } catch (err) {
     warn('live.js: no usable mcp-calls.jsonl, falling back to empty log', err);
+  }
+
+  try {
+    const res = await fetch('/log.jsonl');
+    if (res.ok) {
+      const newLogs = (await res.text())
+        .split('\n')
+        .filter(Boolean)
+        .flatMap(line => {
+          try { return [JSON.parse(line)]; } catch { return []; }
+        });
+      logStore = newLogs;
+      changed = true;
+    }
+  } catch (err) {
+    warn('live.js: no usable log.jsonl, falling back to empty agent log', err);
+  }
+
+  return changed;
+};
+
+if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
+  await loadState();
+  if (typeof window !== 'undefined') {
+    setInterval(async () => {
+      if (await loadState()) {
+        window.dispatchEvent(new Event('live-data-update'));
+      }
+    }, 2000);
   }
 }
 
@@ -57,15 +90,38 @@ const deriveMcpTools = (calls) => {
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
 };
 
+let logStore = [];
+
 export const PROTOTYPES = [];
 export const VERSIONS = [];
 export const LOOP = [];
 export const FINDINGS = [];
-export const SCREENSHOTS = Array.isArray(state.screenshots) ? state.screenshots : [];
 export const SESSION = [];
-export const LOG = [];
 export const TESTS = [];
-export const MCP = [];
-export const MCP_CALLS = mcpCalls;
-export const MCP_TOOLS = deriveMcpTools(mcpCalls);
 export const SETTINGS = [];
+export const MCP = [];
+
+// Exports that need to update on poll
+export const LOG = new Proxy([], {
+  get(target, prop) {
+    return Reflect.get(logStore, prop);
+  }
+});
+
+// Exports that need to update on poll
+export const SCREENSHOTS = new Proxy([], {
+  get(target, prop) {
+    const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
+    return Reflect.get(arr, prop);
+  }
+});
+export const MCP_CALLS = new Proxy([], {
+  get(target, prop) {
+    return Reflect.get(mcpCalls, prop);
+  }
+});
+export const MCP_TOOLS = new Proxy([], {
+  get(target, prop) {
+    return Reflect.get(deriveMcpTools(mcpCalls), prop);
+  }
+});

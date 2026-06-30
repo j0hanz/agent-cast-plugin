@@ -43,7 +43,11 @@ export const deriveAgent = (screenshots) => {
   const fresh = latest?.capturedAt && (Date.now() - new Date(latest.capturedAt).getTime() < AGENT_FRESH_MS);
   return fresh ? { running: true, stage: latest.stage } : { running: false, stage: '' };
 };
-export const AGENT = deriveAgent(SCREENSHOTS);
+export const AGENT = new Proxy({}, {
+  get(target, prop) {
+    return Reflect.get(deriveAgent(SCREENSHOTS), prop);
+  }
+});
 export const STATUS_OF = { All: null, Live: 'live', Drafts: 'draft', Passed: 'passed', Failed: 'failed' };
 export const VIEWPORTS = { Desktop: '1440×900', Tablet: '834×1112', Mobile: '390×844' };
 
@@ -67,4 +71,8 @@ export const filterScreenshots = (filter = 'All', query = '') => {
   return SCREENSHOTS.filter(s => (filter === 'All' || s.proto === filter) && (!q || s.proto.toLowerCase().includes(q)));
 };
 // M2: derived from data so filter stays in sync when prototypes are renamed.
-export const SCREENSHOT_PROTOS = ['All', ...new Set(SCREENSHOTS.map(s => s.proto))];
+export const SCREENSHOT_PROTOS = new Proxy([], {
+  get(target, prop) {
+    return Reflect.get(['All', ...new Set(SCREENSHOTS.map(s => s.proto))], prop);
+  }
+});
