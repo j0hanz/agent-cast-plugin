@@ -5,6 +5,7 @@ import { Input } from '@base-ui/react/input';
 import { Icon } from './icons.jsx';
 import styles from './ui.module.css';
 
+// Assumes well-formed, non-nested, alternating <b>/</b> pairs — not an HTML parser.
 export const RichText = memo(({ text = '' }) =>
   <span>{text.split(/<\/?b>/).map((part, i) => i % 2 ? <b key={i}>{part}</b> : part)}</span>
 );
@@ -66,8 +67,8 @@ export const Preview = memo(({ id }) => (
 
 export const EmptyState = memo(({ icon = 'search', title = 'No results found', description = 'Try adjusting your filters.' }) => (
   <div className={styles.empty}>
-    <div style={{ marginBottom: 12, opacity: 0.5 }}><Icon n={icon} sw={2} /></div>
+    <div style={{ marginBottom: 'var(--s2)', opacity: 0.5 }}><Icon n={icon} sw={2} /></div>
     <h3>{title}</h3>
-    <p style={{ marginTop: 4 }}>{description}</p>
+    <p style={{ marginTop: 'var(--s0)' }}>{description}</p>
   </div>
 ));
