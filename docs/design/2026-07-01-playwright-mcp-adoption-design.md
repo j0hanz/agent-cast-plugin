@@ -39,15 +39,8 @@ are installed and unused today — cheapest opportunity, zero new `--caps`.
 **Approach A — Real assertions + real config (this brief, locked, build now).**
 See the Design Brief section below.
 
-**Approach B — Console + network audit panels + highlight-annotated findings (next).**
-Capture `browser_console_messages` (error-level) and `browser_network_requests`
-(failed/4xx-5xx) at each critique step into new `console.jsonl`/`network.jsonl`,
-rendered as new Detail/System panels via the existing hook-writes-jsonl /
-panel-reads-it pattern (same shape as `findings.jsonl`/`tests.jsonl` today).
-Enable `--caps=devtools` for `browser_highlight` only, so a finding's `loc`
-selector gets a visible box drawn on the critique screenshot instead of a
-bare text string. Risk: noise — needs error/failure-level filtering so console
-warnings don't drown real findings.
+**Approach B — Console + network audit panels + highlight-annotated findings
+(locked, build next).** See the Design Brief section below.
 
 **Approach C — Full trace/video audit trail (later, biggest lift).**
 Enable `--caps=devtools` fully; record a Playwright trace
@@ -136,5 +129,144 @@ First Step: Add `--caps=testing,config` to `.mcp.json`'s playwright server
 - **User Advocate (Low, accepted):** dropping Status/Uptime from the Server
   panel removes a redundant liveness signal — `AgentPill`/`deriveAgent`
   (screenshot-timestamp-derived, see commit `c9968fd`) already covers it.
+
+**Verdict: APPROVED.**
+
+## Correction found while preparing Approach B (2026-07-01)
+
+Approach A's `parseConfig` (`web/src/data/live.ts`) assumed
+`browser_get_config`'s response was bare JSON. Reading the actual tool
+source (`microsoft/playwright`'s `tools/backend/response.ts`) showed every
+text result is wrapped in `### <Section>` markdown headers before being
+returned (`### Result\n<content>`, sometimes followed by `### Page` if the
+tab changed) — never bare text. `JSON.parse` was throwing on the header,
+silently caught by the existing try/catch, leaving the Server panel
+permanently empty in a live session. Fixed in commit `f405e17` by adding
+`extractSection(text, 'Result')`, which strips the markdown wrapper before
+parsing. Approach B's console/network capture depends on this same
+unwrapping, so the fix was made a shared helper rather than duplicated.
+
+## Design Brief — Approach B (locked, build next)
+
+Interview-resolved scope (this session): captured entries are a
+**session-wide, untagged stream** (no per-prototype correlation — console
+and network tool calls carry no protoId/ver, unlike screenshots' filename
+convention, so tagging would require fragile last-navigate inference).
+Highlight-annotation is **bundled into this phase**, which requires
+tightening `findings.jsonl`'s `loc` field to a bare CSS selector/target
+(today it mixes selector + measurement, e.g. `.btn-secondary · 3.1:1`,
+which `browser_highlight`'s `target` param can't consume directly).
+
+```
+Approach: Enable browser_console_messages(level:"error") and
+  browser_network_requests() at the critique step, deriving new "Console"
+  and "Network" System panels from their responses (already captured for
+  free by the existing wildcard mcp-calls.jsonl hook, once that hook is
+  told to also keep output for these two tools). Add --caps=devtools and
+  call browser_highlight on each open finding's loc before the critique
+  screenshot, so findings are visually boxed in the capture instead of only
+  described in text.
+
+Why: playwright-mcp's CORE tools already return console errors and failed
+  network requests for free (no --caps needed for those two) - the only
+  missing piece is capturing and rendering what's already available.
+  Highlighting closes the gap between findings.jsonl's plain-text `loc` and
+  an actual visual pointer at the flagged element, continuing Approach A's
+  "replace self-reported/decorative data with real data" principle.
+
+Scope: M - one hook edit (widen the existing output-capture allowlist from
+  browser_get_config to three tools), two new derived exports + two new
+  System panels, one --caps flag, one findings.jsonl convention change
+  (loc tightened, detail moves to text), one SKILL.md critique-step rewrite.
+  No new jsonl files - console/network entries are derived from
+  mcp-calls.jsonl the same way MCP_TOOLS/MCP already are.
+
+Constraints:
+  - Every playwright-mcp text result is markdown-wrapped in "### <Section>"
+    headers (see the correction above) - any new parsing must go through
+    the shared extractSection('Result') helper, not raw JSON.parse or raw
+    line-splitting on the unwrapped blob.
+  - browser_network_requests has no server-side status filter (unlike
+    console's `level` param) - failure detection is a regex on rendered
+    lines: `=> \[(FAILED|[45]\d\d)\]`. Default params (`static:false`)
+    already surface all failures regardless of resource type, only hiding
+    successful non-fetch/xhr assets, so no extra params are needed.
+  - browser_highlight's `target` accepts a plain CSS selector (not only a
+    snapshot ref) per playwright-mcp's own elementSchema - loc values just
+    need to stay valid, unique selectors, not human-readable compound text.
+  - Output capture for console/network calls adds one markdown blob to
+    mcp-calls.jsonl per critique-step call (not per line/event) - bounded
+    growth, same shape as Approach A's browser_get_config capture, not the
+    unbounded per-frame growth Approach C was flagged for.
+
+Interface:
+  - `.mcp.json`: --caps=testing,config,devtools.
+  - `hooks/log-mcp-call.sh`: widen the tool-name allowlist that captures
+    `output` from just browser_get_config to also
+    mcp__playwright__browser_console_messages and
+    mcp__playwright__browser_network_requests.
+  - `web/src/data/types.ts`: add ConsoleEntry {ts, text} and
+    NetworkEntry {ts, text}.
+  - `web/src/data/live.ts`: export extractSection (currently private to
+    parseConfig) for reuse; add parseConsoleEntries/parseNetworkEntries
+    that scan all mcpCalls (not just the latest, unlike parseConfig) for
+    the matching tool, extract the Result section, split lines, drop the
+    header/empty lines, and (network only) keep lines matching the failure
+    regex. Export CONSOLE/NETWORK arrays built from these.
+  - `web/src/data/mock.ts`: matching CONSOLE/NETWORK arrays (data.check.mjs
+    parity).
+  - `web/src/views/System.tsx`: two new Panels ("Console", "Network") in
+    the existing grid, same EmptyState-guarded list pattern as "Recent
+    calls" - no new component, reuse the row-rendering style already there.
+  - `skills/frontend-loop/SKILL.md` critique step (3): call
+    browser_console_messages(level:"error") and browser_network_requests()
+    right after the preview screenshot (results flow into the dashboard
+    automatically, nothing to hand-write). Before the optional
+    -critique-{ver} capture, call browser_highlight(target: <loc>) once per
+    open finding, then browser_hide_highlight() before moving to Refine.
+    loc must be a bare selector valid as a highlight target; any
+    measurement/detail (e.g. contrast ratio) goes in `text` instead.
+  - `web/src/data/mock.ts` FINDINGS: update existing entries to the
+    tightened convention (e.g. loc: '.btn-secondary', text: 'Secondary
+    button contrast below AA (3.1:1)') so mock and live agree on shape.
+
+Architecture: No new hook trigger, no new jsonl file - console/network are
+  derived views over the same mcp-calls.jsonl stream Approach A's Server
+  panel and System's existing "Recent calls"/"Exposed tools" already read,
+  parsed with the shared extractSection helper. Only the capture allowlist
+  in log-mcp-call.sh and the findings.jsonl loc convention change.
+
+Risks:
+  - Med: findings.jsonl's loc convention change is a breaking change to the
+    critique-step contract - any in-flight findings written under the old
+    mixed-text convention won't resolve as a valid highlight target. No
+    migration needed (findings are append-only and superseded per version
+    already, per findingsFor's latest-version-only read), but the SKILL.md
+    change must ship atomically with the loc-tightening instruction, not
+    partially.
+  - Low: console/network noise - level:"error" and the failure regex
+    already filter at the source, but a chatty page could still produce
+    many rows per critique step. No cap added now; revisit if it proves
+    noisy in practice.
+
+First Step: Widen hooks/log-mcp-call.sh's output-capture condition to
+  include mcp__playwright__browser_console_messages and
+  mcp__playwright__browser_network_requests alongside browser_get_config.
+```
+
+### Phase 5 persona critique (Approach B)
+
+- **Skeptic (Med, resolved):** loc tightening changes what the critique step
+  must write - flagged as a Risk above; mitigation is shipping the SKILL.md
+  instruction and the convention change together, not staggered.
+- **Constraint Guardian (none):** devtools cap adds `browser_highlight`/
+  `browser_resume`/tracing/video tools to the surface, but SKILL.md only
+  instructs highlight/hide_highlight use - no tracing or video capture is
+  wired up in this phase (that's Approach C). Read-only, no new attack
+  surface.
+- **User Advocate (Low, accepted):** a session-wide (untagged) Console/
+  Network stream can't be filtered to "just this prototype" from the
+  System view - acceptable per the locked scope decision; revisit only if
+  it proves hard to use in practice once built.
 
 **Verdict: APPROVED.**
