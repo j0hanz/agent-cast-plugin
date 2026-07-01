@@ -39,6 +39,14 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.4), var(--shadow-inset);
 }
 
+/* ---- mobile: match the ≥44px touch target given to Seg & Chip ---- */
+@media (max-width: 53.75em) {
+  .subtab {
+    min-height: 44px;
+    padding: 0 var(--s3);
+  }
+}
+
 /* ---- prototype cards grid ---- */
 .grid {
   display: grid;

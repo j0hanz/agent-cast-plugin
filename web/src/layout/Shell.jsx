@@ -6,7 +6,7 @@ import styles from './Shell.module.css';
 const NavItem = memo(({ n, active }) =>
   <a className={`${styles.item} ${n.id === active ? styles.active : ''}`} href={'#/' + n.id}
     aria-current={n.id === active ? 'page' : undefined}
-    aria-label={n.label}>
+    aria-label={n.label} title={n.label}>
     <Icon n={n.icon} /><span className={styles.lbl}>{n.label}</span>
   </a>
 );
@@ -18,7 +18,6 @@ export const Sidebar = memo(({ active }) => (
     <nav aria-label="Main navigation">
       <div className={styles.navlabel}>Workspace</div>
       {NAV.map(n => <NavItem key={n.id} n={n} active={active} />)}
-      <div className={styles.navlabel}>System</div>
       {SYSTEM.map(n => <NavItem key={n.id} n={n} active={active} />)}
     </nav>
   </aside>

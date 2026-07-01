@@ -653,3 +653,18 @@
     padding: 0 var(--s3);
   }
 }
+
+/* ---------- mobile: toolbar stacks so count doesn't strand itself
+   below a multi-row wrapped Chips block with a large empty gap ---------- */
+@media (max-width: 53.75em) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar > .grow {
+    display: none;
+  }
+  .count {
+    align-self: flex-end;
+  }
+}
