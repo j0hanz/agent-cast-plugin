@@ -44,16 +44,21 @@ if [ -n "$FILENAME" ] && [ "$FILENAME" != "null" ]; then
       --arg ts "$TS" \
       '{protoId: $protoId, proto: $proto, kind: $kind, stage: $stage, ver: $ver, capturedAt: $ts}')
       
-    # Copy/move screenshot file if it exists (Phase 2.1 - Screenshot File Pipeline)
+    # Copy the capture to the canonical served name the dashboard requests:
+    # screenshotSrc(protoId, ver) = /screenshots/{protoId}-{ver}.png. kind/stage
+    # live only in state.json (parsed above), NOT in the served filename — the
+    # <img> never asks for them, so a kind/stage-named file would 404. Normalize
+    # here so the full descriptive capture name still renders.
     SCREENSHOTS_DIR="${LOG_DIR}/screenshots"
     mkdir -p "$SCREENSHOTS_DIR"
-    
+    SERVED="${SCREENSHOTS_DIR}/${PROTO_ID}-${VER}.png"
+
     if [ -f "$FILENAME" ]; then
-      cp "$FILENAME" "${SCREENSHOTS_DIR}/${BASENAME}"
+      cp "$FILENAME" "$SERVED"
     elif [ -f "${CLAUDE_PLUGIN_ROOT:-$(pwd)}/${FILENAME}" ]; then
-      cp "${CLAUDE_PLUGIN_ROOT:-$(pwd)}/${FILENAME}" "${SCREENSHOTS_DIR}/${BASENAME}"
+      cp "${CLAUDE_PLUGIN_ROOT:-$(pwd)}/${FILENAME}" "$SERVED"
     elif [ -f "$(pwd)/${FILENAME}" ]; then
-      cp "$(pwd)/${FILENAME}" "${SCREENSHOTS_DIR}/${BASENAME}"
+      cp "$(pwd)/${FILENAME}" "$SERVED"
     fi
 
     # Acquire lock for state.json (Issue #2 - Concurrency Fix)

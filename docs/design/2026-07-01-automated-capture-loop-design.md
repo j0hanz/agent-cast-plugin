@@ -49,9 +49,10 @@ that is a platform ceiling, not a shortcut. (ponytail: skill-as-driver, upgrade
 to an external headless runner only if agent-less autonomy is ever required.)
 
 ## Scope
-M. New: `skills/frontend-loop/SKILL.md` (+ marketplace/plugin manifest wiring if
-skills aren't auto-discovered). No changes to `web/` — the dashboard already
-renders everything this produces. Explicitly deferred to their own items:
+M. New: `skills/frontend-loop/SKILL.md` — auto-discovered (like `hooks/`, no
+manifest wiring). One required hook fix: `update-state.sh` normalizes the served
+file to `{protoId}-{ver}.png` (see Constraints) — kind/stage-named captures
+otherwise 404. No changes to `web/`. Explicitly deferred to their own items:
 - **FINDINGS producer** (item B) — the critique step *runs* here but the
   dashboard's `FINDINGS` stays `[]` until B adds the `findings.jsonl` reader.
 - **TESTS producer** (item C) — same; the Test step runs but `TESTS` stays a
