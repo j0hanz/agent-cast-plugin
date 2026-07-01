@@ -258,16 +258,57 @@ export const TESTS: TestRun[] = liveArray(() => {
   }));
 });
 
-// Derived MCP server info
+// Subset of playwright-mcp's Config shape (config.d.ts) this panel reads —
+// not the full type, just the fields worth surfacing.
+interface PlaywrightMcpConfig {
+  browser?: {
+    browserName?: string;
+    launchOptions?: { headless?: boolean };
+    contextOptions?: { viewport?: { width?: number; height?: number } | null };
+  };
+  capabilities?: string[];
+  outputDir?: string;
+}
+
+const GET_CONFIG_TOOL = 'mcp__playwright__browser_get_config';
+
+// Ground-truth resolved config, from the loop's own browser_get_config call
+// (see skills/frontend-loop/SKILL.md) — not the CLI/config-file source, which
+// this dashboard has no other way to observe. Picks the true latest call by
+// timestamp, not array position (position isn't guaranteed chronological —
+// same reasoning as data.ts's latestScreenshot).
+const parseConfig = (calls: McpCall[]): PlaywrightMcpConfig | null => {
+  const call = calls.reduce<McpCall | null>((latest, c) => {
+    if (c.tool !== GET_CONFIG_TOOL || !c.output) return latest;
+    return !latest || c.ts > latest.ts ? c : latest;
+  }, null);
+  if (!call) return null;
+  try {
+    return typeof call.output === 'string'
+      ? (JSON.parse(call.output) as PlaywrightMcpConfig)
+      : (call.output as PlaywrightMcpConfig);
+  } catch {
+    return null;
+  }
+};
+
+// Derived MCP server info — full replace from browser_get_config's real
+// response; only fields the config actually reports are shown (no more
+// hand-maintained Status/Uptime — session liveness is AgentPill's job).
 export const MCP: KV[] = liveArray(() => {
-  const active = mcpCalls.length > 0;
-  const latest = mcpCalls[0];
-  return [
-    { k: 'Server', v: 'Playwright MCP' },
-    { k: 'Transport', v: 'stdio' },
-    { k: 'Status', v: active ? 'Connected' : 'Disconnected', pill: active ? 'live' : 'draft' },
-    { k: 'Recent activity', v: latest ? relativeTime(latest.ts) : 'none' },
-  ];
+  const config = parseConfig(mcpCalls);
+  if (!config) return [];
+  const rows: KV[] = [];
+  if (config.browser?.browserName) rows.push({ k: 'Browser', v: config.browser.browserName });
+  if (config.browser?.launchOptions?.headless !== undefined) {
+    rows.push({ k: 'Headless', v: config.browser.launchOptions.headless ? 'Yes' : 'No' });
+  }
+  const vp = config.browser?.contextOptions?.viewport;
+  if (vp?.width && vp?.height) rows.push({ k: 'Viewport', v: `${vp.width} × ${vp.height}` });
+  if (config.capabilities?.length)
+    rows.push({ k: 'Capabilities', v: config.capabilities.join(', ') });
+  if (config.outputDir) rows.push({ k: 'Output dir', v: config.outputDir });
+  return rows;
 });
 
 // Exports that need to update on poll

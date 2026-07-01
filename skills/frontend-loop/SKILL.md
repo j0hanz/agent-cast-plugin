@@ -16,6 +16,9 @@ convention and the capture is silently dropped or renders blank.
 - Dev server at `localhost:5173` — auto-started by AgentCast's SessionStart
   hook. If it's down, run `npm run dev -- --port 5173` in `web/`.
 - Playwright MCP server available (`mcp__playwright__*` tools).
+- Once per session, call `mcp__playwright__browser_get_config` — the hook
+  captures its response so the dashboard's System → Server panel shows the
+  real resolved config instead of sitting empty.
 
 ## Screenshot naming convention (non-negotiable)
 
@@ -62,16 +65,24 @@ For each prototype, one pass = one `ver`:
    old findings drop off automatically.
 
 4. **Refine** — apply the fixes the critique surfaced.
-5. **Test** — verify the fixes and record the run: append one JSON line to
-   `web/public/tests.jsonl` —
+5. **Test** — verify the fixes with real assertions, then record the run. For
+   each acceptance criterion (e.g. "CTA button visible", "heading text
+   correct"), call one `mcp__playwright__browser_verify_element_visible`,
+   `browser_verify_text_visible`, `browser_verify_list_visible`, or
+   `browser_verify_value` — one call per criterion, since each call asserts
+   exactly one thing and fails on its own. Catch each result individually (a
+   failed assertion doesn't stop you from running the rest) and tally
+   `pass`/`total` from what actually passed, not a self-estimate. Then append
+   one JSON line to `web/public/tests.jsonl` —
 
        {"protoId":"landing-hero","ver":"v3","name":"Landing hero","pass":9,"total":10}
 
-   `total` = checks you ran, `pass` = how many passed. The dashboard marks the
-   suite **failed** if any check failed OR any high-severity finding is open for
-   that version, else passed. When the version passes, capture a final frame as
-   `{protoId}-{kind}-final-{ver}.png` (`stage=final` advances the dashboard's
-   loop). Then bump `ver` and loop, or move to the next prototype.
+   `total` = assertions you ran, `pass` = how many actually passed. The
+   dashboard marks the suite **failed** if any check failed OR any
+   high-severity finding is open for that version, else passed. When the
+   version passes, capture a final frame as `{protoId}-{kind}-final-{ver}.png`
+   (`stage=final` advances the dashboard's loop). Then bump `ver` and loop, or
+   move to the next prototype.
 
 ## Notes
 

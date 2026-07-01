@@ -61,6 +61,9 @@ export interface McpCall {
   ts: string;
   tool: string;
   input: Record<string, unknown>;
+  // Only populated for browser_get_config (see log-mcp-call.sh) — every other
+  // tool call is input-only to keep the log from bloating on large payloads.
+  output?: unknown;
 }
 
 export interface McpTool {

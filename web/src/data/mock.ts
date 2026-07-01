@@ -141,12 +141,14 @@ export const TESTS: TestRun[] = [
   { name: 'Onboarding', checks: 12, pass: 0, total: 12, status: 'queued' },
 ];
 
+// Shaped to match live.ts's browser_get_config-derived fields exactly (full
+// replace, no hand-maintained Status/Uptime — see 2026-07-01 design brief).
 export const MCP: KV[] = [
-  { k: 'Server', v: 'Playwright MCP' },
-  { k: 'Transport', v: 'stdio' },
-  { k: 'Status', v: 'Connected', pill: 'live' },
-  { k: 'Uptime', v: '17m' },
-  { k: 'Browser', v: 'Chrome for Testing' },
+  { k: 'Browser', v: 'chromium' },
+  { k: 'Headless', v: 'No' },
+  { k: 'Viewport', v: '1440 × 900' },
+  { k: 'Capabilities', v: 'core, testing, config' },
+  { k: 'Output dir', v: '/tmp/playwright-mcp-output' },
 ];
 export const MCP_TOOLS: McpTool[] = [
   { name: 'browser_navigate', calls: 42 },
