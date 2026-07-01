@@ -23,16 +23,14 @@ assert.deepStrictEqual(
 );
 
 assert(
-  filterPrototypes('Live', '').every((p) => p.status === 'live'),
+  filterPrototypes('Live').every((p) => p.status === 'live'),
   'Live → only live',
 );
-assert(filterPrototypes('All', 'dash').length === 1, 'query "dash" → 1 match');
-assert(filterPrototypes('Live', 'pricing').length === 0, 'Live + non-live query → none');
 assert(
-  filterScreenshots('Checkout flow', '').every((s) => s.proto === 'Checkout flow'),
+  filterScreenshots('Checkout flow').every((s) => s.proto === 'Checkout flow'),
   'screenshot filter by proto',
 );
-assert(filterScreenshots('All', '').length === 8, 'no filter → all captures');
+assert(filterScreenshots('All').length === 8, 'no filter → all captures');
 
 assert(findingsFor('landing-hero').length === 3, 'mock findings for landing-hero → 3');
 assert(findingsFor('nope').length === 0, 'unknown prototype → no findings');

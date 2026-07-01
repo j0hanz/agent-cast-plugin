@@ -104,13 +104,11 @@ const SubTabs = memo(({ active, onChange }: { active: string; onChange: (t: stri
 
 export function Prototypes() {
   const filter = useUI((s) => s.filter.prototypes);
-  const query = useUI((s) => s.query.prototypes);
   const scFilter = useUI((s) => s.filter.screenshots);
-  const scQuery = useUI((s) => s.query.screenshots);
   const tab = useUI((s) => s.seg.prototypesTab ?? 'Prototypes');
 
-  const list = filterPrototypes(filter, query);
-  const scList = filterScreenshots(scFilter, scQuery);
+  const list = filterPrototypes(filter);
+  const scList = filterScreenshots(scFilter);
 
   const handleFilter = useCallback((v: string) => setFilter('prototypes', v), []);
   const handleScFilter = useCallback((v: string) => setFilter('screenshots', v), []);
@@ -170,10 +168,7 @@ export function Prototypes() {
               ))}
             </div>
           ) : (
-            <EmptyState
-              title="No captures match"
-              description="Try clearing your search or filters."
-            />
+            <EmptyState title="No captures match" description="Try clearing your filters." />
           )}
         </>
       )}

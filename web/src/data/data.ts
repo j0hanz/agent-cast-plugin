@@ -104,19 +104,12 @@ export const SYSTEM: { id: string; label: string; icon: IconName }[] = [
 ];
 
 // Pure filters — shared by the views and the node check.
-export const filterPrototypes = (filter = 'All', query = ''): typeof PROTOTYPES => {
+export const filterPrototypes = (filter = 'All'): typeof PROTOTYPES => {
   const want = STATUS_OF[filter];
-  const q = query.trim().toLowerCase();
-  return PROTOTYPES.filter(
-    (p) => (!want || p.status === want) && (!q || p.name.toLowerCase().includes(q)),
-  );
+  return PROTOTYPES.filter((p) => !want || p.status === want);
 };
-export const filterScreenshots = (filter = 'All', query = ''): typeof SCREENSHOTS => {
-  const q = query.trim().toLowerCase();
-  return SCREENSHOTS.filter(
-    (s) => (filter === 'All' || s.proto === filter) && (!q || s.proto.toLowerCase().includes(q)),
-  );
-};
+export const filterScreenshots = (filter = 'All'): typeof SCREENSHOTS =>
+  SCREENSHOTS.filter((s) => filter === 'All' || s.proto === filter);
 // Findings accumulate append-only (no "resolved" mechanism yet), so a Detail
 // page shows only the active prototype's *latest* version — a fresh critique
 // supersedes the prior one instead of piling stale findings on top. Optional

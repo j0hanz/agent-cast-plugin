@@ -2,51 +2,6 @@
    ErrorBoundary.jsx and several views that reuse these directly). */
 
 /* ---------- topbar bits ---------- */
-.search {
-  margin-left: var(--s1);
-  flex: 1;
-  max-width: 340px;
-  height: var(--h-control);
-  display: flex;
-  align-items: center;
-  gap: var(--s1);
-  padding: 0 var(--s2);
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  color: var(--mut);
-  font-size: var(--fs-md);
-  transition: all var(--dur) var(--ease);
-}
-.search:focus-within {
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
-  color: var(--text);
-}
-.search svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-  stroke: var(--mut);
-  flex: none;
-  transition: stroke 0.2s ease;
-}
-.search:focus-within svg {
-  stroke: var(--accent);
-}
-.search input {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: 0;
-  outline: 0;
-  color: var(--text);
-  font: inherit;
-  font-size: var(--fs-md);
-  padding: 0;
-}
-.search input::placeholder {
-  color: var(--mut);
-}
-
 .agent {
   display: flex;
   align-items: center;
@@ -717,16 +672,6 @@
 /* ---------- generic clip utility — used where a Panel's content must not overflow its rounded corners ---------- */
 .clip {
   overflow: hidden;
-}
-
-/* ---------- responsive: search moves below topbar on narrow viewports (M1) ---------- */
-@media (max-width: 53.75em) {
-  .search {
-    margin-left: 0;
-    max-width: 100%;
-    flex: 1;
-    min-width: 140px;
-  }
 }
 
 /* ---------- mobile: Seg & Chip touch targets (≥44px per HIG) ---------- */

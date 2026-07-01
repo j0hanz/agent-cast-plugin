@@ -5,10 +5,6 @@ interface FilterState {
   prototypes: string;
   screenshots: string;
 }
-interface QueryState {
-  prototypes: string;
-  screenshots: string;
-}
 interface SegState {
   detail: Device | null;
   sandbox: Device | null;
@@ -18,8 +14,6 @@ interface SegState {
 interface UIState {
   filter: FilterState;
   setFilter: (group: keyof FilterState, val: string) => void;
-  query: QueryState;
-  setQuery: (group: keyof QueryState, val: string) => void;
   seg: SegState;
   setSeg: <K extends keyof SegState>(group: K, val: SegState[K]) => void;
 }
@@ -28,16 +22,12 @@ interface UIState {
 // router.tsx already uses for hash routing. No need for a state-management dep.
 export const setFilter = (group: keyof FilterState, val: string) =>
   setState({ filter: { ...state.filter, [group]: val } });
-export const setQuery = (group: keyof QueryState, val: string) =>
-  setState({ query: { ...state.query, [group]: val } });
 export const setSeg = <K extends keyof SegState>(group: K, val: SegState[K]) =>
   setState({ seg: { ...state.seg, [group]: val } });
 
 let state: UIState = {
   filter: { prototypes: 'All', screenshots: 'All' },
   setFilter,
-  query: { prototypes: '', screenshots: '' },
-  setQuery,
   seg: { detail: null, sandbox: null, prototypesTab: 'Prototypes' },
   setSeg,
 };

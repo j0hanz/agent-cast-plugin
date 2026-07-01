@@ -52,8 +52,8 @@
   --s4: 24px;
   --s5: 32px;
   /* ---- sizing: control row height + icon scale ---- */
-  --h-control: 36px; /* search / agent pill / back button row */
-  --icon-sm: 16px; /* nav, search, back, brand mark */
+  --h-control: 36px; /* agent pill / back button row */
+  --icon-sm: 16px; /* nav, back, brand mark */
   --icon-lg: 28px; /* card thumbnail glyph */
   --icon-xl: 40px; /* screenshot reticle glyph */
   --dot: 8px; /* every status / pulse dot */
