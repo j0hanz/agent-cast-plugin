@@ -45,8 +45,8 @@ export const SearchBox = memo(({ value, onChange, placeholder = "Search…" }) =
   </div>
 ));
 
-export const Panel = memo(({ title, count, children, className, style }) =>
-  <div className={[styles.panel, className].filter(Boolean).join(' ')} style={style}>
+export const Panel = memo(({ title, count, children, className }) =>
+  <div className={[styles.panel, className].filter(Boolean).join(' ')}>
     <div className={styles.ptitle}>{title}{count != null && <span className={styles.c}>{count}</span>}</div>
     <div className={styles.pbody}>{children}</div>
   </div>
@@ -83,8 +83,8 @@ export const Preview = memo(({ id, ver }) => {
 
 export const EmptyState = memo(({ icon = 'search', title = 'No results found', description = 'Try adjusting your filters.' }) => (
   <div className={styles.empty}>
-    <div style={{ marginBottom: 'var(--s2)', opacity: 0.5 }}><Icon n={icon} sw={2} /></div>
+    <div className={styles.icon}><Icon n={icon} sw={2} /></div>
     <h2>{title}</h2>
-    <span style={{ marginTop: 'var(--s0)' }}>{description}</span>
+    <span className={styles.desc}>{description}</span>
   </div>
 ));

@@ -124,6 +124,19 @@
   font-size: var(--fs-xl);
   margin-top: var(--s2);
 }
+.empty .icon {
+  margin-bottom: var(--s2);
+  opacity: 0.5;
+}
+.empty .desc {
+  margin-top: var(--s0);
+}
+/* modifier: left-aligned variant (ErrorBoundary) — overrides via source order, see .live/.pill above */
+.left {
+  text-align: left;
+  align-items: flex-start;
+  gap: var(--s2);
+}
 
 /* ---------- surface look (composed by card-like elements in view modules) ---------- */
 .surface {
@@ -457,6 +470,9 @@
   color: var(--accent-text);
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), .12);
 }
+.center {
+  align-self: center;
+}
 
 /* ---------- status pill (Prototypes/Detail/Tests/Sandbox/System) ---------- */
 .pill {
@@ -589,6 +605,9 @@
   gap: var(--s4);
   align-items: start;
 }
+.stretch {
+  align-items: stretch;
+}
 @media(max-width: 65em) {
   .cols {
     grid-template-columns: 1fr;
@@ -598,6 +617,19 @@
   display: flex;
   flex-direction: column;
   gap: var(--s4);
+  min-width: 0;
+}
+
+/* ---------- shared two-row stack: panel + panel-that-fills (Detail/Sandbox side column) ---------- */
+.stackFill {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--s4);
+}
+
+/* ---------- generic clip utility — used where a Panel's content must not overflow its rounded corners ---------- */
+.clip {
+  overflow: hidden;
 }
 
 /* ---------- responsive: search moves below topbar on narrow viewports (M1) ---------- */

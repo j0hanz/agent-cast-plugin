@@ -28,13 +28,13 @@ export function Sandbox() {
       <div className={ui.dhead}><h1>Live sandbox</h1><span className={`${ui.pill} ${ui.live}`}>Running</span><div className="grow" />
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
       </div>
-      <div className={ui.cols} style={{ alignItems: 'stretch' }}>
+      <div className={`${ui.cols} ${ui.stretch}`}>
         <Preview id={activeProtoId} ver={activeVer} />
-        <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 'var(--s4)' }}>
+        <div className={ui.stackFill}>
           <Panel title="Session">
             {SESSION.length ? SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>) : <EmptyState icon="sandbox" title="No session data" description="The session hasn't started or no data was captured." />}
           </Panel>
-          <Panel title="Live log" style={{ overflow: 'hidden' }}>
+          <Panel title="Live log" className={ui.clip}>
             {LOG.length ? LOG.map(l => <LogRow key={l.id} l={l} />) : <EmptyState icon="search" title="No log entries" description="Nothing has happened in this session yet." />}
           </Panel>
         </div>

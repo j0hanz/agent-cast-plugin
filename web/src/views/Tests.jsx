@@ -9,7 +9,7 @@ const TestRow = memo(({ t }) => {
   const pct = Math.round((t.pass / t.total) * 100);
   const map = {
     passed: {
-      bar: <span aria-hidden="true" style={{ width: '100%' }} />,
+      bar: <span aria-hidden="true" />,
       txt: `${t.pass}/${t.total}`,
       pill: <span className={`${ui.pill} ${ui.passed} ${styles.right}`}>Passed</span>,
       pct: 100,
@@ -21,7 +21,7 @@ const TestRow = memo(({ t }) => {
       pct,
     },
     running: {
-      bar: <span aria-hidden="true" style={{ width: '40%', background: 'var(--accent)' }} />,
+      bar: <span aria-hidden="true" className={styles.running} />,
       txt: <span className={ui.muted}>running</span>,
       pill: <span className={`${ui.pill} ${ui.live} ${styles.right}`}>Running</span>,
       pct: 40,

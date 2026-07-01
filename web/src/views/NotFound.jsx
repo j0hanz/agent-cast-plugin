@@ -7,7 +7,7 @@ export function NotFound() {
     <Main topbar={<>Page not found</>}>
       <EmptyState icon="search" title="Page not found"
         description="That route doesn't exist or has moved." />
-      <a href="#/prototypes" className={ui.chip} style={{ alignSelf: 'center' }}>Back to prototypes</a>
+      <a href="#/prototypes" className={`${ui.chip} ${ui.center}`}>Back to prototypes</a>
     </Main>
   );
 }

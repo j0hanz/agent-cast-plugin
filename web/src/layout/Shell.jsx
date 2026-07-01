@@ -18,7 +18,7 @@ export const Sidebar = memo(({ active }) => (
     <nav aria-label="Main navigation">
       <div className={styles.navlabel}>Workspace</div>
       {NAV.map(n => <NavItem key={n.id} n={n} active={active} />)}
-      <div className={styles.navlabel} style={{ marginTop: 'var(--s2)' }}>System</div>
+      <div className={styles.navlabel}>System</div>
       {SYSTEM.map(n => <NavItem key={n.id} n={n} active={active} />)}
     </nav>
   </aside>

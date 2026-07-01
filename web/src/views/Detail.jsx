@@ -41,8 +41,8 @@ export function Detail({ id }) {
     <nav aria-label="breadcrumb">
       <ol className={styles.crumbList}>
         <li>
-          <a href="#/prototypes" className={styles.crumbLink} style={{ display: 'flex', alignItems: 'center', gap: 'var(--s0)' }}>
-            <Icon n="back" sw={2.2} style={{ width: 14, height: 14 }} />
+          <a href="#/prototypes" className={styles.crumbLink}>
+            <Icon n="back" sw={2.2} />
             Prototypes
           </a>
         </li>
@@ -58,8 +58,8 @@ export function Detail({ id }) {
         <span className={ui.dmeta}>{dev} · {VIEWPORTS[dev]}</span><div className="grow" />
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={handleDevChange} />
       </div>
-      <div className={ui.cols} style={{ alignItems: 'stretch' }}>
-        <div className={ui.rail} style={{ minWidth: 0 }}>
+      <div className={`${ui.cols} ${ui.stretch}`}>
+        <div className={ui.rail}>
           <Preview id={p.id} ver={VERSIONS[VERSIONS.length - 1]} />
           <Panel title="Captured versions" count={`${VERSIONS.length} iterations`}>
             <div className={styles.versions}>{VERSIONS.map((v, i) => {
@@ -68,11 +68,11 @@ export function Detail({ id }) {
             })}</div>
           </Panel>
         </div>
-        <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', gap: 'var(--s4)' }}>
+        <div className={ui.stackFill}>
           <Panel title="Loop progress">
             <div className={styles.vstep}>{LOOP.map(s => <StepRow key={s.name} s={s} />)}</div>
           </Panel>
-          <Panel title="Critique findings" count={`${FINDINGS.length} open`} style={{ overflow: 'hidden' }}>
+          <Panel title="Critique findings" count={`${FINDINGS.length} open`} className={ui.clip}>
             {FINDINGS.length ? FINDINGS.map(f => <FindingRow key={f.loc} f={f} />) : <EmptyState icon="search" title="No findings" description="This prototype has no open critique findings." />}
           </Panel>
         </div>

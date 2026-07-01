@@ -64,6 +64,10 @@ nav {
   padding: 0 var(--s2);
   margin: var(--s3) 0 var(--s0);
 }
+/* second nav group ("System") follows the nav items, not another label — tighter gap */
+.item + .navlabel {
+  margin-top: var(--s2);
+}
 .item {
   display: flex;
   align-items: center;
