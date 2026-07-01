@@ -145,11 +145,18 @@ export const testStatus = (run: TestRunInput, findings: Finding[] = FINDINGS): T
 // failing + in-flight = suites.
 export const testSummary = (
   tests: { status: TestStatus }[],
-): { passing: number; failing: number; suites: number } => ({
-  passing: tests.filter((t) => t.status === 'passed').length,
-  failing: tests.filter((t) => t.status === 'failed').length,
-  suites: tests.length,
-});
+): { passing: number; failing: number; suites: number } => {
+  let passing = 0;
+  let failing = 0;
+  for (const t of tests) {
+    if (t.status === 'passed') {
+      passing++;
+    } else if (t.status === 'failed') {
+      failing++;
+    }
+  }
+  return { passing, failing, suites: tests.length };
+};
 
 // LOOP + VERSIONS are per-prototype, not global — a Detail page must show only
 // the viewed prototype's captures, or a sibling on a higher version leaks in
