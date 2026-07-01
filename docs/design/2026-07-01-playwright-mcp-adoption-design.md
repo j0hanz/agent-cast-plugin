@@ -313,7 +313,10 @@ Why: Video is the one artifact type that's both name-able (predictable,
   servable path) and embeddable (webm plays natively) - tracing is neither.
   Reusing the explicit-filename + client-side-existence-probing pattern
   that screenshots already prove out is the smallest genuinely useful
-  integration, not a new architecture.
+  integration, not a new architecture. It also covers something a static
+  screenshot structurally can't: load animations and transitions that only
+  happen once, right as a page opens - a screenshot taken after the fact
+  never shows them.
 
 Scope: S/M - no .mcp.json change (devtools cap already on), one SKILL.md
   addition, one new data.ts helper, one new toggle in an existing
@@ -327,6 +330,15 @@ Constraints:
     must be unconditionally paired with a browser_stop_video before moving
     to Refine, not left running past the critique step.
   - Video capture is optional per iteration, not mandatory every pass.
+  - browser_start_video has no duration param, so bounding a capture is the
+    agent's job, not the tool's: recording must start *before*
+    browser_navigate (Preview step), not before the critique screenshot -
+    starting after navigate misses the page-load animation entirely, since
+    the page has already settled by the time recording begins. No
+    browser_wait_for pacing is needed to "hold" the animation on camera -
+    the recording keeps rolling in real time through the rest of the
+    critique step's tool calls and reasoning regardless of how fast those
+    calls happen, so the animation plays out on camera naturally.
   - browser_start_video has no duration cap or auto-stop timer - it calls
     Playwright's native page.screencast.start() and records until
     browser_stop_video is called, however long that takes. Two partial
@@ -344,12 +356,13 @@ Constraints:
 
 Interface:
   - No .mcp.json change.
-  - skills/frontend-loop/SKILL.md Screenshot-critique step: optionally,
-    right before the preview screenshot, call browser_start_video with
-    filename: web/public/artifacts/{protoId}-{ver}.webm; right after the
-    critique screenshot+highlight (before moving to Refine), call
-    browser_stop_video unconditionally if a recording was started. Never
-    call browser_annotate.
+  - skills/frontend-loop/SKILL.md Preview step: optionally, right before
+    browser_navigate (not after - see Constraints), call browser_start_video
+    with filename: web/public/artifacts/{protoId}-{ver}.webm, so any
+    load/transition animation is captured from its first frame. Screenshot-
+    critique step: right after the critique screenshot+highlight (before
+    moving to Refine), call browser_stop_video unconditionally if a
+    recording was started. Never call browser_annotate.
   - web/src/data/data.ts: add videoSrc(protoId, ver): string mirroring
     screenshotSrc, returning /artifacts/{protoId}-{ver}.webm.
   - web/src/components/ui.tsx Preview component: add a two-option toggle
