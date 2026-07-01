@@ -11,6 +11,8 @@ import type {
   TestRun,
   McpTool,
   McpCall,
+  ConsoleEntry,
+  NetworkEntry,
 } from './types.ts';
 
 // Minutes-ago offsets so capturedAt (and anything derived from it, e.g.
@@ -27,13 +29,16 @@ export const PROTOTYPES: Prototype[] = [
   { id: 'dashboard-shell', name: 'Dashboard shell', device: 'Desktop', status: 'live' },
 ];
 
+// loc is a bare, unique CSS selector (or snapshot target) — it doubles as
+// the browser_highlight target, so any measurement/detail lives in text
+// instead (see 2026-07-01 design brief, Approach B).
 export const FINDINGS: Finding[] = [
   {
     protoId: 'landing-hero',
     ver: 'v4',
     sev: 'high',
-    text: 'Secondary button contrast below AA',
-    loc: '.btn-secondary · 3.1:1',
+    text: 'Secondary button contrast below AA (3.1:1)',
+    loc: '.btn-secondary',
   },
   {
     protoId: 'landing-hero',
@@ -46,8 +51,8 @@ export const FINDINGS: Finding[] = [
     protoId: 'landing-hero',
     ver: 'v4',
     sev: 'low',
-    text: 'CTA below the fold on mobile',
-    loc: 'section.cta · 390px',
+    text: 'CTA below the fold on mobile (390px)',
+    loc: 'section.cta',
   },
 ];
 
@@ -147,7 +152,7 @@ export const MCP: KV[] = [
   { k: 'Browser', v: 'chromium' },
   { k: 'Headless', v: 'No' },
   { k: 'Viewport', v: '1440 × 900' },
-  { k: 'Capabilities', v: 'core, testing, config' },
+  { k: 'Capabilities', v: 'core, testing, config, devtools' },
   { k: 'Output dir', v: '/tmp/playwright-mcp-output' },
 ];
 export const MCP_TOOLS: McpTool[] = [
@@ -163,6 +168,20 @@ export const MCP_CALLS: McpCall[] = [
   { ts: ago(1), tool: 'browser_evaluate', input: { viewport: '1440x900' } },
   { ts: ago(2), tool: 'browser_navigate', input: { url: '/landing-hero' } },
   { ts: ago(3), tool: 'browser_snapshot', input: {} },
+];
+
+// Session-wide audit rows — see live.ts's linesFromCalls for how these are
+// really derived (one row per console error / failed request line).
+export const CONSOLE: ConsoleEntry[] = [
+  { ts: ago(0), text: '[error] Failed to load resource: 404 (Not Found) @ /api/pricing' },
+  {
+    ts: ago(4),
+    text: "[error] Uncaught TypeError: Cannot read properties of undefined (reading 'map')",
+  },
+];
+export const NETWORK: NetworkEntry[] = [
+  { ts: ago(0), text: '3. [GET] /api/pricing => [404] Not Found' },
+  { ts: ago(9), text: '7. [POST] /api/checkout => [FAILED] net::ERR_CONNECTION_REFUSED' },
 ];
 
 // SETTINGS lives in data.ts — identical in mock and live, so one copy covers both.

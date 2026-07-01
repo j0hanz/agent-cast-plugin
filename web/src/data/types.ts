@@ -71,6 +71,19 @@ export interface McpTool {
   calls: number;
 }
 
+// Session-wide audit rows derived from browser_console_messages /
+// browser_network_requests calls — one line each, not one per call (a single
+// call can report several errors/failed requests at once).
+export interface ConsoleEntry {
+  ts: string;
+  text: string;
+}
+
+export interface NetworkEntry {
+  ts: string;
+  text: string;
+}
+
 // SESSION / MCP / Settings rows share this flat key-value shape.
 export interface KV {
   k: string;

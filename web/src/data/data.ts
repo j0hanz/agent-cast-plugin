@@ -24,8 +24,19 @@ import type { IconName } from '../components/icons.tsx';
 // ponytail: optional chaining — import.meta.env only exists under Vite, not
 // when data.check.mjs runs this file via plain `node`.
 const SRC = import.meta.env?.VITE_DATA_SOURCE === 'live' ? live : mock;
-export const { PROTOTYPES, FINDINGS, SCREENSHOTS, SESSION, LOG, TESTS, MCP, MCP_TOOLS, MCP_CALLS } =
-  SRC;
+export const {
+  PROTOTYPES,
+  FINDINGS,
+  SCREENSHOTS,
+  SESSION,
+  LOG,
+  TESTS,
+  MCP,
+  MCP_TOOLS,
+  MCP_CALLS,
+  CONSOLE,
+  NETWORK,
+} = SRC;
 
 // Identical in mock and live (never actually varies by data source) — one
 // copy here instead of duplicating the literal in both. Switches were removed

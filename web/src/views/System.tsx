@@ -5,12 +5,21 @@ import {
   MCP,
   MCP_TOOLS,
   MCP_CALLS,
+  CONSOLE,
+  NETWORK,
   SETTINGS,
   deriveAgent,
   SCREENSHOTS,
   relativeTime,
 } from '../data/data.ts';
-import type { KV, McpTool, McpCall, SettingsGroup } from '../data/types.ts';
+import type {
+  KV,
+  McpTool,
+  McpCall,
+  ConsoleEntry,
+  NetworkEntry,
+  SettingsGroup,
+} from '../data/types.ts';
 import ui from '../components/ui.module.css';
 import styles from './System.module.css';
 
@@ -35,6 +44,14 @@ const McpCallRow = memo(({ c }: { c: McpCall }) => {
     </div>
   );
 });
+
+// Shared row for Console/Network — both are just {ts, text} audit lines.
+const TextEntryRow = memo(({ e }: { e: ConsoleEntry | NetworkEntry }) => (
+  <div className={ui.logrow}>
+    <span className={ui.ts}>{relativeTime(e.ts)}</span>
+    <span className={ui.msg}>{e.text}</span>
+  </div>
+));
 
 const McpStatRow = memo(({ s }: { s: KV }) => (
   <div className={ui.kv}>
@@ -124,6 +141,30 @@ export function System() {
               icon="search"
               title="No recent calls"
               description="No MCP calls have been made yet."
+            />
+          )}
+        </Panel>
+
+        <Panel title="Console" count={CONSOLE.length}>
+          {CONSOLE.length ? (
+            CONSOLE.map((c, i) => <TextEntryRow key={`${c.ts}-${i}`} e={c} />)
+          ) : (
+            <EmptyState
+              icon="search"
+              title="No console errors"
+              description="No console errors captured yet."
+            />
+          )}
+        </Panel>
+
+        <Panel title="Network" count={NETWORK.length}>
+          {NETWORK.length ? (
+            NETWORK.map((n, i) => <TextEntryRow key={`${n.ts}-${i}`} e={n} />)
+          ) : (
+            <EmptyState
+              icon="search"
+              title="No failed requests"
+              description="No failed network requests captured yet."
             />
           )}
         </Panel>

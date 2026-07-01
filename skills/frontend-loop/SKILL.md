@@ -53,16 +53,29 @@ For each prototype, one pass = one `ver`:
    `filename: web/public/screenshots/{protoId}-{kind}-preview-{ver}.png`, then
    read that image back and critique it against the design intent in
    `DESIGN.md` / `PRODUCT.md` (hierarchy, spacing, the single-amber-signal rule,
-   contrast, responsive behaviour). Capture again as `-critique-{ver}` if the
-   review state is worth recording. For each issue found, append one JSON line
-   to `web/public/findings.jsonl`:
+   contrast, responsive behaviour). Also call
+   `mcp__playwright__browser_console_messages` with `level: "error"` and
+   `mcp__playwright__browser_network_requests` (no special params needed —
+   both flow straight into the dashboard's System → Console/Network panels,
+   nothing to hand-write).
 
-       {"protoId":"landing-hero","ver":"v3","sev":"high","text":"Secondary button contrast below AA","loc":".btn-secondary · 3.1:1"}
+   For each issue found, append one JSON line to `web/public/findings.jsonl`:
 
-   `sev` ∈ `high` | `med` | `low`; `loc` is the selector/measurement. The
-   dashboard's Detail → Critique findings panel shows the active prototype's
-   latest-version findings from this file, so bump `ver` per iteration and the
-   old findings drop off automatically.
+       {"protoId":"landing-hero","ver":"v3","sev":"high","text":"Secondary button contrast below AA (3.1:1)","loc":".btn-secondary"}
+
+   `sev` ∈ `high` | `med` | `low`. `loc` must be a bare, unique CSS selector
+   (or snapshot target) — nothing else — since it also doubles as the
+   `browser_highlight` target below; put any measurement/detail (like a
+   contrast ratio) in `text` instead. The dashboard's Detail → Critique
+   findings panel shows the active prototype's latest-version findings from
+   this file, so bump `ver` per iteration and the old findings drop off
+   automatically.
+
+   If the review state is worth recording, highlight what you found before
+   capturing it: call `mcp__playwright__browser_highlight` once per open
+   finding (`target: <its loc>`), capture `-critique-{ver}`, then
+   `mcp__playwright__browser_hide_highlight` (omit `target` to hide all)
+   before moving on.
 
 4. **Refine** — apply the fixes the critique surfaced.
 5. **Test** — verify the fixes with real assertions, then record the run. For

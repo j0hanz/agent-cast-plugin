@@ -12,13 +12,17 @@ if [ -n "$INPUT" ]; then
   TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%SZ")
   # Skip malformed stdin instead of crashing the hook under `set -e`.
   if echo "$INPUT" | jq empty 2>/dev/null; then
-    # `output` is only captured for browser_get_config — every other tool call
+    # `output` is only captured for these three tools — every other tool call
     # stays input-only so high-frequency/large-payload tools (snapshot, evaluate)
     # don't bloat this file. text extracted from the standard MCP text-content
     # shape, falling back to the raw response if it isn't that shape.
     echo "$INPUT" | jq --arg ts "$TS" -c '
       {ts: $ts, tool: .tool_name, input: .tool_input} +
-      (if .tool_name == "mcp__playwright__browser_get_config"
+      (if (.tool_name | IN(
+             "mcp__playwright__browser_get_config",
+             "mcp__playwright__browser_console_messages",
+             "mcp__playwright__browser_network_requests"
+           ))
        then {output: (.tool_response.content[0].text? // .tool_response // null)}
        else {}
        end)

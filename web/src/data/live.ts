@@ -31,6 +31,8 @@ import type {
   TestRun,
   McpTool,
   McpCall,
+  ConsoleEntry,
+  NetworkEntry,
 } from './types.ts';
 
 const warn = (msg: string, err: unknown): void => {
@@ -277,6 +279,8 @@ const GET_CONFIG_TOOL = 'mcp__playwright__browser_get_config';
 // "### Page" if the tab changed) — never bare text. Pull one section's raw
 // content out before parsing it. Falls back to the whole string if no
 // section header is found, in case a future server version stops wrapping.
+// Not exported: only ever consumed within this module (mock.ts has no
+// matching export, which data.check.mjs's key-parity assert would catch).
 const extractSection = (text: string, name: string): string => {
   const parts = text.split(/^### /m).slice(1);
   for (const part of parts) {
@@ -324,6 +328,41 @@ export const MCP: KV[] = liveArray(() => {
   if (config.outputDir) rows.push({ k: 'Output dir', v: config.outputDir });
   return rows;
 });
+
+const CONSOLE_TOOL = 'mcp__playwright__browser_console_messages';
+const NETWORK_TOOL = 'mcp__playwright__browser_network_requests';
+
+// One row per line of a call's Result section, not one row per call — a
+// single browser_console_messages/browser_network_requests call can report
+// several messages/requests at once. Newest first (ts isn't guaranteed to be
+// in file order — same reasoning as parseConfig).
+const linesFromCalls = (calls: McpCall[], tool: string): { ts: string; text: string }[] =>
+  calls
+    .filter((c) => c.tool === tool && typeof c.output === 'string')
+    .flatMap((c) =>
+      extractSection(c.output as string, 'Result')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((text) => ({ ts: c.ts, text })),
+    )
+    .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
+
+// browser_console_messages(level:"error") already filters server-side —
+// strip only its own summary header line(s), not a real message.
+const CONSOLE_HEADER_REGEX = /^(Total messages:|Returning \d+ messages)/;
+export const CONSOLE: ConsoleEntry[] = liveArray(() =>
+  linesFromCalls(mcpCalls, CONSOLE_TOOL).filter((e) => !CONSOLE_HEADER_REGEX.test(e.text)),
+);
+
+// browser_network_requests has no server-side status filter (unlike
+// console's level param) — keep only failed/4xx/5xx lines, matching
+// playwright-mcp's own renderRequestLine format ("... => [404] Not Found" /
+// "... => [FAILED] <error>").
+const NETWORK_FAILURE_REGEX = /=> \[(FAILED|[45]\d\d)\]/;
+export const NETWORK: NetworkEntry[] = liveArray(() =>
+  linesFromCalls(mcpCalls, NETWORK_TOOL).filter((e) => NETWORK_FAILURE_REGEX.test(e.text)),
+);
 
 // Exports that need to update on poll
 export const LOG: LogEntry[] = liveArray(() => logStore);
