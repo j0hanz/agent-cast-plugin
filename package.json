@@ -1,6 +1,6 @@
 {
   "name": "agent-cast",
-  "description": "",
+  "description": "Closed-loop frontend workflow for Claude Code: build, preview, screenshot-critique, refine, and test UIs via the Playwright MCP server.",
   "author": "j0hanz",
   "license": "MIT",
   "repository": {
