@@ -86,6 +86,15 @@ export const findingsFor = (id, list = FINDINGS) => {
   return mine.filter(f => f.ver === latest);
 };
 
+// Live test status (item C): a recorded run passes only if every check the loop
+// ran passed AND the critique left no high-severity finding for that prototype+
+// version — a high finding fails the suite even when the agent's own checks
+// looked clean. Pure so data.check can exercise it.
+export const testStatus = (run, findings = FINDINGS) =>
+  (run.pass === run.total &&
+    !findings.some(f => f.protoId === run.protoId && f.ver === run.ver && f.sev === 'high'))
+    ? 'passed' : 'failed';
+
 // M2: derived from data so filter stays in sync when prototypes are renamed.
 const screenshotProtos = () => ['All', ...new Set(SCREENSHOTS.map(s => s.proto))];
 export const SCREENSHOT_PROTOS = new Proxy([], {

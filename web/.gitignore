@@ -5,4 +5,5 @@ public/state.json
 public/mcp-calls.jsonl
 public/log.jsonl
 public/findings.jsonl
+public/tests.jsonl
 .dev-server.log

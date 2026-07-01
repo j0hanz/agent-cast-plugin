@@ -1,6 +1,6 @@
 // Runnable check for the non-trivial bits (filtering, mock/live parity, derived AGENT). `npm run check`.
 import assert from 'node:assert';
-import { filterPrototypes, filterScreenshots, findingsFor, relativeTime, deriveAgent, AGENT } from './data.js';
+import { filterPrototypes, filterScreenshots, findingsFor, testStatus, relativeTime, deriveAgent, AGENT } from './data.js';
 import * as mock from './mock.js';
 import * as live from './live.js';
 
@@ -23,6 +23,13 @@ assert.deepStrictEqual(
   ['v10'],
   'latest version only, numeric (v10 > v9), scoped to the prototype',
 );
+
+const run = { protoId: 'a', ver: 'v1', pass: 10, total: 10 };
+assert.strictEqual(testStatus(run, []), 'passed', 'all checks pass, no findings → passed');
+assert.strictEqual(testStatus({ ...run, pass: 9 }, []), 'failed', 'a failing check → failed');
+assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v1', sev: 'high' }]), 'failed', 'clean checks but a high finding → failed');
+assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v2', sev: 'high' }]), 'passed', 'high finding on another version does not fail this run');
+assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v1', sev: 'low' }]), 'passed', 'a low finding does not fail the suite');
 
 assert.strictEqual(relativeTime(null), '', 'missing timestamp → empty string, no throw');
 assert.strictEqual(relativeTime(new Date().toISOString()), 'just now', 'fresh timestamp → "just now"');

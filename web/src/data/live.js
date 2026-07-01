@@ -19,7 +19,7 @@
 // This import is circular (data.js imports this module) but safe: relativeTime
 // is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
 // render time, never during module eval, so the binding is always resolved.
-import { relativeTime } from './data.js';
+import { relativeTime, testStatus } from './data.js';
 
 const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg, err); };
 
@@ -30,6 +30,7 @@ let mcpCalls = [];
 // them from inside the first fetch would hit the temporal dead zone.
 let logStore = [];
 let findingsStore = [];
+let testsStore = [];
 const loadState = async () => {
   let changed = false;
   try {
@@ -90,6 +91,21 @@ const loadState = async () => {
     }
   } catch (err) {
     warn('live.js: no usable findings.jsonl, falling back to empty findings', err);
+  }
+
+  try {
+    const res = await fetch('/tests.jsonl');
+    if (res.ok) {
+      testsStore = (await res.text())
+        .split('\n')
+        .filter(Boolean)
+        .flatMap(line => {
+          try { return [JSON.parse(line)]; } catch { return []; }
+        });
+      changed = true;
+    }
+  } catch (err) {
+    warn('live.js: no usable tests.jsonl, falling back to empty tests', err);
   }
 
   return changed;
@@ -190,16 +206,23 @@ export const SESSION = liveArray(() => {
   ];
 });
 
-// Derived TESTS — one passing-stub row per prototype found in screenshots.
+// Real test runs the loop appends to web/public/tests.jsonl (item C). One row
+// per prototype — its latest-version run — with pass/fail gated by findings via
+// testStatus (a high-severity finding fails the suite even if the checks passed).
 export const TESTS = liveArray(() => {
-  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
-  const map = new Map();
-  for (const s of arr) {
-    if (!map.has(s.protoId)) {
-      map.set(s.protoId, { name: s.proto, checks: 10, pass: 10, total: 10, status: 'passed' });
-    }
+  const verNum = (v) => parseInt(String(v).slice(1), 10) || 0;
+  const latest = new Map();
+  for (const t of testsStore) {
+    const cur = latest.get(t.protoId);
+    if (!cur || verNum(t.ver) > verNum(cur.ver)) latest.set(t.protoId, t);
   }
-  return Array.from(map.values());
+  return [...latest.values()].map(t => ({
+    name: t.name,
+    checks: t.total,
+    pass: t.pass,
+    total: t.total,
+    status: testStatus(t, findingsStore),
+  }));
 });
 
 export const SETTINGS = [

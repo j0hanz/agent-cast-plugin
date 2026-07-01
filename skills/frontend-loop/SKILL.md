@@ -61,15 +61,20 @@ For each prototype, one pass = one `ver`:
    latest-version findings from this file, so bump `ver` per iteration and the
    old findings drop off automatically.
 4. **Refine** — apply the fixes the critique surfaced.
-5. **Test** — verify the fixes; when the version passes, capture a final frame
-   as `{protoId}-{kind}-final-{ver}.png`. `stage=final` is what advances the
-   dashboard's Test step. Then bump `ver` and loop, or move to the next
-   prototype.
+5. **Test** — verify the fixes and record the run: append one JSON line to
+   `web/public/tests.jsonl` —
+
+       {"protoId":"landing-hero","ver":"v3","name":"Landing hero","pass":9,"total":10}
+
+   `total` = checks you ran, `pass` = how many passed. The dashboard marks the
+   suite **failed** if any check failed OR any high-severity finding is open for
+   that version, else passed. When the version passes, capture a final frame as
+   `{protoId}-{kind}-final-{ver}.png` (`stage=final` advances the dashboard's
+   loop). Then bump `ver` and loop, or move to the next prototype.
 
 ## Notes
 
 - Everything under `web/public/` is gitignored — captures are artifacts, don't
   commit them.
-- Critique findings are live (item B): they render in Detail once written to
-  `findings.jsonl`. Test pass/fail is not yet surfaced (item C) — run the Test
-  step, but the dashboard won't show results until that producer lands.
+- Critique findings (item B) and test runs (item C) are both live: write
+  `findings.jsonl` / `tests.jsonl` and they render in Detail and the Tests view.
