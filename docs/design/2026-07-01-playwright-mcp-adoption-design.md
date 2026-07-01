@@ -42,16 +42,14 @@ See the Design Brief section below.
 **Approach B — Console + network audit panels + highlight-annotated findings
 (locked, build next).** See the Design Brief section below.
 
-**Approach C — Full trace/video audit trail (later, biggest lift).**
-Enable `--caps=devtools` fully; record a Playwright trace
-(`browser_start_tracing`/`stop_tracing`) and/or video per loop iteration;
-store as a downloadable artifact linked from Detail view. The most literal
-version of PRODUCT.md's "not just a live status glance, a deep traceable
-record" mission. Risks flagged in Phase 5: unbounded artifact storage growth
-under `web/public/` (gitignored, but disk fills over long sessions — needs a
-retention/pruning policy before this ships), and a possible operational
-dependency (Playwright Dashboard companion process for `browser_annotate`).
-Not scoped in detail here — revisit when A and B are shipped and proven.
+**Approach C — Per-iteration video recording, embedded in Preview
+(locked, prepared 2026-07-01, not yet built).** See the Design Brief section
+below. Scoped down from the original "trace and/or video" sketch after
+research: tracing is Chromium-only, has no filename param (can't be given a
+predictable name), and has no in-dashboard viewer (`npx playwright
+show-trace` only) — video alone covers the audit-trail need at far lower
+cost, and `browser_annotate` is hard-excluded (blocks forever waiting for a
+human, unusable by an autonomous loop).
 
 ## Design Brief — Approach A (locked, build now)
 
@@ -268,5 +266,135 @@ First Step: Widen hooks/log-mcp-call.sh's output-capture condition to
   Network stream can't be filtered to "just this prototype" from the
   System view - acceptable per the locked scope decision; revisit only if
   it proves hard to use in practice once built.
+
+**Verdict: APPROVED.**
+
+## Design Brief — Approach C (locked, prepared, not yet built)
+
+Research (three parallel subagents fetching playwright-mcp/playwright monorepo
+source) reshaped this approach from the original "trace and/or video" sketch:
+
+- `browser_start_tracing`/`browser_stop_tracing` take **no parameters** -
+  the output filename is always auto-generated (`trace-<timestamp>.trace` +
+  `.network` + a `resources/` dir), Chromium-only, and replay requires an
+  external tool (`npx playwright show-trace` or trace.playwright.dev) - no
+  in-dashboard viewer is realistic. Dropped from this round's scope.
+- `browser_start_video` takes an optional `filename` - it _can_ be given a
+  predictable name, and finalizes to **webm**, natively playable in an
+  HTML `<video>` element. This is the one artifact type worth building now.
+- `browser_annotate` spawns a Dashboard UI process and blocks indefinitely
+  waiting for a human to draw annotations and close the window - it must
+  never be called by the autonomous frontend-loop skill.
+- `--output-max-size`'s automatic eviction (oldest-mtime-first, single
+  shared budget across all output types) only covers files written to the
+  tool's _default_ output directory with auto-generated names. It does
+  **not** cover files written with an explicit `filename`/`suggestedFilename`
+  param - which is exactly how screenshots already get their predictable,
+  dashboard-servable names, and how video will too. "Storage growth solved
+  for free" does not apply to this design; see Risks.
+
+Interview-resolved scope (this session): video recording is **optional per
+iteration** (mirrors the existing optional `-critique-{ver}` screenshot
+language, not mandatory every pass), and it surfaces as a **toggle inside
+the existing Preview component** (screenshot/video switch in place), not a
+separate panel.
+
+```
+Approach: Add optional per-iteration screen recording via
+  browser_start_video/browser_stop_video (already available under
+  --caps=devtools, enabled since Approach B). Capture uses the exact same
+  explicit-filename convention screenshots already use, landing directly at
+  web/public/artifacts/{protoId}-{ver}.webm with zero new hook, jsonl file,
+  or data-layer plumbing. A toggle inside the existing Preview component
+  switches between screenshot and video, using the same onError-fallback
+  pattern the screenshot <img> already uses to detect a missing capture.
+
+Why: Video is the one artifact type that's both name-able (predictable,
+  servable path) and embeddable (webm plays natively) - tracing is neither.
+  Reusing the explicit-filename + client-side-existence-probing pattern
+  that screenshots already prove out is the smallest genuinely useful
+  integration, not a new architecture.
+
+Scope: S/M - no .mcp.json change (devtools cap already on), one SKILL.md
+  addition, one new data.ts helper, one new toggle in an existing
+  component. No new hook trigger, no new jsonl file, no new exported type.
+
+Constraints:
+  - browser_annotate must never appear in SKILL.md - it hangs an autonomous
+    loop forever waiting for a human.
+  - Video recording is continuous while active (real CPU/disk cost for its
+    duration, unlike a one-shot screenshot) - every browser_start_video
+    must be unconditionally paired with a browser_stop_video before moving
+    to Refine, not left running past the critique step.
+  - Video capture is optional per iteration, not mandatory every pass.
+  - Whether browser_start_video's filename param actually resolves the same
+    way screenshots' filename does (workspace-relative, bypassing
+    --output-dir) is inferred from the codebase's consistent
+    resolveClientFile pattern (confirmed for screenshots/console/
+    network/config) - video's own file-writing path
+    (context.startVideoRecording()) was not read directly. Verify on first
+    real capture during implementation; if the file lands in the default
+    .playwright-mcp/ dir instead, fall back to --output-dir plus a
+    hook-copy step.
+
+Interface:
+  - No .mcp.json change.
+  - skills/frontend-loop/SKILL.md Screenshot-critique step: optionally,
+    right before the preview screenshot, call browser_start_video with
+    filename: web/public/artifacts/{protoId}-{ver}.webm; right after the
+    critique screenshot+highlight (before moving to Refine), call
+    browser_stop_video unconditionally if a recording was started. Never
+    call browser_annotate.
+  - web/src/data/data.ts: add videoSrc(protoId, ver): string mirroring
+    screenshotSrc, returning /artifacts/{protoId}-{ver}.webm.
+  - web/src/components/ui.tsx Preview component: add a two-option toggle
+    (Screenshot | Video, defaulting to Screenshot) using the existing
+    Seg/SingleToggle pattern; Video mode renders
+    <video src={videoSrc(id, ver)} controls> with an onError fallback to an
+    inline "No recording for this version" message - not a silent revert
+    to Screenshot mode, so the toggle's own state stays honest about what
+    was actually chosen.
+
+Architecture: Client-side existence probing (the same pattern screenshots
+  already use for a missing capture) replaces any need for a hook, jsonl
+  file, or mock/live data-layer addition - the dashboard doesn't need to
+  know ahead of render time whether a video exists, it just tries to load
+  one and shows an empty state if there isn't one.
+
+Risks:
+  - Med: video's file-path resolution is inferred, not directly confirmed
+    (see Constraints) - first real capture during implementation must
+    verify the file lands at the expected path.
+  - Med (mitigated in SKILL.md wording): an interrupted turn between
+    start_video and stop_video leaves an open recording running - instruct
+    stop_video as an unconditional pair to start_video, not a separate
+    optional step.
+  - Low (accepted): no storage cap - consistent with existing screenshot
+    behavior (also uncapped), and video's optional-per-iteration cadence
+    naturally throttles growth versus mandatory-every-iteration screenshots.
+
+First Step: Add the optional browser_start_video/browser_stop_video pairing
+  (with the canonical filename) to SKILL.md's Screenshot-critique step,
+  then verify the resulting file's actual path before building the Preview
+  toggle.
+```
+
+### Phase 5 persona critique (Approach C)
+
+- **Skeptic (Med, resolved):** video's file-resolution behavior is inferred
+  by analogy to the confirmed pattern for other tools, not verbatim-read
+  from `context.startVideoRecording()`. Flagged as a Risk above; mitigation
+  is verifying on first real capture during implementation rather than
+  building the Preview toggle against an unconfirmed path.
+- **Constraint Guardian (Med, resolved):** a crashed/interrupted turn
+  between start_video and stop_video would leave an open-ended recording
+  consuming CPU/disk. Mitigation is SKILL.md's unconditional-pairing
+  instruction (Constraints above) - accepted as sufficient for a
+  solo-operator local dev tool, not worth building a session-end safety-net
+  hook for at this scope.
+- **User Advocate (Low, accepted):** no storage cap on accumulated video
+  files - accepted, matches existing (also-uncapped) screenshot behavior,
+  and optional-per-iteration cadence keeps growth proportional to how often
+  recording is actually worth doing.
 
 **Verdict: APPROVED.**
