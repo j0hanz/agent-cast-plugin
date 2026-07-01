@@ -17,7 +17,7 @@ const PrototypeCard = memo(({ p }) => {
       <div className={styles.thumb}>
         {p.status === 'live' && <span className={styles.liveDot} />}
         {showImg
-          ? <img className={ui.shotImg} src={screenshotSrc(p.id, latest.ver)} alt={`${p.name} latest capture`} onError={() => setBroken(true)} />
+          ? <img className={ui.shotImg} src={screenshotSrc(p.id, latest.ver)} alt={`${p.name} latest capture`} onError={() => setBroken(true)} loading="lazy" decoding="async" />
           : <Icon n={deviceIcon(p.device)} sw={1.6} />}
       </div>
       <div className={styles.meta}><div className={styles.title}>{p.name}</div>
@@ -34,7 +34,7 @@ const ScreenshotCard = memo(({ s }) => {
       <div className={styles.sthumb}>
         {broken
           ? <Icon n={s.kind === 'mobile' ? 'mobile' : 'monitor'} sw={1.5} />
-          : <img className={ui.shotImg} src={screenshotSrc(s.protoId, s.ver)} alt={`${s.proto} — ${s.stage} capture, ${s.ver}`} onError={() => setBroken(true)} />}
+          : <img className={ui.shotImg} src={screenshotSrc(s.protoId, s.ver)} alt={`${s.proto} — ${s.stage} capture, ${s.ver}`} onError={() => setBroken(true)} loading="lazy" decoding="async" />}
       </div>
       <div className={styles.smeta}><div className={styles.sname}>{s.proto}</div>
         <div className={styles.srow}><span className={`${styles.tag} ${s.stage === 'critique' ? styles.crit : ''}`}>{s.stage}</span><span>{s.ver} · {relativeTime(s.capturedAt)}</span></div></div>

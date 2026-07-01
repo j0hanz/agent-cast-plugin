@@ -58,7 +58,7 @@ export const Preview = memo(({ id, ver, stage }) => {
       </div>
       <div className={styles.shot}>
         {showImg && (
-          <img className={styles.shotImg} src={screenshotSrc(id, ver)} alt={`${id} screenshot, ${ver}${stage ? `, ${stage}` : ''}`} onError={() => setBroken(true)} />
+          <img className={styles.shotImg} src={screenshotSrc(id, ver)} alt={`${id} screenshot, ${ver}${stage ? `, ${stage}` : ''}`} onError={() => setBroken(true)} loading="eager" decoding="async" />
         )}
         <div className={styles.cropLT} aria-hidden="true"></div>
         <div className={styles.cropRT} aria-hidden="true"></div>
