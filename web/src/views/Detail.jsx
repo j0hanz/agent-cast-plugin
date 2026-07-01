@@ -3,7 +3,7 @@ import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
 import { AgentPill, EmptyState, Panel, Preview, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { cap, PROTOTYPES, VERSIONS, LOOP, findingsFor, VIEWPORTS, AGENT } from '../data/data.js';
+import { cap, PROTOTYPES, versionsFor, loopFor, findingsFor, VIEWPORTS, AGENT } from '../data/data.js';
 import styles from './Detail.module.css';
 import ui from '../components/ui.module.css';
 
@@ -38,6 +38,8 @@ export function Detail({ id }) {
   }
   const dev = segDetail || p.device;
   const findings = findingsFor(p.id);
+  const versions = versionsFor(p.id);
+  const loop = loopFor(p.id);
   const top = <>
     <nav aria-label="breadcrumb">
       <ol className={styles.crumbList}>
@@ -61,17 +63,17 @@ export function Detail({ id }) {
       </div>
       <div className={`${ui.cols} ${ui.stretch}`}>
         <div className={ui.rail}>
-          <Preview id={p.id} ver={VERSIONS[VERSIONS.length - 1]} />
-          <Panel title="Captured versions" count={`${VERSIONS.length} iterations`}>
-            <div className={styles.versions}>{VERSIONS.map((v, i) => {
-              const curr = i === VERSIONS.length - 1;
+          <Preview id={p.id} ver={versions[versions.length - 1]} />
+          <Panel title="Captured versions" count={`${versions.length} iterations`}>
+            <div className={styles.versions}>{versions.map((v, i) => {
+              const curr = i === versions.length - 1;
               return <div key={v} className={`${styles.ver} ${curr ? styles.cur : ''}`}>{v}{curr && ' · current'}</div>;
             })}</div>
           </Panel>
         </div>
         <div className={ui.stackFill}>
           <Panel title="Loop progress">
-            <div className={styles.vstep}>{LOOP.map(s => <StepRow key={s.name} s={s} />)}</div>
+            <div className={styles.vstep}>{loop.map(s => <StepRow key={s.name} s={s} />)}</div>
           </Panel>
           <Panel title="Critique findings" count={`${findings.length} open`} className={ui.clip}>
             {findings.length ? findings.map((f, i) => <FindingRow key={`${f.loc}-${i}`} f={f} />) : <EmptyState icon="search" title="No findings" description="This prototype has no open critique findings." />}

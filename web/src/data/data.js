@@ -12,7 +12,7 @@ import * as live from './live.js';
 // when data.check.mjs runs this file via plain `node`.
 const SRC = import.meta.env?.VITE_DATA_SOURCE === 'live' ? live : mock;
 export const {
-  PROTOTYPES, VERSIONS, LOOP, FINDINGS, SCREENSHOTS,
+  PROTOTYPES, FINDINGS, SCREENSHOTS,
   SESSION, LOG, TESTS, MCP, MCP_TOOLS, MCP_CALLS, SETTINGS,
 } = SRC;
 
@@ -94,6 +94,25 @@ export const testStatus = (run, findings = FINDINGS) =>
   (run.pass === run.total &&
     !findings.some(f => f.protoId === run.protoId && f.ver === run.ver && f.sev === 'high'))
     ? 'passed' : 'failed';
+
+// LOOP + VERSIONS are per-prototype, not global — a Detail page must show only
+// the viewed prototype's captures, or a sibling on a higher version leaks in
+// (Cause A). deriveLoop maps a stage to the 5 loop steps; loopFor/versionsFor
+// scope it to one prototype. Numeric version sort so v10 > v9. Optional `list`
+// arg keeps them testable in isolation, same pattern as findingsFor.
+export const deriveLoop = (stage) => [
+  { name: 'Build', state: 'done', t: 'completed' },
+  { name: 'Preview', state: stage === 'preview' ? 'live' : 'done', t: stage === 'preview' ? 'running…' : 'completed' },
+  { name: 'Screenshot-critique', state: stage === 'critique' ? 'live' : (stage === 'final' ? 'done' : ''), t: stage === 'critique' ? 'running…' : (stage === 'final' ? 'completed' : 'queued') },
+  { name: 'Refine', state: '', t: 'queued' },
+  { name: 'Test', state: stage === 'final' ? 'live' : '', t: stage === 'final' ? 'running…' : 'queued' },
+];
+export const versionsFor = (id, list = SCREENSHOTS) => {
+  const n = (v) => parseInt(String(v).slice(1), 10) || 0;
+  return [...new Set(list.filter(s => s.protoId === id).map(s => s.ver))].sort((a, b) => n(a) - n(b));
+};
+export const loopFor = (id, list = SCREENSHOTS) =>
+  deriveLoop(latestScreenshot(list.filter(s => s.protoId === id))?.stage);
 
 // M2: derived from data so filter stays in sync when prototypes are renamed.
 const screenshotProtos = () => ['All', ...new Set(SCREENSHOTS.map(s => s.proto))];

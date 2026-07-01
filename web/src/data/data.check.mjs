@@ -1,6 +1,6 @@
 // Runnable check for the non-trivial bits (filtering, mock/live parity, derived AGENT). `npm run check`.
 import assert from 'node:assert';
-import { filterPrototypes, filterScreenshots, findingsFor, testStatus, relativeTime, deriveAgent, AGENT } from './data.js';
+import { filterPrototypes, filterScreenshots, findingsFor, testStatus, deriveLoop, versionsFor, loopFor, relativeTime, deriveAgent, AGENT } from './data.js';
 import * as mock from './mock.js';
 import * as live from './live.js';
 
@@ -23,6 +23,21 @@ assert.deepStrictEqual(
   ['v10'],
   'latest version only, numeric (v10 > v9), scoped to the prototype',
 );
+
+// Cause A: LOOP + VERSIONS are per-prototype, never global.
+assert.strictEqual(deriveLoop('final').at(-1).state, 'live', 'final stage → Test step live');
+assert.strictEqual(deriveLoop('critique')[2].state, 'live', 'critique stage → critique step live');
+assert.strictEqual(deriveLoop('preview')[1].state, 'live', 'preview stage → Preview step live');
+const scoped = [
+  { protoId: 'a', ver: 'v9',  stage: 'preview',  capturedAt: '2026-01-01T00:00:00Z' },
+  { protoId: 'a', ver: 'v10', stage: 'final',    capturedAt: '2026-01-01T00:02:00Z' },
+  { protoId: 'b', ver: 'v3',  stage: 'critique', capturedAt: '2026-01-01T00:01:00Z' },
+];
+assert.deepStrictEqual(versionsFor('a', scoped), ['v9', 'v10'], 'scoped to a, numeric sort (v10 > v9)');
+assert.deepStrictEqual(versionsFor('b', scoped), ['v3'], "sibling a's versions never leak into b");
+assert.strictEqual(loopFor('a', scoped).at(-1).state, 'live', "a's latest (final) → Test live");
+assert.strictEqual(loopFor('b', scoped)[2].state, 'live', "b's own latest (critique) drives its loop, not a's global final");
+assert.deepStrictEqual(versionsFor('landing-hero'), ['v3', 'v4'], 'mock landing-hero versions, scoped');
 
 const run = { protoId: 'a', ver: 'v1', pass: 10, total: 10 };
 assert.strictEqual(testStatus(run, []), 'passed', 'all checks pass, no findings → passed');

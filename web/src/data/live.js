@@ -127,8 +127,11 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
 // would break data.check.mjs's mock/live key-parity check (mock.js has no
 // matching export), and importing it from data.js would be circular
 // (data.js already imports this module). Verified via browser testing.
+// log-mcp-call.sh records the raw tool_name (mcp__playwright__browser_*). Strip
+// the server prefix so live matches mock's short names in System (Cause C).
+const shortTool = (t) => (t || '').replace(/^mcp__playwright__/, '');
 const deriveMcpTools = (calls) => {
-  const counts = calls.reduce((acc, c) => (acc[c.tool] = (acc[c.tool] || 0) + 1, acc), {});
+  const counts = calls.reduce((acc, c) => (acc[shortTool(c.tool)] = (acc[shortTool(c.tool)] || 0) + 1, acc), {});
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
 };
 
@@ -162,27 +165,9 @@ export const PROTOTYPES = liveArray(() => {
   return Array.from(map.values());
 });
 
-// Derived VERSIONS for the active prototype
-export const VERSIONS = liveArray(() => {
-  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
-  return [...new Set(arr.map(s => s.ver))].sort();
-});
-
-// Derived LOOP steps based on the latest screenshot's stage
-export const LOOP = liveArray(() => {
-  const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
-  const latest = latestScreenshot(arr);
-  if (!latest) return [];
-
-  const stage = latest.stage;
-  return [
-    { name: 'Build', state: 'done', t: 'completed' },
-    { name: 'Preview', state: stage === 'preview' ? 'live' : 'done', t: stage === 'preview' ? 'running…' : 'completed' },
-    { name: 'Screenshot-critique', state: stage === 'critique' ? 'live' : (stage === 'final' ? 'done' : ''), t: stage === 'critique' ? 'running…' : (stage === 'final' ? 'completed' : 'queued') },
-    { name: 'Refine', state: '', t: 'queued' },
-    { name: 'Test', state: stage === 'final' ? 'live' : '', t: stage === 'final' ? 'running…' : 'queued' }
-  ];
-});
+// VERSIONS + LOOP are no longer exported here — they're per-prototype and
+// derived in data.js (versionsFor/loopFor) so Detail scopes them to the viewed
+// prototype instead of the whole session (Cause A).
 
 // Critique findings the loop appends to web/public/findings.jsonl (item B).
 // Detail filters these to the active prototype's latest version via findingsFor.
@@ -253,6 +238,6 @@ export const LOG = liveArray(() => logStore);
 // Exports that need to update on poll
 export const SCREENSHOTS = liveArray(() => Array.isArray(state.screenshots) ? state.screenshots : []);
 
-export const MCP_CALLS = liveArray(() => mcpCalls);
+export const MCP_CALLS = liveArray(() => mcpCalls.map(c => ({ ...c, tool: shortTool(c.tool) })));
 
 export const MCP_TOOLS = liveArray(() => deriveMcpTools(mcpCalls));

@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { SESSION, LOG, AGENT, VERSIONS, SCREENSHOTS, latestScreenshot } from '../data/data.js';
+import { SESSION, LOG, AGENT, SCREENSHOTS, latestScreenshot } from '../data/data.js';
 import ui from '../components/ui.module.css';
 
 const LogRow = memo(({ l }) => (

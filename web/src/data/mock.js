@@ -16,14 +16,6 @@ export const PROTOTYPES = [
   { id: 'dashboard-shell', name: 'Dashboard shell', device: 'Desktop', status: 'live' },
 ];
 
-export const VERSIONS = ['v1', 'v2', 'v3', 'v4'];
-export const LOOP = [
-  { name: 'Build', state: 'done', t: 'completed' },
-  { name: 'Preview', state: 'done', t: 'completed' },
-  { name: 'Screenshot-critique', state: 'live', t: 'running…' },
-  { name: 'Refine', state: '', t: 'queued' },
-  { name: 'Test', state: '', t: 'queued' },
-];
 export const FINDINGS = [
   { protoId: 'landing-hero', ver: 'v4', sev: 'high', text: 'Secondary button contrast below AA', loc: '.btn-secondary · 3.1:1' },
   { protoId: 'landing-hero', ver: 'v4', sev: 'med', text: 'Hero heading exceeds 65ch line length', loc: 'h1.hero' },
