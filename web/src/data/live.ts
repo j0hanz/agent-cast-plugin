@@ -15,11 +15,12 @@
 // runtime), which means this file's top-level code always evaluates — even
 // in mock mode. Guard the fetch on the actual selected mode so mock mode
 // stays 100% synchronous with zero network calls, as designed.
-// relativeTime is a pure helper owned by data.ts (single source of truth).
-// This import is circular (data.ts imports this module) but safe: relativeTime
-// is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
-// render time, never during module eval, so the binding is always resolved.
-import { relativeTime } from './data.ts';
+// relativeTime/latestScreenshot/versionNum are pure helpers owned by data.ts
+// (single source of truth). This import is circular (data.ts imports this
+// module) but safe: each is only ever *called* lazily inside the
+// liveArray/PROTOTYPES/SESSION/TESTS computes at render time, never during
+// module eval, so the binding is always resolved.
+import { relativeTime, latestScreenshot, versionNum } from './data.ts';
 import type {
   Prototype,
   Screenshot,
@@ -184,12 +185,6 @@ const liveArray = <T>(compute: () => T[]): T[] =>
     },
   });
 
-const latestScreenshot = (arr: Screenshot[]): Screenshot | null =>
-  arr.reduce(
-    (latest: Screenshot | null, s) => (!latest || s.capturedAt > latest.capturedAt ? s : latest),
-    null,
-  );
-
 // Derived PROTOTYPES
 export const PROTOTYPES: Prototype[] = liveArray(() => {
   const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
@@ -246,11 +241,10 @@ export const SESSION: KV[] = liveArray(() => {
 // per prototype — its latest-version run — with pass/fail gated by findings via
 // testStatus (a high-severity finding fails the suite even if the checks passed).
 export const TESTS: TestRun[] = liveArray(() => {
-  const verNum = (v: string) => parseInt(String(v).slice(1), 10) || 0;
   const latest = new Map<string, TestRunInput>();
   for (const t of testsStore) {
     const cur = latest.get(t.protoId);
-    if (!cur || verNum(t.ver) > verNum(cur.ver)) latest.set(t.protoId, t);
+    if (!cur || versionNum(t.ver) > versionNum(cur.ver)) latest.set(t.protoId, t);
   }
   const highFindings = new Set(
     findingsStore.filter((f) => f.sev === 'high').map((f) => `${f.protoId}:${f.ver}`),

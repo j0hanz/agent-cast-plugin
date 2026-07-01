@@ -75,6 +75,9 @@ export const latestScreenshot = (screenshots: Screenshot[]): Screenshot | null =
     (latest: Screenshot | null, s) => (!latest || s.capturedAt > latest.capturedAt ? s : latest),
     null,
   );
+// Shared numeric version comparator ('v10' > 'v9') — the one place this parses
+// a `ver` string, so findingsFor/versionsFor/live.ts's TESTS all agree.
+export const versionNum = (v: string): number => parseInt(String(v).slice(1), 10) || 0;
 export const deriveAgent = (screenshots: Screenshot[]): { running: boolean; stage: string } => {
   const latest = latestScreenshot(screenshots);
   const fresh =
@@ -117,8 +120,7 @@ export const filterScreenshots = (filter = 'All'): typeof SCREENSHOTS =>
 export const findingsFor = (id: string, list: Finding[] = FINDINGS): Finding[] => {
   const mine = list.filter((f) => f.protoId === id);
   if (!mine.length) return [];
-  const n = (v: string) => parseInt(String(v).slice(1), 10) || 0; // 'v10' > 'v9', numeric
-  const latest = mine.reduce((m, f) => (n(f.ver) > n(m.ver) ? f : m)).ver;
+  const latest = mine.reduce((m, f) => (versionNum(f.ver) > versionNum(m.ver) ? f : m)).ver;
   return mine.filter((f) => f.ver === latest);
 };
 
@@ -176,12 +178,10 @@ export const deriveLoop = (stage?: Stage): LoopStep[] => [
     t: stage === 'final' ? 'running…' : 'queued',
   },
 ];
-export const versionsFor = (id: string, list: Screenshot[] = SCREENSHOTS): string[] => {
-  const n = (v: string) => parseInt(String(v).slice(1), 10) || 0;
-  return [...new Set(list.filter((s) => s.protoId === id).map((s) => s.ver))].sort(
-    (a, b) => n(a) - n(b),
+export const versionsFor = (id: string, list: Screenshot[] = SCREENSHOTS): string[] =>
+  [...new Set(list.filter((s) => s.protoId === id).map((s) => s.ver))].sort(
+    (a, b) => versionNum(a) - versionNum(b),
   );
-};
 export const loopFor = (id: string, list: Screenshot[] = SCREENSHOTS): LoopStep[] =>
   deriveLoop(latestScreenshot(list.filter((s) => s.protoId === id))?.stage);
 
