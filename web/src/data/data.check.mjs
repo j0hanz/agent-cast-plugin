@@ -11,7 +11,7 @@ import {
   loopFor,
   relativeTime,
   deriveAgent,
-  AGENT,
+  SCREENSHOTS,
 } from './data.ts';
 import * as mock from './mock.ts';
 import * as live from './live.ts';
@@ -131,7 +131,7 @@ assert.deepStrictEqual(
   'picks the most recent by capturedAt value, not array position',
 );
 assert.strictEqual(
-  AGENT.running,
+  deriveAgent(SCREENSHOTS).running,
   true,
   'mock SCREENSHOTS has a "just now" entry → AGENT.running true by default',
 );

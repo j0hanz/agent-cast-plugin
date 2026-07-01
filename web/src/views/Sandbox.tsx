@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.tsx';
 import { useUI, setSeg } from '../state/ui.ts';
-import { SESSION, LOG, AGENT, SCREENSHOTS, latestScreenshot } from '../data/data.ts';
+import { SESSION, LOG, deriveAgent, SCREENSHOTS, latestScreenshot } from '../data/data.ts';
 import type { LogEntry, Device } from '../data/types.ts';
 import ui from '../components/ui.module.css';
 
@@ -20,7 +20,7 @@ export function Sandbox() {
   const top = (
     <>
       <div className="grow" />
-      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+      <AgentPill {...deriveAgent(SCREENSHOTS)} />
     </>
   );
 

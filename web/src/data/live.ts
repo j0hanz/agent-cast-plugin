@@ -30,7 +30,6 @@ import type {
   TestRun,
   McpTool,
   McpCall,
-  SettingsGroup,
 } from './types.ts';
 
 const warn = (msg: string, err: unknown): void => {
@@ -264,19 +263,6 @@ export const TESTS: TestRun[] = liveArray(() => {
     status: t.pass === t.total && !highFindings.has(`${t.protoId}:${t.ver}`) ? 'passed' : 'failed',
   }));
 });
-
-export const SETTINGS: SettingsGroup[] = [
-  {
-    group: 'Environment',
-    items: [
-      { k: 'Default viewport', v: '1440 × 900' },
-      { k: 'Image format', v: 'PNG' },
-      { k: 'Dev server port', v: ':5173' },
-      { k: 'Theme', v: 'Graphite' },
-      { k: 'Accent', v: 'Amber' },
-    ],
-  },
-];
 
 // Derived MCP server info
 export const MCP: KV[] = liveArray(() => {

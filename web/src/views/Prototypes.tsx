@@ -12,8 +12,8 @@ import {
   relativeTime,
   latestScreenshot,
   SCREENSHOTS,
-  SCREENSHOT_PROTOS,
-  AGENT,
+  screenshotProtos,
+  deriveAgent,
 } from '../data/data.ts';
 import type { Prototype, Screenshot } from '../data/types.ts';
 import styles from './Prototypes.module.css';
@@ -125,7 +125,7 @@ export function Prototypes() {
     <>
       <SubTabs active={tab} onChange={handleTab} />
       <div className="grow" />
-      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+      <AgentPill {...deriveAgent(SCREENSHOTS)} />
     </>
   );
 
@@ -159,7 +159,7 @@ export function Prototypes() {
       ) : (
         <>
           <div className={styles.toolbar}>
-            <Chips labels={SCREENSHOT_PROTOS} value={scFilter} onChange={handleScFilter} />
+            <Chips labels={screenshotProtos()} value={scFilter} onChange={handleScFilter} />
             <div className="grow" />
             <span className={styles.count}>{scList.length} captures</span>
           </div>

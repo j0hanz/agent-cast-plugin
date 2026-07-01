@@ -6,11 +6,12 @@ import { useUI, setSeg } from '../state/ui.ts';
 import {
   cap,
   PROTOTYPES,
+  SCREENSHOTS,
   versionsFor,
   loopFor,
   findingsFor,
   VIEWPORTS,
-  AGENT,
+  deriveAgent,
 } from '../data/data.ts';
 import type { Finding, LoopStep, Device } from '../data/types.ts';
 import styles from './Detail.module.css';
@@ -75,7 +76,7 @@ export function Detail({ id }: { id: string }) {
         </ol>
       </nav>
       <div className="grow" />
-      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+      <AgentPill {...deriveAgent(SCREENSHOTS)} />
     </>
   );
   return (

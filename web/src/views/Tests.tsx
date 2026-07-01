@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { AgentPill, EmptyState } from '../components/ui.tsx';
-import { TESTS, testSummary, AGENT } from '../data/data.ts';
+import { TESTS, testSummary, deriveAgent, SCREENSHOTS } from '../data/data.ts';
 import type { TestRun } from '../data/types.ts';
 import styles from './Tests.module.css';
 import ui from '../components/ui.module.css';
@@ -62,7 +62,7 @@ export function Tests() {
   const top = (
     <>
       <div className="grow" />
-      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+      <AgentPill {...deriveAgent(SCREENSHOTS)} />
     </>
   );
   return (

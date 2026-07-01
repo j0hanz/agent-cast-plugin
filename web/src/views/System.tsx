@@ -1,7 +1,15 @@
 import { memo } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { AgentPill, EmptyState, Panel } from '../components/ui.tsx';
-import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT, relativeTime } from '../data/data.ts';
+import {
+  MCP,
+  MCP_TOOLS,
+  MCP_CALLS,
+  SETTINGS,
+  deriveAgent,
+  SCREENSHOTS,
+  relativeTime,
+} from '../data/data.ts';
 import type { KV, McpTool, McpCall, SettingsGroup } from '../data/types.ts';
 import ui from '../components/ui.module.css';
 import styles from './System.module.css';
@@ -61,7 +69,7 @@ export function System() {
   const top = (
     <>
       <div className="grow" />
-      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+      <AgentPill {...deriveAgent(SCREENSHOTS)} />
     </>
   );
 

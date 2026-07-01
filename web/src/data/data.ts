@@ -16,24 +16,34 @@ import type {
   TestStatus,
   TestRunInput,
   LoopStep,
+  SettingsGroup,
 } from './types.ts';
 import type { IconName } from '../components/icons.tsx';
 
 // ponytail: optional chaining — import.meta.env only exists under Vite, not
 // when data.check.mjs runs this file via plain `node`.
 const SRC = import.meta.env?.VITE_DATA_SOURCE === 'live' ? live : mock;
-export const {
-  PROTOTYPES,
-  FINDINGS,
-  SCREENSHOTS,
-  SESSION,
-  LOG,
-  TESTS,
-  MCP,
-  MCP_TOOLS,
-  MCP_CALLS,
-  SETTINGS,
-} = SRC;
+export const { PROTOTYPES, FINDINGS, SCREENSHOTS, SESSION, LOG, TESTS, MCP, MCP_TOOLS, MCP_CALLS } =
+  SRC;
+
+// Identical in mock and live (never actually varies by data source) — one
+// copy here instead of duplicating the literal in both. Switches were removed
+// (along with their labels) — nothing here is actually configurable, so
+// showing disabled toggles implying otherwise was dishonest. One card, not
+// three near-empty ones — these are five flat facts with no functional
+// distinction between them now that none are toggleable.
+export const SETTINGS: SettingsGroup[] = [
+  {
+    group: 'Environment',
+    items: [
+      { k: 'Default viewport', v: '1440 × 900' },
+      { k: 'Image format', v: 'PNG' },
+      { k: 'Dev server port', v: ':5173' },
+      { k: 'Theme', v: 'Graphite' },
+      { k: 'Accent', v: 'Amber' },
+    ],
+  },
+];
 
 export const cap = (s: string): string => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
 export const deviceIcon = (d: Device): IconName => (d === 'Mobile' ? 'mobile' : 'monitor');
@@ -71,15 +81,6 @@ export const deriveAgent = (screenshots: Screenshot[]): { running: boolean; stag
     latest?.capturedAt && Date.now() - new Date(latest.capturedAt).getTime() < AGENT_FRESH_MS;
   return fresh ? { running: true, stage: latest.stage } : { running: false, stage: '' };
 };
-export const AGENT: { running: boolean; stage: string } = new Proxy(
-  { running: false, stage: '' },
-  {
-    get(_target, prop) {
-      const agent = deriveAgent(SCREENSHOTS);
-      return agent[prop as keyof typeof agent];
-    },
-  },
-);
 export const STATUS_OF: Record<string, Status | null> = {
   All: null,
   Live: 'live',
@@ -192,13 +193,7 @@ export const loopFor = (id: string, list: Screenshot[] = SCREENSHOTS): LoopStep[
   deriveLoop(latestScreenshot(list.filter((s) => s.protoId === id))?.stage);
 
 // M2: derived from data so filter stays in sync when prototypes are renamed.
-const screenshotProtos = (): string[] => ['All', ...new Set(SCREENSHOTS.map((s) => s.proto))];
-export const SCREENSHOT_PROTOS: string[] = new Proxy([] as string[], {
-  get(_target, prop) {
-    const arr = screenshotProtos();
-    return Reflect.get(arr, prop) as (typeof arr)[keyof typeof arr];
-  },
-  has(_target, prop) {
-    return Reflect.has(screenshotProtos(), prop);
-  },
-});
+export const screenshotProtos = (): string[] => [
+  'All',
+  ...new Set(SCREENSHOTS.map((s) => s.proto)),
+];

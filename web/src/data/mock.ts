@@ -11,7 +11,6 @@ import type {
   TestRun,
   McpTool,
   McpCall,
-  SettingsGroup,
 } from './types.ts';
 
 // Minutes-ago offsets so capturedAt (and anything derived from it, e.g.
@@ -164,19 +163,4 @@ export const MCP_CALLS: McpCall[] = [
   { ts: ago(3), tool: 'browser_snapshot', input: {} },
 ];
 
-// Switches were removed (along with their labels) — nothing here is actually
-// configurable, so showing disabled toggles implying otherwise was dishonest.
-// One card, not three near-empty ones — these are five flat facts with no
-// functional distinction between them now that none are toggleable.
-export const SETTINGS: SettingsGroup[] = [
-  {
-    group: 'Environment',
-    items: [
-      { k: 'Default viewport', v: '1440 × 900' },
-      { k: 'Image format', v: 'PNG' },
-      { k: 'Dev server port', v: ':5173' },
-      { k: 'Theme', v: 'Graphite' },
-      { k: 'Accent', v: 'Amber' },
-    ],
-  },
-];
+// SETTINGS lives in data.ts — identical in mock and live, so one copy covers both.
