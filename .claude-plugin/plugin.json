@@ -2,5 +2,11 @@
   "name": "agent-cast",
   "version": "0.1.0",
   "description": "Closed-loop frontend workflow for Claude Code: build, preview, screenshot-critique, refine, and test UIs via the Playwright MCP server.",
-  "author": "golfarenlj@gmail.com"
+  "author": {
+    "name": "j0hanz",
+    "email": "l.johansson93@outlook.com"
+  },
+  "repository": "https://github.com/j0hanz/agent-cast-plugin",
+  "homepage": "https://github.com/j0hanz/agent-cast-plugin",
+  "license": "MIT"
 }
