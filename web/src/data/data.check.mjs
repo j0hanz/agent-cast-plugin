@@ -133,5 +133,13 @@ assert.strictEqual(
   true,
   'mock SCREENSHOTS has a "just now" entry → AGENT.running true by default',
 );
+assert.deepStrictEqual(
+  deriveAgent(
+    [{ capturedAt: new Date(Date.now() - 3600_000).toISOString(), stage: 'old' }],
+    [{ ts: new Date().toISOString(), tool: 'browser_navigate', input: {} }],
+  ),
+  { running: true, stage: 'old' },
+  'stale screenshot but a fresh MCP call → still running (non-visual activity), stage from last known screenshot',
+);
 
 console.log('data check: ok');

@@ -69,7 +69,7 @@ export function System() {
   const top = (
     <>
       <div className="grow" />
-      <AgentPill {...deriveAgent(SCREENSHOTS)} />
+      <AgentPill {...deriveAgent(SCREENSHOTS, MCP_CALLS)} />
     </>
   );
 

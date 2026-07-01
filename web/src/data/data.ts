@@ -17,6 +17,7 @@ import type {
   TestRunInput,
   LoopStep,
   SettingsGroup,
+  McpCall,
 } from './types.ts';
 import type { IconName } from '../components/icons.tsx';
 
@@ -78,11 +79,20 @@ export const latestScreenshot = (screenshots: Screenshot[]): Screenshot | null =
 // Shared numeric version comparator ('v10' > 'v9') — the one place this parses
 // a `ver` string, so findingsFor/versionsFor/live.ts's TESTS all agree.
 export const versionNum = (v: string): number => parseInt(String(v).slice(1), 10) || 0;
-export const deriveAgent = (screenshots: Screenshot[]): { running: boolean; stage: string } => {
+// Screenshots alone under-report activity: most loop steps (navigate, evaluate,
+// snapshot) call the MCP server without capturing, so a long non-visual stretch
+// used to read as idle. Fold in the latest MCP call timestamp too — stage still
+// comes from the latest screenshot (the only stage-bearing signal) since calls
+// don't carry one.
+export const deriveAgent = (
+  screenshots: Screenshot[],
+  mcpCalls: McpCall[] = [],
+): { running: boolean; stage: string } => {
   const latest = latestScreenshot(screenshots);
-  const fresh =
-    latest?.capturedAt && Date.now() - new Date(latest.capturedAt).getTime() < AGENT_FRESH_MS;
-  return fresh ? { running: true, stage: latest.stage } : { running: false, stage: '' };
+  const latestCallTs = mcpCalls.reduce((max, c) => (c.ts > max ? c.ts : max), '');
+  const latestTs = (latest?.capturedAt ?? '') > latestCallTs ? latest?.capturedAt : latestCallTs;
+  const fresh = !!latestTs && Date.now() - new Date(latestTs).getTime() < AGENT_FRESH_MS;
+  return fresh ? { running: true, stage: latest?.stage ?? '' } : { running: false, stage: '' };
 };
 export const STATUS_OF: Record<string, Status | null> = {
   All: null,

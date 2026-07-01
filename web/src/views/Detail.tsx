@@ -7,6 +7,7 @@ import {
   cap,
   PROTOTYPES,
   SCREENSHOTS,
+  MCP_CALLS,
   versionsFor,
   loopFor,
   findingsFor,
@@ -76,7 +77,7 @@ export function Detail({ id }: { id: string }) {
         </ol>
       </nav>
       <div className="grow" />
-      <AgentPill {...deriveAgent(SCREENSHOTS)} />
+      <AgentPill {...deriveAgent(SCREENSHOTS, MCP_CALLS)} />
     </>
   );
   return (

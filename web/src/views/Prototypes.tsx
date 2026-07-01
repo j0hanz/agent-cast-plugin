@@ -12,6 +12,7 @@ import {
   relativeTime,
   latestScreenshot,
   SCREENSHOTS,
+  MCP_CALLS,
   screenshotProtos,
   deriveAgent,
 } from '../data/data.ts';
@@ -122,7 +123,7 @@ export function Prototypes() {
     <>
       <SubTabs active={tab} onChange={handleTab} />
       <div className="grow" />
-      <AgentPill {...deriveAgent(SCREENSHOTS)} />
+      <AgentPill {...deriveAgent(SCREENSHOTS, MCP_CALLS)} />
     </>
   );
 
