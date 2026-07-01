@@ -1,7 +1,7 @@
 import { memo, useMemo, useCallback, useState } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
-import { AgentPill, Chips, SearchBox, EmptyState } from '../components/ui.jsx';
+import { AgentPill, Chips, EmptyState } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
 import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
 import styles from './Prototypes.module.css';
@@ -69,7 +69,6 @@ export function Prototypes() {
   const top = (
     <>
       <SubTabs active={tab} onChange={handleTab} />
-      <SearchBox value={currentQuery} onChange={handleQChange} />
       <div className="grow" />
       <AgentPill running={AGENT.running} stage={AGENT.stage} />
     </>

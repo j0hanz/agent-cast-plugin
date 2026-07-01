@@ -85,6 +85,6 @@ export const EmptyState = memo(({ icon = 'search', title = 'No results found', d
   <div className={styles.empty}>
     <div style={{ marginBottom: 'var(--s2)', opacity: 0.5 }}><Icon n={icon} sw={2} /></div>
     <h2>{title}</h2>
-    <p style={{ marginTop: 'var(--s0)' }}>{description}</p>
+    <span style={{ marginTop: 'var(--s0)' }}>{description}</span>
   </div>
 ));

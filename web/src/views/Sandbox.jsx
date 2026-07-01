@@ -15,7 +15,7 @@ const LogRow = memo(({ l }) => (
 export function Sandbox() {
   const dev = useUI(s => s.seg.sandbox) || 'Desktop';
   const setSeg = useUI(s => s.setSeg);
-  const top = <>Sandbox<div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
+  const top = <><div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
 
   // Resolve active prototype/version by capturedAt, not array position —
   // screenshot order isn't guaranteed chronological.

@@ -56,7 +56,7 @@ export function Tests() {
     pass: acc.pass + (t.status === 'passed' || t.status === 'failed' ? t.pass : 0),
     fail: acc.fail + (t.status === 'failed' ? t.total - t.pass : 0),
   }), { pass: 0, fail: 0 });
-  const top = <>Tests<div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
+  const top = <><div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
   return (
     <Main topbar={top}>
       <h1 className="sr-only">Tests</h1>

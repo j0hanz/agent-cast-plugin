@@ -53,7 +53,6 @@ const SettingGroup = memo(({ g }) => (
 export function System() {
   const top = (
     <>
-      System
       <div className="grow" />
       <AgentPill running={AGENT.running} stage={AGENT.stage} />
     </>
@@ -64,7 +63,6 @@ export function System() {
       <div className={ui.dhead}>
         <h1>System</h1>
         <span className={`${ui.pill} ${ui.live}`}>MCP connected</span>
-        <span className={ui.dmeta}>Read-only · managed by the plugin</span>
       </div>
 
       {/* Single unified 2-col grid — settings then MCP panels, all flowing together */}
