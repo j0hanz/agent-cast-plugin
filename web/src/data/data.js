@@ -95,6 +95,17 @@ export const testStatus = (run, findings = FINDINGS) =>
     !findings.some(f => f.protoId === run.protoId && f.ver === run.ver && f.sev === 'high'))
     ? 'passed' : 'failed';
 
+// Summary counts suites by status, not checks (Cause B). Counting failing
+// *checks* (total - pass) hid findings-gated failures — a suite with 10/10
+// checks but a high finding reads "Failed" per-row yet added 0 to "Failing".
+// Suite-status counts keep the header consistent with the rows: passing +
+// failing + in-flight = suites.
+export const testSummary = (tests) => ({
+  passing: tests.filter(t => t.status === 'passed').length,
+  failing: tests.filter(t => t.status === 'failed').length,
+  suites: tests.length,
+});
+
 // LOOP + VERSIONS are per-prototype, not global — a Detail page must show only
 // the viewed prototype's captures, or a sibling on a higher version leaks in
 // (Cause A). deriveLoop maps a stage to the 5 loop steps; loopFor/versionsFor

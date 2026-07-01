@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Main } from '../layout/Shell.jsx';
 import { AgentPill, EmptyState } from '../components/ui.jsx';
-import { TESTS, AGENT } from '../data/data.js';
+import { TESTS, testSummary, AGENT } from '../data/data.js';
 import styles from './Tests.module.css';
 import ui from '../components/ui.module.css';
 
@@ -52,18 +52,15 @@ const TestRow = memo(({ t }) => {
 });
 
 export function Tests() {
-  const { pass, fail } = TESTS.reduce((acc, t) => ({
-    pass: acc.pass + (t.status === 'passed' || t.status === 'failed' ? t.pass : 0),
-    fail: acc.fail + (t.status === 'failed' ? t.total - t.pass : 0),
-  }), { pass: 0, fail: 0 });
+  const { passing, failing, suites } = testSummary(TESTS);
   const top = <><div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
   return (
     <Main topbar={top}>
       <h1 className="sr-only">Tests</h1>
       <div className={styles.summary}>
-        <div className={`${styles.stat} ${styles.ok}`}><div className={styles.k}>Passing</div><div className={styles.v}>{pass}</div></div>
-        <div className={`${styles.stat} ${styles.bad}`}><div className={styles.k}>Failing</div><div className={styles.v}>{fail}</div></div>
-        <div className={styles.stat}><div className={styles.k}>Suites</div><div className={styles.v}>{TESTS.length}</div></div>
+        <div className={`${styles.stat} ${styles.ok}`}><div className={styles.k}>Passing</div><div className={styles.v}>{passing}</div></div>
+        <div className={`${styles.stat} ${styles.bad}`}><div className={styles.k}>Failing</div><div className={styles.v}>{failing}</div></div>
+        <div className={styles.stat}><div className={styles.k}>Suites</div><div className={styles.v}>{suites}</div></div>
       </div>
       <div className={ui.panel}>
         <div className={ui.ptitle}>Test runs <span className={ui.c}>last {TESTS.length} prototypes</span></div>

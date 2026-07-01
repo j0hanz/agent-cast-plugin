@@ -1,6 +1,6 @@
 // Runnable check for the non-trivial bits (filtering, mock/live parity, derived AGENT). `npm run check`.
 import assert from 'node:assert';
-import { filterPrototypes, filterScreenshots, findingsFor, testStatus, deriveLoop, versionsFor, loopFor, relativeTime, deriveAgent, AGENT } from './data.js';
+import { filterPrototypes, filterScreenshots, findingsFor, testStatus, testSummary, deriveLoop, versionsFor, loopFor, relativeTime, deriveAgent, AGENT } from './data.js';
 import * as mock from './mock.js';
 import * as live from './live.js';
 
@@ -45,6 +45,19 @@ assert.strictEqual(testStatus({ ...run, pass: 9 }, []), 'failed', 'a failing che
 assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v1', sev: 'high' }]), 'failed', 'clean checks but a high finding → failed');
 assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v2', sev: 'high' }]), 'passed', 'high finding on another version does not fail this run');
 assert.strictEqual(testStatus(run, [{ protoId: 'a', ver: 'v1', sev: 'low' }]), 'passed', 'a low finding does not fail the suite');
+
+// Cause B: summary counts suites by status, not checks — a findings-gated
+// failure (10/10 checks, status failed) must count as 1 Failing, not 0.
+assert.deepStrictEqual(
+  testSummary([
+    { status: 'passed', pass: 12, total: 12 },
+    { status: 'failed', pass: 10, total: 10 },
+    { status: 'running', pass: 0, total: 8 },
+    { status: 'queued', pass: 0, total: 5 },
+  ]),
+  { passing: 1, failing: 1, suites: 4 },
+  'suite-status counts; a clean-checks findings-gated failure still counts as failing',
+);
 
 assert.strictEqual(relativeTime(null), '', 'missing timestamp → empty string, no throw');
 assert.strictEqual(relativeTime(new Date().toISOString()), 'just now', 'fresh timestamp → "just now"');
