@@ -272,6 +272,20 @@ interface PlaywrightMcpConfig {
 
 const GET_CONFIG_TOOL = 'mcp__playwright__browser_get_config';
 
+// playwright-mcp wraps every text result in "### <Section>" markdown headers
+// (browser_get_config's JSON lands under "### Result", sometimes followed by
+// "### Page" if the tab changed) — never bare text. Pull one section's raw
+// content out before parsing it. Falls back to the whole string if no
+// section header is found, in case a future server version stops wrapping.
+const extractSection = (text: string, name: string): string => {
+  const parts = text.split(/^### /m).slice(1);
+  for (const part of parts) {
+    const nl = part.indexOf('\n');
+    if (nl !== -1 && part.slice(0, nl).trim() === name) return part.slice(nl + 1).trim();
+  }
+  return text;
+};
+
 // Ground-truth resolved config, from the loop's own browser_get_config call
 // (see skills/frontend-loop/SKILL.md) — not the CLI/config-file source, which
 // this dashboard has no other way to observe. Picks the true latest call by
@@ -285,7 +299,7 @@ const parseConfig = (calls: McpCall[]): PlaywrightMcpConfig | null => {
   if (!call) return null;
   try {
     return typeof call.output === 'string'
-      ? (JSON.parse(call.output) as PlaywrightMcpConfig)
+      ? (JSON.parse(extractSection(call.output, 'Result')) as PlaywrightMcpConfig)
       : (call.output as PlaywrightMcpConfig);
   } catch {
     return null;
