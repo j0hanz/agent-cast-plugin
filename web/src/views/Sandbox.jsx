@@ -29,7 +29,7 @@ export function Sandbox() {
         <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
       </div>
       <div className={`${ui.cols} ${ui.stretch}`}>
-        <Preview id={activeProtoId} ver={activeVer} stage={latest?.stage} />
+        <Preview key={`${activeProtoId}:${activeVer}`} id={activeProtoId} ver={activeVer} stage={latest?.stage} />
         <div className={ui.stackFill}>
           <Panel title="Session">
             {SESSION.length ? SESSION.map(s => <div key={s.k} className={ui.kv}><span className={ui.k}>{s.k}</span><span className={ui.v}>{s.v}</span></div>) : <EmptyState icon="sandbox" title="No session data" description="The session hasn't started or no data was captured." />}

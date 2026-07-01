@@ -94,7 +94,7 @@ export function Prototypes() {
             <div className="grow" /><span className={styles.count}>{list.length} prototypes</span>
           </div>
           {list.length ? (
-            <div className={styles.grid}>{list.map(p => <PrototypeCard key={p.id} p={p} />)}</div>
+            <div className={styles.grid}>{list.map(p => <PrototypeCard key={`${p.id}:${latestScreenshot(SCREENSHOTS.filter(s => s.protoId === p.id))?.ver}`} p={p} />)}</div>
           ) : <EmptyState />}
         </>
       ) : (
