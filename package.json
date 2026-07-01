@@ -1,0 +1,33 @@
+{
+  "name": "agent-cast",
+  "description": "",
+  "author": "j0hanz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/j0hanz/agent-cast-plugin.git"
+  },
+  "homepage": "https://github.com/j0hanz/agent-cast-plugin#readme",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "prettier": "^3.8.4",
+    "typescript-eslint": "^8.62.1"
+  }
+}
