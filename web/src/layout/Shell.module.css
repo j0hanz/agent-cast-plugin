@@ -57,7 +57,7 @@ nav {
 .navlabel {
   font-family: var(--font-mono);
   font-size: var(--fs-2xs);
-  letter-spacing: .15em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--mut);
   font-weight: 600;
@@ -84,7 +84,7 @@ nav {
   height: var(--icon-sm);
   stroke: currentColor;
   flex: none;
-  opacity: .8;
+  opacity: 0.8;
   transition: transform 0.2s ease;
 }
 .item:hover {
@@ -109,7 +109,9 @@ nav {
 @media (prefers-reduced-motion: reduce) {
   .item:hover,
   .item:active,
-  .item:hover svg { transform: none; }
+  .item:hover svg {
+    transform: none;
+  }
 }
 
 .status {
@@ -159,7 +161,11 @@ nav {
     align-items: center;
     gap: var(--s3);
   }
-  .brand .name, .brand .sub, .item .lbl, .navlabel, .status span:not(.pulse) {
+  .brand .name,
+  .brand .sub,
+  .item .lbl,
+  .navlabel,
+  .status span:not(.pulse) {
     display: none;
   }
   .brand {

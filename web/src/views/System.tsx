@@ -21,7 +21,9 @@ const McpCallRow = memo(({ c }: { c: McpCall }) => {
   return (
     <div className={ui.logrow}>
       <span className={ui.ts}>{relativeTime(c.ts)}</span>
-      <span className={ui.msg}><b>{c.tool}</b> {args.length > 60 ? args.slice(0, 60) + '…' : args}</span>
+      <span className={ui.msg}>
+        <b>{c.tool}</b> {args.length > 60 ? args.slice(0, 60) + '…' : args}
+      </span>
     </div>
   );
 });
@@ -29,9 +31,11 @@ const McpCallRow = memo(({ c }: { c: McpCall }) => {
 const McpStatRow = memo(({ s }: { s: KV }) => (
   <div className={ui.kv}>
     <span className={ui.k}>{s.k}</span>
-    {s.pill
-      ? <span className={`${ui.pill} ${ui[s.pill]}`}>{s.v}</span>
-      : <span className={ui.v}>{s.v}</span>}
+    {s.pill ? (
+      <span className={`${ui.pill} ${ui[s.pill]}`}>{s.v}</span>
+    ) : (
+      <span className={ui.v}>{s.v}</span>
+    )}
   </div>
 ));
 
@@ -46,7 +50,9 @@ const SettingItem = memo(({ it }: { it: KV }) => (
 
 const SettingGroup = memo(({ g }: { g: SettingsGroup }) => (
   <Panel title={g.group}>
-    {g.items.map(it => <SettingItem key={it.k} it={it} />)}
+    {g.items.map((it) => (
+      <SettingItem key={it.k} it={it} />
+    ))}
   </Panel>
 ));
 
@@ -69,19 +75,49 @@ export function System() {
       {/* Single unified 2-col grid — settings then MCP panels, all flowing together */}
       <div className={styles.grid}>
         {/* Settings rows */}
-        {SETTINGS.length ? SETTINGS.map(g => <SettingGroup key={g.group} g={g} />) : <Panel title="Settings"><EmptyState icon="settings" title="No settings" description="No configuration settings found." /></Panel>}
+        {SETTINGS.length ? (
+          SETTINGS.map((g) => <SettingGroup key={g.group} g={g} />)
+        ) : (
+          <Panel title="Settings">
+            <EmptyState
+              icon="settings"
+              title="No settings"
+              description="No configuration settings found."
+            />
+          </Panel>
+        )}
 
         {/* MCP rows — continue in the same grid */}
         <Panel title="Server">
-          {MCP.length ? MCP.map(s => <McpStatRow key={s.k} s={s} />) : <EmptyState icon="server" title="No server info" description="No server information available." />}
+          {MCP.length ? (
+            MCP.map((s) => <McpStatRow key={s.k} s={s} />)
+          ) : (
+            <EmptyState
+              icon="server"
+              title="No server info"
+              description="No server information available."
+            />
+          )}
         </Panel>
 
         <Panel title="Exposed tools" count={MCP_TOOLS.length}>
-          {MCP_TOOLS.length ? MCP_TOOLS.map(t => <McpToolRow key={t.name} t={t} />) : <EmptyState icon="tool" title="No tools" description="No tools exposed." />}
+          {MCP_TOOLS.length ? (
+            MCP_TOOLS.map((t) => <McpToolRow key={t.name} t={t} />)
+          ) : (
+            <EmptyState icon="tool" title="No tools" description="No tools exposed." />
+          )}
         </Panel>
 
         <Panel title="Recent calls">
-          {MCP_CALLS.length ? MCP_CALLS.map(c => <McpCallRow key={`${c.ts}-${c.tool}`} c={c} />) : <EmptyState icon="search" title="No recent calls" description="No MCP calls have been made yet." />}
+          {MCP_CALLS.length ? (
+            MCP_CALLS.map((c) => <McpCallRow key={`${c.ts}-${c.tool}`} c={c} />)
+          ) : (
+            <EmptyState
+              icon="search"
+              title="No recent calls"
+              description="No MCP calls have been made yet."
+            />
+          )}
         </Panel>
       </div>
     </Main>

@@ -46,9 +46,9 @@ Stays in `data.js`: `cap, deviceIcon, STATUS_OF, VIEWPORTS, NAV, SYSTEM, filterP
 
 ```js
 // data.js (new shape)
-import * as mock from "./mock.js";
-import * as live from "./live.js";
-const SRC = import.meta.env.VITE_DATA_SOURCE === "live" ? live : mock;
+import * as mock from './mock.js';
+import * as live from './live.js';
+const SRC = import.meta.env.VITE_DATA_SOURCE === 'live' ? live : mock;
 
 export const {
   AGENT,

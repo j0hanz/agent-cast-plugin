@@ -9,14 +9,14 @@ Items 1–4 and 6 of the original roadmap shipped; item 5 (settings enforcement)
 was deferred. P0 hygiene (gitignore log artifacts, dedupe `relativeTime`, drop
 dead `SearchBox`, gate nav motion) landed in `018bb6a`.
 
-| # | Item | State |
-|---|------|-------|
-| 1 | SessionStart auto-starts dev server | shipped |
-| 2 | Real screenshot rendering (`screenshotSrc` + `<img>`) | shipped |
-| 3 | `state.json` manifest contract for `live.js` | shipped |
-| 4 | AGENT status derived from screenshot recency | shipped |
-| 6 | MCP call logging (PostToolUse → `mcp-calls.jsonl`) | shipped |
-| 5 | Settings enforcement (PreToolUse) | deferred, not designed |
+| #   | Item                                                  | State                  |
+| --- | ----------------------------------------------------- | ---------------------- |
+| 1   | SessionStart auto-starts dev server                   | shipped                |
+| 2   | Real screenshot rendering (`screenshotSrc` + `<img>`) | shipped                |
+| 3   | `state.json` manifest contract for `live.js`          | shipped                |
+| 4   | AGENT status derived from screenshot recency          | shipped                |
+| 6   | MCP call logging (PostToolUse → `mcp-calls.jsonl`)    | shipped                |
+| 5   | Settings enforcement (PreToolUse)                     | deferred, not designed |
 
 What actually works: the dashboard **ingests** real agent activity. What's
 missing: something reliably **produces** that activity. The dashboard observes
@@ -28,7 +28,7 @@ Claude Code hooks are `type: "command"` scripts that receive a tool's I/O on
 stdin and may allow/deny/modify it. **They cannot initiate an MCP tool call.**
 Every existing hook (`update-state.sh`, `log-mcp-call.sh`, `log-session.sh`)
 only reacts. So "automated capture trigger" (the old framing of item 4-next)
-*cannot* be a hook that fires `browser_take_screenshot`.
+_cannot_ be a hook that fires `browser_take_screenshot`.
 
 The only actor that can call the Playwright MCP is the agent (Claude) itself.
 Therefore closing the loop = giving the agent a **skill/workflow** that runs
@@ -49,14 +49,14 @@ by `mcp-calls.jsonl`.
 **A. The loop skill (keystone).** New plugin skill that drives the
 build/preview/critique/refine/test loop and captures screenshots with the
 naming convention `update-state.sh` already parses. No dashboard change. Full
-design: `2026-07-01-automated-capture-loop-design.md`. *Effort: M. Depends on
-nothing. Do first.*
+design: `2026-07-01-automated-capture-loop-design.md`. _Effort: M. Depends on
+nothing. Do first._
 
 **B. Live critique findings.** The loop's critique step appends
 `{protoId, ver, severity, text}` lines to `web/public/findings.jsonl`; `live.js`
 reads it exactly like `mcp-calls.jsonl` and exposes `FINDINGS` (today a hardcoded
-`[]`). Detail's critique panel goes live. *Effort: S. Depends on A (A produces
-the findings). Gitignore + one live.js block + Detail already renders FINDINGS.*
+`[]`). Detail's critique panel goes live. _Effort: S. Depends on A (A produces
+the findings). Gitignore + one live.js block + Detail already renders FINDINGS._
 
 **C. Live test results.** Replace `live.js`'s stubbed `TESTS` (hardcoded
 `10/10` per prototype) with a real `tests.jsonl` producer. **Open decision:
@@ -64,17 +64,17 @@ what is a "test" here?** No test framework is wired in `web/`. Candidates:
 (a) accessibility / web-guideline checks via existing skills, (b) Playwright
 assertions the loop runs, (c) the critique findings rolled up to pass/fail.
 Recommend (a)+(c): reuse what the agent already does, don't stand up a runner.
-*Effort: S–M. Depends on A + the decision above.*
+_Effort: S–M. Depends on A + the decision above._
 
 **D. Settings enforcement (original item 5).** A PreToolUse hook on
 `mcp__playwright__.*` that reads a `settings.json` and can **deny/modify** a
 call — the first hook to use PreToolUse's gate power (today's `log-session.sh`
 only logs). Makes System → Settings real: the panel displays the same file the
 hook enforces (allowed viewports, localhost-only navigation, capture on/off).
-*Effort: M. Independent of A–C; can run in parallel. Own design doc when picked.*
+_Effort: M. Independent of A–C; can run in parallel. Own design doc when picked._
 
 **E. Polish.** PrototypeCard thumbnails via `latestScreenshot(protoId)` (now
-exists in `data.js`); Preview `alt` text carrying stage. *Effort: S. Anytime.*
+exists in `data.js`); Preview `alt` text carrying stage. _Effort: S. Anytime._
 
 ## Open decisions (need your steer)
 

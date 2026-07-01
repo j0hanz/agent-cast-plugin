@@ -60,6 +60,7 @@ For each prototype, one pass = one `ver`:
    dashboard's Detail → Critique findings panel shows the active prototype's
    latest-version findings from this file, so bump `ver` per iteration and the
    old findings drop off automatically.
+
 4. **Refine** — apply the fixes the critique surfaced.
 5. **Test** — verify the fixes and record the run: append one JSON line to
    `web/public/tests.jsonl` —

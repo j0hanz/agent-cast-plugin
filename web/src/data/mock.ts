@@ -2,7 +2,17 @@
 // 'live' (data.ts picks this by default). Edit freely for CSS/layout work; the
 // shape must stay in sync with live.ts (enforced structurally by shared types.ts,
 // and at runtime by data.check.mjs).
-import type { Prototype, Finding, Screenshot, KV, LogEntry, TestRun, McpTool, McpCall, SettingsGroup } from './types.ts';
+import type {
+  Prototype,
+  Finding,
+  Screenshot,
+  KV,
+  LogEntry,
+  TestRun,
+  McpTool,
+  McpCall,
+  SettingsGroup,
+} from './types.ts';
 
 // Minutes-ago offsets so capturedAt (and anything derived from it, e.g.
 // AGENT) stays freshly "2m ago" etc. every time this loads, instead of a
@@ -19,20 +29,94 @@ export const PROTOTYPES: Prototype[] = [
 ];
 
 export const FINDINGS: Finding[] = [
-  { protoId: 'landing-hero', ver: 'v4', sev: 'high', text: 'Secondary button contrast below AA', loc: '.btn-secondary · 3.1:1' },
-  { protoId: 'landing-hero', ver: 'v4', sev: 'med', text: 'Hero heading exceeds 65ch line length', loc: 'h1.hero' },
-  { protoId: 'landing-hero', ver: 'v4', sev: 'low', text: 'CTA below the fold on mobile', loc: 'section.cta · 390px' },
+  {
+    protoId: 'landing-hero',
+    ver: 'v4',
+    sev: 'high',
+    text: 'Secondary button contrast below AA',
+    loc: '.btn-secondary · 3.1:1',
+  },
+  {
+    protoId: 'landing-hero',
+    ver: 'v4',
+    sev: 'med',
+    text: 'Hero heading exceeds 65ch line length',
+    loc: 'h1.hero',
+  },
+  {
+    protoId: 'landing-hero',
+    ver: 'v4',
+    sev: 'low',
+    text: 'CTA below the fold on mobile',
+    loc: 'section.cta · 390px',
+  },
 ];
 
 export const SCREENSHOTS: Screenshot[] = [
-  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'critique', ver: 'v4', capturedAt: ago(0) },
-  { protoId: 'landing-hero', proto: 'Landing hero', kind: 'desktop', stage: 'preview', ver: 'v3', capturedAt: ago(2) },
-  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'critique', ver: 'v5', capturedAt: ago(6) },
-  { protoId: 'pricing-page', proto: 'Pricing page', kind: 'desktop', stage: 'preview', ver: 'v2', capturedAt: ago(11) },
-  { protoId: 'onboarding', proto: 'Onboarding', kind: 'mobile', stage: 'preview', ver: 'v1', capturedAt: ago(14) },
-  { protoId: 'checkout-flow', proto: 'Checkout flow', kind: 'mobile', stage: 'preview', ver: 'v4', capturedAt: ago(18) },
-  { protoId: 'settings-panel', proto: 'Settings panel', kind: 'desktop', stage: 'critique', ver: 'v2', capturedAt: ago(22) },
-  { protoId: 'dashboard-shell', proto: 'Dashboard shell', kind: 'desktop', stage: 'preview', ver: 'v3', capturedAt: ago(27) },
+  {
+    protoId: 'landing-hero',
+    proto: 'Landing hero',
+    kind: 'desktop',
+    stage: 'critique',
+    ver: 'v4',
+    capturedAt: ago(0),
+  },
+  {
+    protoId: 'landing-hero',
+    proto: 'Landing hero',
+    kind: 'desktop',
+    stage: 'preview',
+    ver: 'v3',
+    capturedAt: ago(2),
+  },
+  {
+    protoId: 'checkout-flow',
+    proto: 'Checkout flow',
+    kind: 'mobile',
+    stage: 'critique',
+    ver: 'v5',
+    capturedAt: ago(6),
+  },
+  {
+    protoId: 'pricing-page',
+    proto: 'Pricing page',
+    kind: 'desktop',
+    stage: 'preview',
+    ver: 'v2',
+    capturedAt: ago(11),
+  },
+  {
+    protoId: 'onboarding',
+    proto: 'Onboarding',
+    kind: 'mobile',
+    stage: 'preview',
+    ver: 'v1',
+    capturedAt: ago(14),
+  },
+  {
+    protoId: 'checkout-flow',
+    proto: 'Checkout flow',
+    kind: 'mobile',
+    stage: 'preview',
+    ver: 'v4',
+    capturedAt: ago(18),
+  },
+  {
+    protoId: 'settings-panel',
+    proto: 'Settings panel',
+    kind: 'desktop',
+    stage: 'critique',
+    ver: 'v2',
+    capturedAt: ago(22),
+  },
+  {
+    protoId: 'dashboard-shell',
+    proto: 'Dashboard shell',
+    kind: 'desktop',
+    stage: 'preview',
+    ver: 'v3',
+    capturedAt: ago(27),
+  },
 ];
 
 export const SESSION: KV[] = [
@@ -85,11 +169,14 @@ export const MCP_CALLS: McpCall[] = [
 // One card, not three near-empty ones — these are five flat facts with no
 // functional distinction between them now that none are toggleable.
 export const SETTINGS: SettingsGroup[] = [
-  { group: 'Environment', items: [
-    { k: 'Default viewport', v: '1440 × 900' },
-    { k: 'Image format', v: 'PNG' },
-    { k: 'Dev server port', v: ':5173' },
-    { k: 'Theme', v: 'Graphite' },
-    { k: 'Accent', v: 'Amber' },
-  ] },
+  {
+    group: 'Environment',
+    items: [
+      { k: 'Default viewport', v: '1440 × 900' },
+      { k: 'Image format', v: 'PNG' },
+      { k: 'Dev server port', v: ':5173' },
+      { k: 'Theme', v: 'Graphite' },
+      { k: 'Accent', v: 'Amber' },
+    ],
+  },
 ];

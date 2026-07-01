@@ -35,39 +35,73 @@ const TestRow = memo(({ t }: { t: TestRun }) => {
     },
   }[t.status];
   return (
-    <div className={styles.trow}><span className={styles.tname}>{t.name}</span><span className={ui.muted}>{t.checks} checks</span>
+    <div className={styles.trow}>
+      <span className={styles.tname}>{t.name}</span>
+      <span className={ui.muted}>{t.checks} checks</span>
       <div className={styles.result}>
         {/* L6: role=progressbar makes the pass ratio accessible to screen readers */}
-        <div className={styles.ratio}
+        <div
+          className={styles.ratio}
           role="progressbar"
           aria-label={`${t.name} pass rate`}
           aria-valuenow={map.pct}
           aria-valuemin={0}
-          aria-valuemax={100}>
+          aria-valuemax={100}
+        >
           {map.bar}
         </div>
         <span className={styles.rtext}>{map.txt}</span>
-      </div>{map.pill}
+      </div>
+      {map.pill}
     </div>
   );
 });
 
 export function Tests() {
   const { passing, failing, suites } = testSummary(TESTS);
-  const top = <><div className="grow" /><AgentPill running={AGENT.running} stage={AGENT.stage} /></>;
+  const top = (
+    <>
+      <div className="grow" />
+      <AgentPill running={AGENT.running} stage={AGENT.stage} />
+    </>
+  );
   return (
     <Main topbar={top}>
       <h1 className="sr-only">Tests</h1>
       <div className={styles.summary}>
-        <div className={`${styles.stat} ${styles.ok}`}><div className={styles.k}>Passing</div><div className={styles.v}>{passing}</div></div>
-        <div className={`${styles.stat} ${styles.bad}`}><div className={styles.k}>Failing</div><div className={styles.v}>{failing}</div></div>
-        <div className={styles.stat}><div className={styles.k}>Suites</div><div className={styles.v}>{suites}</div></div>
+        <div className={`${styles.stat} ${styles.ok}`}>
+          <div className={styles.k}>Passing</div>
+          <div className={styles.v}>{passing}</div>
+        </div>
+        <div className={`${styles.stat} ${styles.bad}`}>
+          <div className={styles.k}>Failing</div>
+          <div className={styles.v}>{failing}</div>
+        </div>
+        <div className={styles.stat}>
+          <div className={styles.k}>Suites</div>
+          <div className={styles.v}>{suites}</div>
+        </div>
       </div>
       <div className={ui.panel}>
-        <div className={ui.ptitle}>Test runs <span className={ui.c}>last {TESTS.length} prototypes</span></div>
+        <div className={ui.ptitle}>
+          Test runs <span className={ui.c}>last {TESTS.length} prototypes</span>
+        </div>
         <div>
-          <div className={`${styles.trow} ${styles.head}`}><span>Prototype</span><span>Checks</span><span>Result</span><span className={styles.right}>Status</span></div>
-          {TESTS.length ? TESTS.map(t => <TestRow key={t.name} t={t} />) : <EmptyState icon="tests" title="No tests" description="No test runs have been recorded." />}
+          <div className={`${styles.trow} ${styles.head}`}>
+            <span>Prototype</span>
+            <span>Checks</span>
+            <span>Result</span>
+            <span className={styles.right}>Status</span>
+          </div>
+          {TESTS.length ? (
+            TESTS.map((t) => <TestRow key={t.name} t={t} />)
+          ) : (
+            <EmptyState
+              icon="tests"
+              title="No tests"
+              description="No test runs have been recorded."
+            />
+          )}
         </div>
       </div>
     </Main>

@@ -4,6 +4,7 @@ topic: Derive AGENT status from SCREENSHOTS recency (roadmap item 4)
 status: approved (locked via interview + Phase 5 critique 2026-06-30)
 
 ## Approach
+
 Stop tracking `AGENT` as its own hand-maintained field. Add a real
 `capturedAt` (ISO 8601) timestamp to every `SCREENSHOTS` entry, replacing the
 pre-formatted `time` display string everywhere it's shown. `AGENT.stage`/
@@ -11,6 +12,7 @@ pre-formatted `time` display string everywhere it's shown. `AGENT.stage`/
 `capturedAt` at render time via pure helpers.
 
 ## Why
+
 Claude Code is turn-based, not continuously running — there's no moment a
 human observes the dashboard while something is genuinely "in progress," so a
 hand-toggled `{running, stage}` flag (the original roadmap framing) would be
@@ -20,12 +22,14 @@ nothing has to remember to reset it. Confirmed via interview over both the
 hand-toggled-flag and defer-entirely alternatives.
 
 ## Scope
+
 S, flagged for Phase 5 (redefines what "AGENT running" means; touches the
 `state.json` manifest contract set in the prior cycle). Confirmed via
 interview to also replace `time` everywhere (not just feed `AGENT`) — so
 `ScreenshotCard` is in scope too, not just the pill.
 
 ## Constraints
+
 - No timer/polling (confirmed via interview) — relative time and `AGENT`
   recompute correctly whenever a component naturally re-renders (navigation,
   state changes). Nothing ticks live on a static screen; this is consistent
@@ -33,7 +37,7 @@ interview to also replace `time` everywhere (not just feed `AGENT`) — so
 - Mock mode must render identically to today. `mock.js`'s `capturedAt` values
   are computed as offsets from `Date.now()` at module load (e.g. `Date.now()
   - 2 * 60_000` for "2m ago"), not frozen ISO literals — otherwise the mock
-  fixture would go visibly stale the day after it's written.
+    fixture would go visibly stale the day after it's written.
 - `relativeTime(capturedAt)` must handle a missing/invalid timestamp without
   throwing (return `''`/safe default).
 - The "most recent" screenshot lookup must compare `capturedAt` values
@@ -43,6 +47,7 @@ interview to also replace `time` everywhere (not just feed `AGENT`) — so
   without throwing.
 
 ## Interface
+
 ```js
 // data.js — new pure helpers, alongside cap/deviceIcon/screenshotSrc
 export const relativeTime = (iso) => {
@@ -55,7 +60,7 @@ export const relativeTime = (iso) => {
 };
 
 const latestScreenshot = (list) =>
-  list.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
+  list.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt ? s : latest), null);
 
 export const AGENT = (() => {
   const latest = latestScreenshot(SCREENSHOTS);
@@ -64,11 +69,13 @@ export const AGENT = (() => {
   return { running: fresh, stage: fresh ? latest.stage : '' };
 })();
 ```
+
 `SCREENSHOTS` entries: `{ protoId, proto, kind, stage, ver, capturedAt }` —
 `time` field removed. `ScreenshotCard` ([Prototypes.jsx](web/src/views/Prototypes.jsx))
 renders `relativeTime(s.capturedAt)` instead of `s.time`.
 
 ## Architecture
+
 `AGENT` moves from a static export to a derived value computed once at
 module evaluation (same timing as today — it's still a plain `const`, just
 computed instead of literal). No new reactivity layer, no subscription, no
@@ -77,6 +84,7 @@ this app's existing pattern of pure derived values (`filterPrototypes`,
 `SCREENSHOT_PROTOS`).
 
 ## Risks
+
 - None blocking after the three Skeptic guards (missing-timestamp safety,
   empty-array safety, recency-by-value not array-position) are built into
   the Interface above, not deferred.
@@ -84,6 +92,7 @@ this app's existing pattern of pure derived values (`filterPrototypes`,
   constant — trivially adjustable later, not worth interviewing on.
 
 ## First Step
+
 1. Replace `time` with `capturedAt` (ISO 8601) in `mock.js`'s `SCREENSHOTS`
    entries, computed as `Date.now()`-relative offsets.
 2. Add `relativeTime()` and the `AGENT` derivation to `data.js`; remove the

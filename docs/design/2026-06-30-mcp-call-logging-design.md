@@ -4,6 +4,7 @@ topic: Real MCP call logging via a PostToolUse hook (roadmap item 6)
 status: approved (locked via interview + Phase 5 critique 2026-06-30)
 
 ## Approach
+
 A `PostToolUse` hook (`hooks/log-mcp-call.mjs`, Node ESM) matching
 `mcp__playwright__.*` appends one JSON line per call to
 `web/public/mcp-calls.jsonl` (gitignored, append-only). `live.js` fetches and
@@ -14,6 +15,7 @@ parses it the same way it already fetches `state.json`. `MCP_TOOLS`
 `JSON.stringify(tool_input)`, no per-tool formatting.
 
 ## Why
+
 Item 5 established that anything meant to work for arbitrary marketplace
 users needs a deterministic mechanism, not Claude's conversational memory.
 `PostToolUse` hooks are exactly that — they fire on every matching tool call
@@ -27,6 +29,7 @@ map because the Playwright MCP server is a third-party package
 a formatter map would silently go stale as that package evolves.
 
 ## Scope
+
 M, flagged for Phase 5 (first non-`SessionStart` hook, first non-JSON-object
 manifest file, real concurrency consideration). Item 5 (settings
 enforcement via `PreToolUse`) explicitly excluded — confirmed via interview
@@ -34,6 +37,7 @@ to stay its own future cycle, even though the same hook infrastructure could
 plausibly cover it.
 
 ## Constraints
+
 - `web/public/` doesn't exist on a fresh clone (everything written there so
   far is gitignored, nothing tracked creates it) — the hook script must
   `mkdir -p` the target directory before appending.
@@ -49,6 +53,7 @@ plausibly cover it.
   untruncated.
 
 ## Interface
+
 ```js
 // hooks/log-mcp-call.mjs (PostToolUse, matcher: mcp__playwright__.*)
 // reads hook input JSON from stdin, appends one line to mcp-calls.jsonl
@@ -61,23 +66,29 @@ const logPath = `${process.env.CLAUDE_PLUGIN_ROOT}/web/public/mcp-calls.jsonl`;
 mkdirSync(dirname(logPath), { recursive: true });
 appendFileSync(logPath, JSON.stringify(entry) + '\n');
 ```
+
 ```js
 // live.js — same try/catch/guard pattern as the state.json fetch
 export const MCP_CALLS = parseJsonl(await fetchText('/mcp-calls.jsonl'));
 ```
+
 ```js
 // data.js — new pure helper, alongside deriveAgent
 export const deriveMcpTools = (calls) => {
-  const counts = calls.reduce((acc, c) => (acc[c.tool] = (acc[c.tool] || 0) + 1, acc), {});
-  return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
+  const counts = calls.reduce((acc, c) => ((acc[c.tool] = (acc[c.tool] || 0) + 1), acc), {});
+  return Object.entries(counts)
+    .map(([name, calls]) => ({ name, calls }))
+    .sort((a, b) => b.calls - a.calls);
 };
 export const MCP_TOOLS = deriveMcpTools(MCP_CALLS);
 ```
+
 `System.jsx`'s `McpCallRow` renders `relativeTime(c.ts)` (reusing item 4's
 helper) instead of a new time format, and `tool`/truncated `JSON.stringify(input)`
 via the existing `RichText` component for bolding.
 
 ## Architecture
+
 No new dependency (Node's built-in `fs`, matching `data.check.mjs`'s existing
 plain-ESM-script convention). `MCP_CALLS` and `MCP_TOOLS` join `SCREENSHOTS`
 as the third and fourth manifest-backed live fields; `AGENT`, `TESTS`,
@@ -85,6 +96,7 @@ as the third and fourth manifest-backed live fields; `AGENT`, `TESTS`,
 items.
 
 ## Risks
+
 - Concurrent `PostToolUse` processes appending simultaneously could
   theoretically interleave for unusually large `tool_input` payloads
   (>~4KB, e.g. a big `browser_evaluate` script) — POSIX `O_APPEND` atomicity
@@ -94,6 +106,7 @@ items.
 - None blocking otherwise.
 
 ## First Step
+
 1. Add `web/public/mcp-calls.jsonl` to `web/.gitignore`.
 2. Write `hooks/log-mcp-call.mjs` per the Interface above.
 3. Add a `PostToolUse` entry to `hooks/hooks.json` matching `mcp__playwright__.*`.

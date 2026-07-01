@@ -9,7 +9,7 @@
 }
 .crumbLink {
   color: var(--mut);
-  transition: color .2s ease;
+  transition: color 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: var(--s0);
@@ -17,9 +17,17 @@
   padding: var(--s1) var(--s2);
   margin: calc(-1 * var(--s1)) calc(-1 * var(--s2));
 }
-.crumbLink:hover { color: var(--accent-text); }
-.crumbLink svg { width: 14px; height: 14px; }
-.crumbSep { user-select: none; opacity: 0.5; }
+.crumbLink:hover {
+  color: var(--accent-text);
+}
+.crumbLink svg {
+  width: 14px;
+  height: 14px;
+}
+.crumbSep {
+  user-select: none;
+  opacity: 0.5;
+}
 .crumb {
   color: var(--text);
   font-weight: 600;
@@ -50,21 +58,33 @@
 .ver.cur {
   color: var(--accent-text);
   background: var(--accent-soft);
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15),
-              inset 0 1px 0 rgba(var(--accent-rgb), 0.1);
+  box-shadow:
+    0 4px 12px rgba(var(--accent-rgb), 0.15),
+    inset 0 1px 0 rgba(var(--accent-rgb), 0.1);
 }
 /* mini viewfinder corners on the current capture — same bracket technique as
    .thumbBracket, scaled down, reserved for the active frame only */
-.ver.cur::before, .ver.cur::after {
-  content: "";
+.ver.cur::before,
+.ver.cur::after {
+  content: '';
   position: absolute;
   width: 8px;
   height: 8px;
   border: 0 solid var(--accent);
   opacity: 0.6;
 }
-.ver.cur::before { top: 4px; left: 4px; border-top-width: 1.5px; border-left-width: 1.5px; }
-.ver.cur::after { bottom: 4px; right: 4px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+.ver.cur::before {
+  top: 4px;
+  left: 4px;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.ver.cur::after {
+  bottom: 4px;
+  right: 4px;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+}
 
 .vstep {
   position: relative;
@@ -78,7 +98,7 @@
   padding-bottom: 0;
 }
 .vstep .s::before {
-  content: "";
+  content: '';
   position: absolute;
   left: -17px;
   top: 14px;
@@ -114,11 +134,21 @@
   animation: verPulse 2s infinite;
 }
 @keyframes verPulse {
-  0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.5); }
-  70% { box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0); }
-  100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
+  }
 }
-@media (prefers-reduced-motion: reduce) { .vstep .s.live .dot { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .vstep .s.live .dot {
+    animation: none;
+  }
+}
 
 .vstep .s .n {
   font-family: var(--font-display);

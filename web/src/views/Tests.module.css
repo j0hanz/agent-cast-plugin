@@ -4,7 +4,7 @@
   gap: var(--s3);
   margin-bottom: var(--s2);
 }
-@media(max-width: 35em) {
+@media (max-width: 35em) {
   .summary {
     grid-template-columns: 1fr;
   }
@@ -42,7 +42,7 @@
 
 .trow {
   display: grid;
-  grid-template-columns: 1.5fr .8fr 1.6fr 108px;
+  grid-template-columns: 1.5fr 0.8fr 1.6fr 108px;
   gap: var(--s3);
   align-items: center;
   padding: var(--s2) var(--s3);
@@ -63,7 +63,7 @@
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   font-weight: 600;
   padding: var(--s2) var(--s3);
 }

@@ -26,7 +26,9 @@
   background: transparent;
   color: var(--dim);
   cursor: pointer;
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
   white-space: nowrap;
   min-height: 28px;
 }
@@ -36,7 +38,9 @@
 .subtabActive {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4), var(--shadow-inset);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    var(--shadow-inset);
 }
 
 /* ---- mobile: match the ≥44px touch target given to Seg & Chip ---- */
@@ -75,7 +79,7 @@
 }
 .card:hover .thumb svg {
   stroke: var(--accent);
-  opacity: .85;
+  opacity: 0.85;
   transform: scale(1.1);
 }
 
@@ -90,11 +94,21 @@
   animation: livePulse 2.5s infinite;
 }
 @keyframes livePulse {
-  0%   { box-shadow: 0 0 0 0   rgba(var(--accent-rgb), 0.65); }
-  70%  { box-shadow: 0 0 0 8px rgba(var(--accent-rgb), 0); }
-  100% { box-shadow: 0 0 0 0   rgba(var(--accent-rgb), 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.65);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(var(--accent-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
+  }
 }
-@media (prefers-reduced-motion: reduce) { .liveDot { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .liveDot {
+    animation: none;
+  }
+}
 
 .meta {
   padding: var(--s2) var(--s3) var(--s3);
@@ -151,7 +165,7 @@
 }
 .sc:hover .sthumb svg {
   stroke: var(--accent);
-  opacity: .85;
+  opacity: 0.85;
   transform: scale(1.1);
 }
 .smeta {
@@ -166,7 +180,7 @@
   font-family: var(--font-display);
   font-size: var(--fs-md);
   font-weight: 700;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
   color: var(--text);
   line-height: 1.3;
 }
