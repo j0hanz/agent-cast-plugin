@@ -1,8 +1,8 @@
-import { memo, useMemo, useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { Icon } from '../components/icons.tsx';
 import { AgentPill, Chips, EmptyState } from '../components/ui.tsx';
-import { useUI } from '../state/ui.ts';
+import { useUI, setFilter, setSeg } from '../state/ui.ts';
 import {
   cap,
   deviceIcon,
@@ -108,17 +108,15 @@ export function Prototypes() {
   const scFilter = useUI((s) => s.filter.screenshots);
   const scQuery = useUI((s) => s.query.screenshots);
   const tab = useUI((s) => s.seg.prototypesTab ?? 'Prototypes');
-  const setFilter = useUI((s) => s.setFilter);
-  const setSeg = useUI((s) => s.setSeg);
 
-  const list = useMemo(() => filterPrototypes(filter, query), [filter, query]);
-  const scList = useMemo(() => filterScreenshots(scFilter, scQuery), [scFilter, scQuery]);
+  const list = filterPrototypes(filter, query);
+  const scList = filterScreenshots(scFilter, scQuery);
 
-  const handleFilter = useCallback((v: string) => setFilter('prototypes', v), [setFilter]);
-  const handleScFilter = useCallback((v: string) => setFilter('screenshots', v), [setFilter]);
+  const handleFilter = useCallback((v: string) => setFilter('prototypes', v), []);
+  const handleScFilter = useCallback((v: string) => setFilter('screenshots', v), []);
   const handleTab = useCallback(
     (t: string) => setSeg('prototypesTab', t as 'Prototypes' | 'Screenshots'),
-    [setSeg],
+    [],
   );
 
   const isProtos = tab === 'Prototypes';

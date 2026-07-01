@@ -26,11 +26,11 @@ interface UIState {
 
 // ponytail: hand-rolled external store — same useSyncExternalStore primitive
 // router.tsx already uses for hash routing. No need for a state-management dep.
-const setFilter = (group: keyof FilterState, val: string) =>
+export const setFilter = (group: keyof FilterState, val: string) =>
   setState({ filter: { ...state.filter, [group]: val } });
-const setQuery = (group: keyof QueryState, val: string) =>
+export const setQuery = (group: keyof QueryState, val: string) =>
   setState({ query: { ...state.query, [group]: val } });
-const setSeg = <K extends keyof SegState>(group: K, val: SegState[K]) =>
+export const setSeg = <K extends keyof SegState>(group: K, val: SegState[K]) =>
   setState({ seg: { ...state.seg, [group]: val } });
 
 let state: UIState = {

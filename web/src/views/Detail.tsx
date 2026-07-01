@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { Icon } from '../components/icons.tsx';
 import { AgentPill, EmptyState, Panel, Preview, Seg } from '../components/ui.tsx';
-import { useUI } from '../state/ui.ts';
+import { useUI, setSeg } from '../state/ui.ts';
 import {
   cap,
   PROTOTYPES,
@@ -39,8 +39,7 @@ const FindingRow = memo(({ f }: { f: Finding }) => (
 
 export function Detail({ id }: { id: string }) {
   const segDetail = useUI((s) => s.seg.detail);
-  const setSeg = useUI((s) => s.setSeg);
-  const handleDevChange = useCallback((v: string) => setSeg('detail', v as Device), [setSeg]);
+  const handleDevChange = useCallback((v: string) => setSeg('detail', v as Device), []);
   const p = PROTOTYPES.find((x) => x.id === id);
   if (!p) {
     return (

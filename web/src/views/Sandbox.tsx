@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { Main } from '../layout/Shell.tsx';
 import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.tsx';
-import { useUI } from '../state/ui.ts';
+import { useUI, setSeg } from '../state/ui.ts';
 import { SESSION, LOG, AGENT, SCREENSHOTS, latestScreenshot } from '../data/data.ts';
 import type { LogEntry, Device } from '../data/types.ts';
 import ui from '../components/ui.module.css';
@@ -17,7 +17,6 @@ const LogRow = memo(({ l }: { l: LogEntry }) => (
 
 export function Sandbox() {
   const dev = useUI((s) => s.seg.sandbox) ?? 'Desktop';
-  const setSeg = useUI((s) => s.setSeg);
   const top = (
     <>
       <div className="grow" />
@@ -40,7 +39,7 @@ export function Sandbox() {
         <Seg
           opts={['Desktop', 'Tablet', 'Mobile']}
           value={dev}
-          onChange={useCallback((v: string) => setSeg('sandbox', v as Device), [setSeg])}
+          onChange={useCallback((v: string) => setSeg('sandbox', v as Device), [])}
         />
       </div>
       <div className={`${ui.cols} ${ui.stretch}`}>
