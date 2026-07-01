@@ -3,3 +3,5 @@ dist
 public/screenshots
 public/state.json
 public/mcp-calls.jsonl
+public/log.jsonl
+.dev-server.log

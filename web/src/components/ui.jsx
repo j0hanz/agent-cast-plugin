@@ -39,12 +39,6 @@ const SingleToggle = ({ opts, value, onChange, className, itemClass, ariaLabel }
 export const Seg = memo(p => <SingleToggle {...p} className={styles.seg} ariaLabel={p['aria-label'] || "Select viewport"} />);
 export const Chips = memo(p => <SingleToggle {...p} opts={p.labels} className={styles.chips} itemClass={styles.chip} />);
 
-export const SearchBox = memo(({ value, onChange, placeholder = "Search…" }) => (
-  <div className={styles.search}><Icon n="search" sw={2} />
-    <input placeholder={placeholder} aria-label="Search" value={value} onChange={e => onChange(e.target.value)} />
-  </div>
-));
-
 export const Panel = memo(({ title, count, children, className }) =>
   <div className={[styles.panel, className].filter(Boolean).join(' ')}>
     <div className={styles.ptitle}>{title}{count != null && <span className={styles.c}>{count}</span>}</div>

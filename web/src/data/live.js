@@ -15,6 +15,12 @@
 // runtime), which means this file's top-level code always evaluates — even
 // in mock mode. Guard the fetch on the actual selected mode so mock mode
 // stays 100% synchronous with zero network calls, as designed.
+// relativeTime is a pure helper owned by data.js (single source of truth).
+// This import is circular (data.js imports this module) but safe: relativeTime
+// is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
+// render time, never during module eval, so the binding is always resolved.
+import { relativeTime } from './data.js';
+
 const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg, err); };
 
 let state = {};
@@ -88,14 +94,6 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
 const deriveMcpTools = (calls) => {
   const counts = calls.reduce((acc, c) => (acc[c.tool] = (acc[c.tool] || 0) + 1, acc), {});
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
-};
-
-const relativeTime = (iso) => {
-  if (!iso) return '';
-  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  return `${Math.floor(mins / 60)}h ago`;
 };
 
 let logStore = [];
