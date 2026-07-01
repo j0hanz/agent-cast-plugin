@@ -19,7 +19,7 @@
 // This import is circular (data.ts imports this module) but safe: relativeTime
 // is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
 // render time, never during module eval, so the binding is always resolved.
-import { relativeTime, testStatus } from './data.ts';
+import { relativeTime } from './data.ts';
 import type {
   Prototype,
   Screenshot,
@@ -66,58 +66,72 @@ const parseJsonLines = <T>(text: string): T[] =>
 
 const loadState = async (): Promise<boolean> => {
   let changed = false;
-  try {
-    const res = await fetch('/state.json');
+
+  const urls = [
+    '/state.json',
+    '/mcp-calls.jsonl',
+    '/log.jsonl',
+    '/findings.jsonl',
+    '/tests.jsonl',
+  ] as const;
+
+  const responses = await Promise.allSettled(urls.map((url) => fetch(url)));
+
+  const [stateRes, mcpRes, logRes, findingsRes, testsRes] = responses;
+
+  // state.json
+  if (stateRes?.status === 'fulfilled') {
+    const res = stateRes.value;
     if (res.ok) {
-      const newState = (await res.json()) as LiveState;
-      if (Array.isArray(newState.screenshots)) {
-        state = newState;
-        changed = true;
+      try {
+        const newState = (await res.json()) as LiveState;
+        if (Array.isArray(newState.screenshots)) {
+          state = newState;
+          changed = true;
+        }
+      } catch (err) {
+        warn('live.ts: no usable state.json, falling back to empty state', err);
       }
     }
-  } catch (err) {
-    warn('live.ts: no usable state.json, falling back to empty state', err);
+  } else if (stateRes?.status === 'rejected') {
+    warn('live.ts: no usable state.json, falling back to empty state', stateRes.reason);
   }
 
-  try {
-    const res = await fetch('/mcp-calls.jsonl');
-    if (res.ok) {
-      mcpCalls = parseJsonLines<McpCall>(await res.text());
-      changed = true;
+  const updateStore = async <T>(
+    resResult: PromiseSettledResult<Response> | undefined,
+    name: string,
+    apply: (data: T[]) => void,
+  ) => {
+    if (resResult?.status === 'fulfilled') {
+      const res = resResult.value;
+      if (res.ok) {
+        try {
+          const text = await res.text();
+          apply(parseJsonLines<T>(text));
+          changed = true;
+        } catch (err) {
+          warn(`live.ts: no usable ${name}, falling back to empty`, err);
+        }
+      }
+    } else if (resResult?.status === 'rejected') {
+      warn(`live.ts: no usable ${name}, falling back to empty`, resResult.reason);
     }
-  } catch (err) {
-    warn('live.ts: no usable mcp-calls.jsonl, falling back to empty log', err);
-  }
+  };
 
-  try {
-    const res = await fetch('/log.jsonl');
-    if (res.ok) {
-      logStore = parseJsonLines<LogEntry>(await res.text());
-      changed = true;
-    }
-  } catch (err) {
-    warn('live.ts: no usable log.jsonl, falling back to empty agent log', err);
-  }
-
-  try {
-    const res = await fetch('/findings.jsonl');
-    if (res.ok) {
-      findingsStore = parseJsonLines<Finding>(await res.text());
-      changed = true;
-    }
-  } catch (err) {
-    warn('live.ts: no usable findings.jsonl, falling back to empty findings', err);
-  }
-
-  try {
-    const res = await fetch('/tests.jsonl');
-    if (res.ok) {
-      testsStore = parseJsonLines<TestRunInput>(await res.text());
-      changed = true;
-    }
-  } catch (err) {
-    warn('live.ts: no usable tests.jsonl, falling back to empty tests', err);
-  }
+  await Promise.all([
+    updateStore<McpCall>(mcpRes, 'mcp-calls.jsonl', (data) => {
+      mcpCalls = data;
+    }),
+    updateStore<LogEntry>(logRes, 'log.jsonl', (data) => {
+      logStore = data;
+    }),
+    updateStore<Finding>(findingsRes, 'findings.jsonl', (data) => {
+      findingsStore = data;
+    }),
+    updateStore<TestRunInput>(testsRes, 'tests.jsonl', (data) => {
+      testsStore = data;
+    }),
+  ]);
 
   return changed;
 };
@@ -140,7 +154,8 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
 // (data.ts already imports this module). Verified via browser testing.
 // log-mcp-call.sh records the raw tool_name (mcp__playwright__browser_*). Strip
 // the server prefix so live matches mock's short names in System (Cause C).
-const shortTool = (t: string | undefined): string => (t ?? '').replace(/^mcp__playwright__/, '');
+const PLAYWRIGHT_PREFIX_REGEX = /^mcp__playwright__/;
+const shortTool = (t: string | undefined): string => (t ?? '').replace(PLAYWRIGHT_PREFIX_REGEX, '');
 const deriveMcpTools = (calls: McpCall[]): McpTool[] => {
   const counts = calls.reduce(
     (acc: Record<string, number>, c) => (
@@ -238,12 +253,15 @@ export const TESTS: TestRun[] = liveArray(() => {
     const cur = latest.get(t.protoId);
     if (!cur || verNum(t.ver) > verNum(cur.ver)) latest.set(t.protoId, t);
   }
+  const highFindings = new Set(
+    findingsStore.filter((f) => f.sev === 'high').map((f) => `${f.protoId}:${f.ver}`),
+  );
   return [...latest.values()].map((t) => ({
     name: t.name,
     checks: t.total,
     pass: t.pass,
     total: t.total,
-    status: testStatus(t, findingsStore),
+    status: t.pass === t.total && !highFindings.has(`${t.protoId}:${t.ver}`) ? 'passed' : 'failed',
   }));
 });
 
