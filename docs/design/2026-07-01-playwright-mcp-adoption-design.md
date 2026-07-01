@@ -327,15 +327,20 @@ Constraints:
     must be unconditionally paired with a browser_stop_video before moving
     to Refine, not left running past the critique step.
   - Video capture is optional per iteration, not mandatory every pass.
-  - Whether browser_start_video's filename param actually resolves the same
-    way screenshots' filename does (workspace-relative, bypassing
-    --output-dir) is inferred from the codebase's consistent
-    resolveClientFile pattern (confirmed for screenshots/console/
-    network/config) - video's own file-writing path
-    (context.startVideoRecording()) was not read directly. Verify on first
-    real capture during implementation; if the file lands in the default
-    .playwright-mcp/ dir instead, fall back to --output-dir plus a
-    hook-copy step.
+  - browser_start_video has no duration cap or auto-stop timer - it calls
+    Playwright's native page.screencast.start() and records until
+    browser_stop_video is called, however long that takes. Two partial
+    safety nets exist, confirmed by reading context.ts directly:
+    Context.dispose() (session teardown) calls stopVideoRecording()
+    automatically, so a clean session end won't orphan a recording, though
+    a hard crash still could; and startVideoRecording() throws
+    ("Video recording has already been started.") if called twice without
+    a stop in between, so a stuck recording surfaces as a visible error
+    instead of failing silently.
+  - If a new tab opens while a recording is active, that tab is recorded
+    too and its filename gets a `-1`/`-2` suffix (confirmed in
+    context.ts's _startPageVideo). Low-probability for AgentCast's
+    single-page loop, not worth guarding against explicitly.
 
 Interface:
   - No .mcp.json change.
@@ -362,16 +367,18 @@ Architecture: Client-side existence probing (the same pattern screenshots
   one and shows an empty state if there isn't one.
 
 Risks:
-  - Med: video's file-path resolution is inferred, not directly confirmed
-    (see Constraints) - first real capture during implementation must
-    verify the file lands at the expected path.
-  - Med (mitigated in SKILL.md wording): an interrupted turn between
-    start_video and stop_video leaves an open recording running - instruct
-    stop_video as an unconditional pair to start_video, not a separate
-    optional step.
+  - Med (mitigated in SKILL.md wording, partially self-healing): no
+    duration cap on recording - an interrupted turn between start_video
+    and stop_video leaves it running until either SKILL.md's unconditional
+    stop_video pairing runs, or the session ends cleanly (dispose() stops
+    it automatically). A hard crash (not a clean session end) can still
+    orphan a recording.
   - Low (accepted): no storage cap - consistent with existing screenshot
     behavior (also uncapped), and video's optional-per-iteration cadence
     naturally throttles growth versus mandatory-every-iteration screenshots.
+  - Low (accepted): a new tab opening mid-recording produces a suffixed
+    extra file (-1, -2, ...) instead of overwriting the canonical name -
+    not guarded against, low-probability for this loop's single-page usage.
 
 First Step: Add the optional browser_start_video/browser_stop_video pairing
   (with the canonical filename) to SKILL.md's Screenshot-critique step,
@@ -381,17 +388,21 @@ First Step: Add the optional browser_start_video/browser_stop_video pairing
 
 ### Phase 5 persona critique (Approach C)
 
-- **Skeptic (Med, resolved):** video's file-resolution behavior is inferred
-  by analogy to the confirmed pattern for other tools, not verbatim-read
-  from `context.startVideoRecording()`. Flagged as a Risk above; mitigation
-  is verifying on first real capture during implementation rather than
-  building the Preview toggle against an unconfirmed path.
-- **Constraint Guardian (Med, resolved):** a crashed/interrupted turn
-  between start_video and stop_video would leave an open-ended recording
-  consuming CPU/disk. Mitigation is SKILL.md's unconditional-pairing
-  instruction (Constraints above) - accepted as sufficient for a
-  solo-operator local dev tool, not worth building a session-end safety-net
-  hook for at this scope.
+- **Skeptic (resolved, confirmed by direct read):** video's file-resolution
+  behavior was originally inferred by analogy; `context.ts`'s
+  `startVideoRecording`/`outputFile`/`workspaceFile` were read directly on
+  2026-07-01 and confirm `suggestedFilename` (our `filename` param) resolves
+  workspace-relative, bypassing `--output-dir`, exactly like screenshots.
+  No longer a risk.
+- **Constraint Guardian (Med, resolved):** no duration cap exists on
+  recording - confirmed by reading `startVideoRecording`/`stopVideoRecording`
+  directly, which wrap Playwright's native `page.screencast.start()`/`stop()`
+  with no timer. Mitigation is layered: SKILL.md's unconditional
+  stop_video pairing (primary), plus `Context.dispose()`'s automatic
+  `stopVideoRecording()` on clean session end (secondary, confirmed in
+  source) - accepted as sufficient for a solo-operator local dev tool; a
+  hard crash bypassing both is not worth building a watchdog for at this
+  scope.
 - **User Advocate (Low, accepted):** no storage cap on accumulated video
   files - accepted, matches existing (also-uncapped) screenshot behavior,
   and optional-per-iteration cadence keeps growth proportional to how often
