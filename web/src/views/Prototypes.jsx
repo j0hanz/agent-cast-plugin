@@ -3,18 +3,28 @@ import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
 import { AgentPill, Chips, EmptyState } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
+import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, latestScreenshot, SCREENSHOTS, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
 import styles from './Prototypes.module.css';
 import ui from '../components/ui.module.css';
 
 // ---- Prototype card ----
-const PrototypeCard = memo(({ p }) => (
-  <a className={styles.card} href={'#/prototype/' + p.id}>
-    <div className={styles.thumb}>{p.status === 'live' && <span className={styles.liveDot} />}<Icon n={deviceIcon(p.device)} sw={1.6} /></div>
-    <div className={styles.meta}><div className={styles.title}>{p.name}</div>
-      <div className={styles.row}><span className={styles.sub}>{p.device}</span><span className={`${ui.pill} ${ui[p.status]}`}>{cap(p.status)}</span></div></div>
-  </a>
-));
+const PrototypeCard = memo(({ p }) => {
+  const [broken, setBroken] = useState(false);
+  const latest = latestScreenshot(SCREENSHOTS.filter(s => s.protoId === p.id));
+  const showImg = Boolean(latest) && !broken;
+  return (
+    <a className={styles.card} href={'#/prototype/' + p.id}>
+      <div className={styles.thumb}>
+        {p.status === 'live' && <span className={styles.liveDot} />}
+        {showImg
+          ? <img className={ui.shotImg} src={screenshotSrc(p.id, latest.ver)} alt={`${p.name} latest capture`} onError={() => setBroken(true)} />
+          : <Icon n={deviceIcon(p.device)} sw={1.6} />}
+      </div>
+      <div className={styles.meta}><div className={styles.title}>{p.name}</div>
+        <div className={styles.row}><span className={styles.sub}>{p.device}</span><span className={`${ui.pill} ${ui[p.status]}`}>{cap(p.status)}</span></div></div>
+    </a>
+  );
+});
 
 // ---- Screenshot card (inlined from Screenshots view) ----
 const ScreenshotCard = memo(({ s }) => {

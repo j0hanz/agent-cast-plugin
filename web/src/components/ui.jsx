@@ -46,7 +46,7 @@ export const Panel = memo(({ title, count, children, className }) =>
   </div>
 );
 
-export const Preview = memo(({ id, ver }) => {
+export const Preview = memo(({ id, ver, stage }) => {
   const [broken, setBroken] = useState(false);
   const showImg = Boolean(ver) && !broken;
   return (
@@ -58,7 +58,7 @@ export const Preview = memo(({ id, ver }) => {
       </div>
       <div className={styles.shot}>
         {showImg && (
-          <img className={styles.shotImg} src={screenshotSrc(id, ver)} alt={`${id} screenshot preview`} onError={() => setBroken(true)} />
+          <img className={styles.shotImg} src={screenshotSrc(id, ver)} alt={`${id} screenshot, ${ver}${stage ? `, ${stage}` : ''}`} onError={() => setBroken(true)} />
         )}
         <div className={styles.cropLT} aria-hidden="true"></div>
         <div className={styles.cropRT} aria-hidden="true"></div>
