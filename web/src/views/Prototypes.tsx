@@ -20,9 +20,8 @@ import styles from './Prototypes.module.css';
 import ui from '../components/ui.module.css';
 
 // ---- Prototype card ----
-const PrototypeCard = memo(({ p }: { p: Prototype }) => {
+const PrototypeCard = memo(({ p, latest }: { p: Prototype; latest: Screenshot | null }) => {
   const [broken, setBroken] = useState(false);
-  const latest = latestScreenshot(SCREENSHOTS.filter((s) => s.protoId === p.id));
   const showImg = Boolean(latest) && !broken;
   return (
     <a className={styles.card} href={'#/prototype/' + p.id}>
@@ -143,12 +142,10 @@ export function Prototypes() {
           </div>
           {list.length ? (
             <div className={styles.grid}>
-              {list.map((p) => (
-                <PrototypeCard
-                  key={`${p.id}:${latestScreenshot(SCREENSHOTS.filter((s) => s.protoId === p.id))?.ver}`}
-                  p={p}
-                />
-              ))}
+              {list.map((p) => {
+                const latest = latestScreenshot(SCREENSHOTS.filter((s) => s.protoId === p.id));
+                return <PrototypeCard key={`${p.id}:${latest?.ver}`} p={p} latest={latest} />;
+              })}
             </div>
           ) : (
             <EmptyState />
