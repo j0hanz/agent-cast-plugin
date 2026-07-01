@@ -74,6 +74,18 @@ export const filterScreenshots = (filter = 'All', query = '') => {
   const q = query.trim().toLowerCase();
   return SCREENSHOTS.filter(s => (filter === 'All' || s.proto === filter) && (!q || s.proto.toLowerCase().includes(q)));
 };
+// Findings accumulate append-only (no "resolved" mechanism yet), so a Detail
+// page shows only the active prototype's *latest* version — a fresh critique
+// supersedes the prior one instead of piling stale findings on top. Optional
+// `list` arg keeps the numeric-version logic testable in isolation.
+export const findingsFor = (id, list = FINDINGS) => {
+  const mine = list.filter(f => f.protoId === id);
+  if (!mine.length) return [];
+  const n = (v) => parseInt(String(v).slice(1), 10) || 0; // 'v10' > 'v9', numeric
+  const latest = mine.reduce((m, f) => (n(f.ver) > n(m.ver) ? f : m), mine[0]).ver;
+  return mine.filter(f => f.ver === latest);
+};
+
 // M2: derived from data so filter stays in sync when prototypes are renamed.
 const screenshotProtos = () => ['All', ...new Set(SCREENSHOTS.map(s => s.proto))];
 export const SCREENSHOT_PROTOS = new Proxy([], {

@@ -25,6 +25,11 @@ const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg
 
 let state = {};
 let mcpCalls = [];
+// Declared here, above loadState, not next to the exports below: loadState runs
+// at top-level await before those later `let`s would initialize, so assigning
+// them from inside the first fetch would hit the temporal dead zone.
+let logStore = [];
+let findingsStore = [];
 const loadState = async () => {
   let changed = false;
   try {
@@ -72,6 +77,21 @@ const loadState = async () => {
     warn('live.js: no usable log.jsonl, falling back to empty agent log', err);
   }
 
+  try {
+    const res = await fetch('/findings.jsonl');
+    if (res.ok) {
+      findingsStore = (await res.text())
+        .split('\n')
+        .filter(Boolean)
+        .flatMap(line => {
+          try { return [JSON.parse(line)]; } catch { return []; }
+        });
+      changed = true;
+    }
+  } catch (err) {
+    warn('live.js: no usable findings.jsonl, falling back to empty findings', err);
+  }
+
   return changed;
 };
 
@@ -95,8 +115,6 @@ const deriveMcpTools = (calls) => {
   const counts = calls.reduce((acc, c) => (acc[c.tool] = (acc[c.tool] || 0) + 1, acc), {});
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
 };
-
-let logStore = [];
 
 // Wraps a fresh-computed-array getter in a Proxy whose contents stay live
 // across polling without callers ever re-importing. The `has` trap matters:
@@ -150,8 +168,9 @@ export const LOOP = liveArray(() => {
   ];
 });
 
-// Placeholder for FINDINGS — no producer yet, intentionally static.
-export const FINDINGS = [];
+// Critique findings the loop appends to web/public/findings.jsonl (item B).
+// Detail filters these to the active prototype's latest version via findingsFor.
+export const FINDINGS = liveArray(() => findingsStore);
 
 // Derived SESSION data
 export const SESSION = liveArray(() => {

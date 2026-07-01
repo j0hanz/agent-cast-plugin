@@ -25,9 +25,9 @@ export const LOOP = [
   { name: 'Test', state: '', t: 'queued' },
 ];
 export const FINDINGS = [
-  { sev: 'high', text: 'Secondary button contrast below AA', loc: '.btn-secondary · 3.1:1' },
-  { sev: 'med', text: 'Hero heading exceeds 65ch line length', loc: 'h1.hero' },
-  { sev: 'low', text: 'CTA below the fold on mobile', loc: 'section.cta · 390px' },
+  { protoId: 'landing-hero', ver: 'v4', sev: 'high', text: 'Secondary button contrast below AA', loc: '.btn-secondary · 3.1:1' },
+  { protoId: 'landing-hero', ver: 'v4', sev: 'med', text: 'Hero heading exceeds 65ch line length', loc: 'h1.hero' },
+  { protoId: 'landing-hero', ver: 'v4', sev: 'low', text: 'CTA below the fold on mobile', loc: 'section.cta · 390px' },
 ];
 
 export const SCREENSHOTS = [

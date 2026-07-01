@@ -3,7 +3,7 @@ import { Main } from '../layout/Shell.jsx';
 import { Icon } from '../components/icons.jsx';
 import { AgentPill, EmptyState, Panel, Preview, Seg } from '../components/ui.jsx';
 import { useUI } from '../state/ui.js';
-import { cap, PROTOTYPES, VERSIONS, LOOP, FINDINGS, VIEWPORTS, AGENT } from '../data/data.js';
+import { cap, PROTOTYPES, VERSIONS, LOOP, findingsFor, VIEWPORTS, AGENT } from '../data/data.js';
 import styles from './Detail.module.css';
 import ui from '../components/ui.module.css';
 
@@ -37,6 +37,7 @@ export function Detail({ id }) {
     );
   }
   const dev = segDetail || p.device;
+  const findings = findingsFor(p.id);
   const top = <>
     <nav aria-label="breadcrumb">
       <ol className={styles.crumbList}>
@@ -72,8 +73,8 @@ export function Detail({ id }) {
           <Panel title="Loop progress">
             <div className={styles.vstep}>{LOOP.map(s => <StepRow key={s.name} s={s} />)}</div>
           </Panel>
-          <Panel title="Critique findings" count={`${FINDINGS.length} open`} className={ui.clip}>
-            {FINDINGS.length ? FINDINGS.map(f => <FindingRow key={f.loc} f={f} />) : <EmptyState icon="search" title="No findings" description="This prototype has no open critique findings." />}
+          <Panel title="Critique findings" count={`${findings.length} open`} className={ui.clip}>
+            {findings.length ? findings.map((f, i) => <FindingRow key={`${f.loc}-${i}`} f={f} />) : <EmptyState icon="search" title="No findings" description="This prototype has no open critique findings." />}
           </Panel>
         </div>
       </div>

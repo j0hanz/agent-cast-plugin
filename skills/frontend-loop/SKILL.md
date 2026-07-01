@@ -51,7 +51,15 @@ For each prototype, one pass = one `ver`:
    read that image back and critique it against the design intent in
    `DESIGN.md` / `PRODUCT.md` (hierarchy, spacing, the single-amber-signal rule,
    contrast, responsive behaviour). Capture again as `-critique-{ver}` if the
-   review state is worth recording.
+   review state is worth recording. For each issue found, append one JSON line
+   to `web/public/findings.jsonl`:
+
+       {"protoId":"landing-hero","ver":"v3","sev":"high","text":"Secondary button contrast below AA","loc":".btn-secondary · 3.1:1"}
+
+   `sev` ∈ `high` | `med` | `low`; `loc` is the selector/measurement. The
+   dashboard's Detail → Critique findings panel shows the active prototype's
+   latest-version findings from this file, so bump `ver` per iteration and the
+   old findings drop off automatically.
 4. **Refine** — apply the fixes the critique surfaced.
 5. **Test** — verify the fixes; when the version passes, capture a final frame
    as `{protoId}-{kind}-final-{ver}.png`. `stage=final` is what advances the
@@ -62,6 +70,6 @@ For each prototype, one pass = one `ver`:
 
 - Everything under `web/public/` is gitignored — captures are artifacts, don't
   commit them.
-- `findings` (critique output) and `tests` (pass/fail) are not yet shown live in
-  the dashboard — those are roadmap items B and C. This skill runs those steps;
-  the dashboard just won't surface them until their producers land.
+- Critique findings are live (item B): they render in Detail once written to
+  `findings.jsonl`. Test pass/fail is not yet surfaced (item C) — run the Test
+  step, but the dashboard won't show results until that producer lands.
