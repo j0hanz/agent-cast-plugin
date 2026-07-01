@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Sidebar } from './layout/Shell.jsx';
 import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 import { useRoute } from './router.jsx';
 
+const subscribe = (cb) => {
+  window.addEventListener('live-data-update', cb);
+  return () => window.removeEventListener('live-data-update', cb);
+};
+
 export default function App() {
   const { active, Component, props } = useRoute();
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    const handler = () => setTick(t => t + 1);
-    window.addEventListener('live-data-update', handler);
-    return () => window.removeEventListener('live-data-update', handler);
-  }, []);
+  useSyncExternalStore(subscribe, () => null);
 
   return (
     <div className="app">
