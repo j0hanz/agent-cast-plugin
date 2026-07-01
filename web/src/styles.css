@@ -5,7 +5,7 @@
   /* ---- color: neutral graphite chrome, amber phosphor reserved for the live signal + viewfinder reticle ---- */
   --bg:#0b0c0d; --surface:#15171a; --surface-2:#1e2125;
   --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.12); /* structural lines stay neutral so amber reads as "live" */
-  --text:#f4f6f7; --dim:#c8cdd2; --mut:#969ca6; /* WCAG AA: >=4.5:1 on --surface (mut ~7:1) */
+  --text:#f4f6f7; --dim:#c8cdd2; --mut:#b0b6c0; /* WCAG AAA: >=7:1 on --surface and --surface-2 */
   --accent:#f5a524; --accent-text:#f8c069; --accent-soft:rgba(var(--accent-rgb),.08);
   --ok:#34d399; --warn:#fb923c; --bad:#f87171; /* warn shifted to orange so it never reads as the amber live-accent */
   /* rgb channels — for rgba() tints derived from the colors above */
