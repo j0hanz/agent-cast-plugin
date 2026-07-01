@@ -20,9 +20,22 @@
 // is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
 // render time, never during module eval, so the binding is always resolved.
 import { relativeTime, testStatus } from './data.ts';
-import type { Prototype, Screenshot, Finding, KV, LogEntry, TestRunInput, TestRun, McpTool, McpCall, SettingsGroup } from './types.ts';
+import type {
+  Prototype,
+  Screenshot,
+  Finding,
+  KV,
+  LogEntry,
+  TestRunInput,
+  TestRun,
+  McpTool,
+  McpCall,
+  SettingsGroup,
+} from './types.ts';
 
-const warn = (msg: string, err: unknown): void => { if (typeof window !== 'undefined') console.warn(msg, err); };
+const warn = (msg: string, err: unknown): void => {
+  if (typeof window !== 'undefined') console.warn(msg, err);
+};
 
 interface LiveState {
   screenshots?: Screenshot[];
@@ -36,12 +49,27 @@ let mcpCalls: McpCall[] = [];
 let logStore: LogEntry[] = [];
 let findingsStore: Finding[] = [];
 let testsStore: TestRunInput[] = [];
+
+// Every *.jsonl producer here is our own loop's output, not third-party input —
+// a cast at this one seam is the honest type, not a gap a validation lib should fill.
+const parseJsonLines = <T>(text: string): T[] =>
+  text
+    .split('\n')
+    .filter(Boolean)
+    .flatMap((line) => {
+      try {
+        return [JSON.parse(line) as T];
+      } catch {
+        return [];
+      }
+    });
+
 const loadState = async (): Promise<boolean> => {
   let changed = false;
   try {
     const res = await fetch('/state.json');
     if (res.ok) {
-      const newState = await res.json();
+      const newState = (await res.json()) as LiveState;
       if (Array.isArray(newState.screenshots)) {
         state = newState;
         changed = true;
@@ -54,13 +82,7 @@ const loadState = async (): Promise<boolean> => {
   try {
     const res = await fetch('/mcp-calls.jsonl');
     if (res.ok) {
-      const newCalls: McpCall[] = (await res.text())
-        .split('\n')
-        .filter(Boolean)
-        .flatMap(line => {
-          try { return [JSON.parse(line)]; } catch { return []; }
-        });
-      mcpCalls = newCalls;
+      mcpCalls = parseJsonLines<McpCall>(await res.text());
       changed = true;
     }
   } catch (err) {
@@ -70,13 +92,7 @@ const loadState = async (): Promise<boolean> => {
   try {
     const res = await fetch('/log.jsonl');
     if (res.ok) {
-      const newLogs: LogEntry[] = (await res.text())
-        .split('\n')
-        .filter(Boolean)
-        .flatMap(line => {
-          try { return [JSON.parse(line)]; } catch { return []; }
-        });
-      logStore = newLogs;
+      logStore = parseJsonLines<LogEntry>(await res.text());
       changed = true;
     }
   } catch (err) {
@@ -86,12 +102,7 @@ const loadState = async (): Promise<boolean> => {
   try {
     const res = await fetch('/findings.jsonl');
     if (res.ok) {
-      findingsStore = (await res.text())
-        .split('\n')
-        .filter(Boolean)
-        .flatMap(line => {
-          try { return [JSON.parse(line)]; } catch { return []; }
-        });
+      findingsStore = parseJsonLines<Finding>(await res.text());
       changed = true;
     }
   } catch (err) {
@@ -101,12 +112,7 @@ const loadState = async (): Promise<boolean> => {
   try {
     const res = await fetch('/tests.jsonl');
     if (res.ok) {
-      testsStore = (await res.text())
-        .split('\n')
-        .filter(Boolean)
-        .flatMap(line => {
-          try { return [JSON.parse(line)]; } catch { return []; }
-        });
+      testsStore = parseJsonLines<TestRunInput>(await res.text());
       changed = true;
     }
   } catch (err) {
@@ -134,10 +140,18 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
 // (data.ts already imports this module). Verified via browser testing.
 // log-mcp-call.sh records the raw tool_name (mcp__playwright__browser_*). Strip
 // the server prefix so live matches mock's short names in System (Cause C).
-const shortTool = (t: string | undefined): string => (t || '').replace(/^mcp__playwright__/, '');
+const shortTool = (t: string | undefined): string => (t ?? '').replace(/^mcp__playwright__/, '');
 const deriveMcpTools = (calls: McpCall[]): McpTool[] => {
-  const counts = calls.reduce((acc: Record<string, number>, c) => (acc[shortTool(c.tool)] = (acc[shortTool(c.tool)] || 0) + 1, acc), {});
-  return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
+  const counts = calls.reduce(
+    (acc: Record<string, number>, c) => (
+      (acc[shortTool(c.tool)] = (acc[shortTool(c.tool)] ?? 0) + 1),
+      acc
+    ),
+    {},
+  );
+  return Object.entries(counts)
+    .map(([name, calls]) => ({ name, calls }))
+    .sort((a, b) => b.calls - a.calls);
 };
 
 // Wraps a fresh-computed-array getter in a Proxy whose contents stay live
@@ -145,13 +159,22 @@ const deriveMcpTools = (calls: McpCall[]): McpTool[] => {
 // without it, `k in target` falls back to the real (always-empty) backing
 // array, which silently breaks every bulk Array method (map/filter/reduce/
 // forEach all internally check HasProperty before reading an index).
-const liveArray = <T,>(compute: () => T[]): T[] => new Proxy([] as T[], {
-  get(_target, prop) { return Reflect.get(compute(), prop); },
-  has(_target, prop) { return Reflect.has(compute(), prop); }
-});
+const liveArray = <T>(compute: () => T[]): T[] =>
+  new Proxy([] as T[], {
+    get(_target, prop) {
+      const arr = compute();
+      return Reflect.get(arr, prop) as (typeof arr)[keyof typeof arr];
+    },
+    has(_target, prop) {
+      return Reflect.has(compute(), prop);
+    },
+  });
 
 const latestScreenshot = (arr: Screenshot[]): Screenshot | null =>
-  arr.reduce((latest: Screenshot | null, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
+  arr.reduce(
+    (latest: Screenshot | null, s) => (!latest || s.capturedAt > latest.capturedAt ? s : latest),
+    null,
+  );
 
 // Derived PROTOTYPES
 export const PROTOTYPES: Prototype[] = liveArray(() => {
@@ -159,12 +182,12 @@ export const PROTOTYPES: Prototype[] = liveArray(() => {
   const map = new Map<string, Prototype>();
   for (const s of arr) {
     if (!map.has(s.protoId)) {
-      const recent = (Date.now() - new Date(s.capturedAt).getTime()) < 5 * 60_000;
+      const recent = Date.now() - new Date(s.capturedAt).getTime() < 5 * 60_000;
       map.set(s.protoId, {
         id: s.protoId,
         name: s.proto,
-        device: s.kind === 'mobile' ? 'Mobile' : (s.kind === 'tablet' ? 'Tablet' : 'Desktop'),
-        status: recent ? 'live' : 'draft'
+        device: s.kind === 'mobile' ? 'Mobile' : s.kind === 'tablet' ? 'Tablet' : 'Desktop',
+        status: recent ? 'live' : 'draft',
       });
     }
   }
@@ -185,15 +208,23 @@ export const SESSION: KV[] = liveArray(() => {
   const latest = latestScreenshot(arr);
   if (!latest) return [];
 
-  const navCall = mcpCalls.find(c => c.tool === 'mcp__playwright__browser_navigate');
-  const url = (navCall?.input?.url as string | undefined) || `/${latest.protoId}`;
+  const navCall = mcpCalls.find((c) => c.tool === 'mcp__playwright__browser_navigate');
+  const url = (navCall?.input?.url as string | undefined) ?? `/${latest.protoId}`;
 
   return [
     { k: 'Prototype', v: latest.proto },
-    { k: 'Viewport', v: latest.kind === 'mobile' ? '390 × 844' : (latest.kind === 'tablet' ? '834 × 1112' : '1440 × 900') },
+    {
+      k: 'Viewport',
+      v:
+        latest.kind === 'mobile'
+          ? '390 × 844'
+          : latest.kind === 'tablet'
+            ? '834 × 1112'
+            : '1440 × 900',
+    },
     { k: 'URL', v: url },
     { k: 'Dev server', v: ':5173' },
-    { k: 'Latest capture', v: relativeTime(latest.capturedAt) }
+    { k: 'Latest capture', v: relativeTime(latest.capturedAt) },
   ];
 });
 
@@ -207,7 +238,7 @@ export const TESTS: TestRun[] = liveArray(() => {
     const cur = latest.get(t.protoId);
     if (!cur || verNum(t.ver) > verNum(cur.ver)) latest.set(t.protoId, t);
   }
-  return [...latest.values()].map(t => ({
+  return [...latest.values()].map((t) => ({
     name: t.name,
     checks: t.total,
     pass: t.pass,
@@ -217,13 +248,16 @@ export const TESTS: TestRun[] = liveArray(() => {
 });
 
 export const SETTINGS: SettingsGroup[] = [
-  { group: 'Environment', items: [
-    { k: 'Default viewport', v: '1440 × 900' },
-    { k: 'Image format', v: 'PNG' },
-    { k: 'Dev server port', v: ':5173' },
-    { k: 'Theme', v: 'Graphite' },
-    { k: 'Accent', v: 'Amber' },
-  ] },
+  {
+    group: 'Environment',
+    items: [
+      { k: 'Default viewport', v: '1440 × 900' },
+      { k: 'Image format', v: 'PNG' },
+      { k: 'Dev server port', v: ':5173' },
+      { k: 'Theme', v: 'Graphite' },
+      { k: 'Accent', v: 'Amber' },
+    ],
+  },
 ];
 
 // Derived MCP server info
@@ -234,7 +268,7 @@ export const MCP: KV[] = liveArray(() => {
     { k: 'Server', v: 'Playwright MCP' },
     { k: 'Transport', v: 'stdio' },
     { k: 'Status', v: active ? 'Connected' : 'Disconnected', pill: active ? 'live' : 'draft' },
-    { k: 'Recent activity', v: latest ? relativeTime(latest.ts) : 'none' }
+    { k: 'Recent activity', v: latest ? relativeTime(latest.ts) : 'none' },
   ];
 });
 
@@ -242,8 +276,12 @@ export const MCP: KV[] = liveArray(() => {
 export const LOG: LogEntry[] = liveArray(() => logStore);
 
 // Exports that need to update on poll
-export const SCREENSHOTS: Screenshot[] = liveArray(() => Array.isArray(state.screenshots) ? state.screenshots : []);
+export const SCREENSHOTS: Screenshot[] = liveArray(() =>
+  Array.isArray(state.screenshots) ? state.screenshots : [],
+);
 
-export const MCP_CALLS: McpCall[] = liveArray(() => mcpCalls.map(c => ({ ...c, tool: shortTool(c.tool) })));
+export const MCP_CALLS: McpCall[] = liveArray(() =>
+  mcpCalls.map((c) => ({ ...c, tool: shortTool(c.tool) })),
+);
 
 export const MCP_TOOLS: McpTool[] = liveArray(() => deriveMcpTools(mcpCalls));

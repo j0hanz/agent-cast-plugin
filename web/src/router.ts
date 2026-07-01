@@ -26,13 +26,16 @@ function useHashRoute() {
 }
 
 // L5: map route id -> human label for document.title updates
-const NAV_LABELS: Record<string, string> = Object.fromEntries([...NAV, ...SYSTEM].map(n => [n.id, n.label]));
+const NAV_LABELS: Record<string, string> = Object.fromEntries(
+  [...NAV, ...SYSTEM].map((n) => [n.id, n.label]),
+);
 
 // Component/props are inherently dynamic here (Detail takes {id}, the rest
 // take none) — `any`/unknown-record is the honest type for a route table
 // dispatched by string id, not a gap to close with a discriminated union.
 export interface RouteMatch {
   active: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see rationale above
   Component: ComponentType<any>;
   props: Record<string, unknown>;
 }
@@ -43,21 +46,26 @@ export function useRoute(): RouteMatch {
   const [seg0, seg1] = (hash.replace(/^#\/?/, '') || 'prototypes').split('/');
 
   let active: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see rationale above
   let Component: ComponentType<any>;
   let props: Record<string, unknown> = {};
   if (seg0 === 'prototype' && seg1) {
-    active = 'prototypes'; Component = Detail; props = { id: seg1 };
+    active = 'prototypes';
+    Component = Detail;
+    props = { id: seg1 };
   } else if (seg0 && ROUTES[seg0]) {
-    active = seg0; Component = ROUTES[seg0];
+    active = seg0;
+    Component = ROUTES[seg0];
   } else {
-    active = null; Component = NotFound; // unknown route -> 404 (empty hash already resolves to 'prototypes')
+    active = null;
+    Component = NotFound; // unknown route -> 404 (empty hash already resolves to 'prototypes')
   }
 
   // L5: keep browser tab title in sync with the active route
   useEffect(() => {
     let label;
     if (seg0 === 'prototype' && seg1) {
-      const p = PROTOTYPES.find(x => x.id === seg1);
+      const p = PROTOTYPES.find((x) => x.id === seg1);
       label = p ? `${p.name} — Prototype — AgentCast` : 'Prototype — AgentCast';
     } else {
       label = active ? `${NAV_LABELS[active]} — AgentCast` : 'Page not found — AgentCast';
