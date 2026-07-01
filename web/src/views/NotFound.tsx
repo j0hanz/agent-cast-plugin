@@ -1,5 +1,5 @@
-import { Main } from '../layout/Shell.jsx';
-import { EmptyState } from '../components/ui.jsx';
+import { Main } from '../layout/Shell.tsx';
+import { EmptyState } from '../components/ui.tsx';
 import ui from '../components/ui.module.css';
 
 export function NotFound() {

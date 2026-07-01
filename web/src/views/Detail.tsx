@@ -1,17 +1,18 @@
 import { memo, useCallback } from 'react';
-import { Main } from '../layout/Shell.jsx';
-import { Icon } from '../components/icons.jsx';
-import { AgentPill, EmptyState, Panel, Preview, Seg } from '../components/ui.jsx';
-import { useUI } from '../state/ui.js';
-import { cap, PROTOTYPES, versionsFor, loopFor, findingsFor, VIEWPORTS, AGENT } from '../data/data.js';
+import { Main } from '../layout/Shell.tsx';
+import { Icon } from '../components/icons.tsx';
+import { AgentPill, EmptyState, Panel, Preview, Seg } from '../components/ui.tsx';
+import { useUI } from '../state/ui.ts';
+import { cap, PROTOTYPES, versionsFor, loopFor, findingsFor, VIEWPORTS, AGENT } from '../data/data.ts';
+import type { Finding, LoopStep, Device } from '../data/types.ts';
 import styles from './Detail.module.css';
 import ui from '../components/ui.module.css';
 
-const StepRow = memo(({ s }) => (
+const StepRow = memo(({ s }: { s: LoopStep }) => (
   <div className={`${styles.s} ${styles[s.state] || ''}`}><span className={styles.dot} /><div className={styles.n}>{s.name}</div><div className={styles.t}>{s.t}</div></div>
 ));
 
-const FindingRow = memo(({ f }) => (
+const FindingRow = memo(({ f }: { f: Finding }) => (
   <div className={`${styles.finding} ${styles[f.sev]}`}>
     <span className={styles.sev} aria-hidden="true" />
     <div>
@@ -24,10 +25,10 @@ const FindingRow = memo(({ f }) => (
   </div>
 ));
 
-export function Detail({ id }) {
+export function Detail({ id }: { id: string }) {
   const segDetail = useUI(s => s.seg.detail);
   const setSeg = useUI(s => s.setSeg);
-  const handleDevChange = useCallback(v => setSeg('detail', v), [setSeg]);
+  const handleDevChange = useCallback((v: string) => setSeg('detail', v as Device), [setSeg]);
   const p = PROTOTYPES.find(x => x.id === id);
   if (!p) {
     return (
@@ -83,4 +84,3 @@ export function Detail({ id }) {
     </Main>
   );
 }
-

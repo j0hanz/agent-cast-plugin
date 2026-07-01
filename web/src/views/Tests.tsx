@@ -1,11 +1,12 @@
 import { memo } from 'react';
-import { Main } from '../layout/Shell.jsx';
-import { AgentPill, EmptyState } from '../components/ui.jsx';
-import { TESTS, testSummary, AGENT } from '../data/data.js';
+import { Main } from '../layout/Shell.tsx';
+import { AgentPill, EmptyState } from '../components/ui.tsx';
+import { TESTS, testSummary, AGENT } from '../data/data.ts';
+import type { TestRun } from '../data/types.ts';
 import styles from './Tests.module.css';
 import ui from '../components/ui.module.css';
 
-const TestRow = memo(({ t }) => {
+const TestRow = memo(({ t }: { t: TestRun }) => {
   const pct = Math.round((t.pass / t.total) * 100);
   const map = {
     passed: {

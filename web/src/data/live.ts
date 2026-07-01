@@ -2,8 +2,8 @@
 // Most fields are still placeholders until their own roadmap item builds a
 // real producer (see docs/design/2026-06-30-live-data-manifest-design.md).
 // Every consumer already empty/falsy-guards, so empty values render correctly
-// with no further view changes. Shape must match mock.js (data.check.mjs enforces it).
-// AGENT isn't exported here — data.js derives it from SCREENSHOTS recency
+// with no further view changes. Shape must match mock.ts (data.check.mjs enforces it).
+// AGENT isn't exported here — data.ts derives it from SCREENSHOTS recency
 // (see docs/design/2026-06-30-derived-agent-status-design.md).
 
 // SCREENSHOTS is the one field with a real producer today (captures written to
@@ -11,27 +11,32 @@
 // future background process can write to without producing valid JS. Each
 // entry needs a real `capturedAt` (ISO 8601) so relative time and AGENT's
 // recency check stay honest, not a pre-formatted string that goes stale.
-// data.js statically imports this module either way (so it can switch at
+// data.ts statically imports this module either way (so it can switch at
 // runtime), which means this file's top-level code always evaluates — even
 // in mock mode. Guard the fetch on the actual selected mode so mock mode
 // stays 100% synchronous with zero network calls, as designed.
-// relativeTime is a pure helper owned by data.js (single source of truth).
-// This import is circular (data.js imports this module) but safe: relativeTime
+// relativeTime is a pure helper owned by data.ts (single source of truth).
+// This import is circular (data.ts imports this module) but safe: relativeTime
 // is only ever *called* lazily inside the liveArray/SESSION/MCP computes at
 // render time, never during module eval, so the binding is always resolved.
-import { relativeTime, testStatus } from './data.js';
+import { relativeTime, testStatus } from './data.ts';
+import type { Prototype, Screenshot, Finding, KV, LogEntry, TestRunInput, TestRun, McpTool, McpCall, SettingsGroup } from './types.ts';
 
-const warn = (msg, err) => { if (typeof window !== 'undefined') console.warn(msg, err); };
+const warn = (msg: string, err: unknown): void => { if (typeof window !== 'undefined') console.warn(msg, err); };
 
-let state = {};
-let mcpCalls = [];
+interface LiveState {
+  screenshots?: Screenshot[];
+}
+
+let state: LiveState = {};
+let mcpCalls: McpCall[] = [];
 // Declared here, above loadState, not next to the exports below: loadState runs
 // at top-level await before those later `let`s would initialize, so assigning
 // them from inside the first fetch would hit the temporal dead zone.
-let logStore = [];
-let findingsStore = [];
-let testsStore = [];
-const loadState = async () => {
+let logStore: LogEntry[] = [];
+let findingsStore: Finding[] = [];
+let testsStore: TestRunInput[] = [];
+const loadState = async (): Promise<boolean> => {
   let changed = false;
   try {
     const res = await fetch('/state.json');
@@ -43,13 +48,13 @@ const loadState = async () => {
       }
     }
   } catch (err) {
-    warn('live.js: no usable state.json, falling back to empty state', err);
+    warn('live.ts: no usable state.json, falling back to empty state', err);
   }
 
   try {
     const res = await fetch('/mcp-calls.jsonl');
     if (res.ok) {
-      const newCalls = (await res.text())
+      const newCalls: McpCall[] = (await res.text())
         .split('\n')
         .filter(Boolean)
         .flatMap(line => {
@@ -59,13 +64,13 @@ const loadState = async () => {
       changed = true;
     }
   } catch (err) {
-    warn('live.js: no usable mcp-calls.jsonl, falling back to empty log', err);
+    warn('live.ts: no usable mcp-calls.jsonl, falling back to empty log', err);
   }
 
   try {
     const res = await fetch('/log.jsonl');
     if (res.ok) {
-      const newLogs = (await res.text())
+      const newLogs: LogEntry[] = (await res.text())
         .split('\n')
         .filter(Boolean)
         .flatMap(line => {
@@ -75,7 +80,7 @@ const loadState = async () => {
       changed = true;
     }
   } catch (err) {
-    warn('live.js: no usable log.jsonl, falling back to empty agent log', err);
+    warn('live.ts: no usable log.jsonl, falling back to empty agent log', err);
   }
 
   try {
@@ -90,7 +95,7 @@ const loadState = async () => {
       changed = true;
     }
   } catch (err) {
-    warn('live.js: no usable findings.jsonl, falling back to empty findings', err);
+    warn('live.ts: no usable findings.jsonl, falling back to empty findings', err);
   }
 
   try {
@@ -105,7 +110,7 @@ const loadState = async () => {
       changed = true;
     }
   } catch (err) {
-    warn('live.js: no usable tests.jsonl, falling back to empty tests', err);
+    warn('live.ts: no usable tests.jsonl, falling back to empty tests', err);
   }
 
   return changed;
@@ -123,15 +128,15 @@ if (import.meta.env?.VITE_DATA_SOURCE === 'live') {
 }
 
 // Aggregate {name, calls} counts derived from the raw log — same "derive,
-// don't separately track" pattern data.js uses for AGENT. Not exported:
-// would break data.check.mjs's mock/live key-parity check (mock.js has no
-// matching export), and importing it from data.js would be circular
-// (data.js already imports this module). Verified via browser testing.
+// don't separately track" pattern data.ts uses for AGENT. Not exported:
+// would break data.check.mjs's mock/live key-parity check (mock.ts has no
+// matching export), and importing it from data.ts would be circular
+// (data.ts already imports this module). Verified via browser testing.
 // log-mcp-call.sh records the raw tool_name (mcp__playwright__browser_*). Strip
 // the server prefix so live matches mock's short names in System (Cause C).
-const shortTool = (t) => (t || '').replace(/^mcp__playwright__/, '');
-const deriveMcpTools = (calls) => {
-  const counts = calls.reduce((acc, c) => (acc[shortTool(c.tool)] = (acc[shortTool(c.tool)] || 0) + 1, acc), {});
+const shortTool = (t: string | undefined): string => (t || '').replace(/^mcp__playwright__/, '');
+const deriveMcpTools = (calls: McpCall[]): McpTool[] => {
+  const counts = calls.reduce((acc: Record<string, number>, c) => (acc[shortTool(c.tool)] = (acc[shortTool(c.tool)] || 0) + 1, acc), {});
   return Object.entries(counts).map(([name, calls]) => ({ name, calls })).sort((a, b) => b.calls - a.calls);
 };
 
@@ -140,17 +145,18 @@ const deriveMcpTools = (calls) => {
 // without it, `k in target` falls back to the real (always-empty) backing
 // array, which silently breaks every bulk Array method (map/filter/reduce/
 // forEach all internally check HasProperty before reading an index).
-const liveArray = (compute) => new Proxy([], {
-  get(target, prop) { return Reflect.get(compute(), prop); },
-  has(target, prop) { return Reflect.has(compute(), prop); }
+const liveArray = <T,>(compute: () => T[]): T[] => new Proxy([] as T[], {
+  get(_target, prop) { return Reflect.get(compute(), prop); },
+  has(_target, prop) { return Reflect.has(compute(), prop); }
 });
 
-const latestScreenshot = (arr) => arr.reduce((latest, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
+const latestScreenshot = (arr: Screenshot[]): Screenshot | null =>
+  arr.reduce((latest: Screenshot | null, s) => (!latest || s.capturedAt > latest.capturedAt) ? s : latest, null);
 
 // Derived PROTOTYPES
-export const PROTOTYPES = liveArray(() => {
+export const PROTOTYPES: Prototype[] = liveArray(() => {
   const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
-  const map = new Map();
+  const map = new Map<string, Prototype>();
   for (const s of arr) {
     if (!map.has(s.protoId)) {
       const recent = (Date.now() - new Date(s.capturedAt).getTime()) < 5 * 60_000;
@@ -166,21 +172,21 @@ export const PROTOTYPES = liveArray(() => {
 });
 
 // VERSIONS + LOOP are no longer exported here — they're per-prototype and
-// derived in data.js (versionsFor/loopFor) so Detail scopes them to the viewed
+// derived in data.ts (versionsFor/loopFor) so Detail scopes them to the viewed
 // prototype instead of the whole session (Cause A).
 
 // Critique findings the loop appends to web/public/findings.jsonl (item B).
 // Detail filters these to the active prototype's latest version via findingsFor.
-export const FINDINGS = liveArray(() => findingsStore);
+export const FINDINGS: Finding[] = liveArray(() => findingsStore);
 
 // Derived SESSION data
-export const SESSION = liveArray(() => {
+export const SESSION: KV[] = liveArray(() => {
   const arr = Array.isArray(state.screenshots) ? state.screenshots : [];
   const latest = latestScreenshot(arr);
   if (!latest) return [];
 
   const navCall = mcpCalls.find(c => c.tool === 'mcp__playwright__browser_navigate');
-  const url = navCall?.input?.url || `/${latest.protoId}`;
+  const url = (navCall?.input?.url as string | undefined) || `/${latest.protoId}`;
 
   return [
     { k: 'Prototype', v: latest.proto },
@@ -194,9 +200,9 @@ export const SESSION = liveArray(() => {
 // Real test runs the loop appends to web/public/tests.jsonl (item C). One row
 // per prototype — its latest-version run — with pass/fail gated by findings via
 // testStatus (a high-severity finding fails the suite even if the checks passed).
-export const TESTS = liveArray(() => {
-  const verNum = (v) => parseInt(String(v).slice(1), 10) || 0;
-  const latest = new Map();
+export const TESTS: TestRun[] = liveArray(() => {
+  const verNum = (v: string) => parseInt(String(v).slice(1), 10) || 0;
+  const latest = new Map<string, TestRunInput>();
   for (const t of testsStore) {
     const cur = latest.get(t.protoId);
     if (!cur || verNum(t.ver) > verNum(cur.ver)) latest.set(t.protoId, t);
@@ -210,7 +216,7 @@ export const TESTS = liveArray(() => {
   }));
 });
 
-export const SETTINGS = [
+export const SETTINGS: SettingsGroup[] = [
   { group: 'Environment', items: [
     { k: 'Default viewport', v: '1440 × 900' },
     { k: 'Image format', v: 'PNG' },
@@ -221,7 +227,7 @@ export const SETTINGS = [
 ];
 
 // Derived MCP server info
-export const MCP = liveArray(() => {
+export const MCP: KV[] = liveArray(() => {
   const active = mcpCalls.length > 0;
   const latest = mcpCalls[0];
   return [
@@ -233,11 +239,11 @@ export const MCP = liveArray(() => {
 });
 
 // Exports that need to update on poll
-export const LOG = liveArray(() => logStore);
+export const LOG: LogEntry[] = liveArray(() => logStore);
 
 // Exports that need to update on poll
-export const SCREENSHOTS = liveArray(() => Array.isArray(state.screenshots) ? state.screenshots : []);
+export const SCREENSHOTS: Screenshot[] = liveArray(() => Array.isArray(state.screenshots) ? state.screenshots : []);
 
-export const MCP_CALLS = liveArray(() => mcpCalls.map(c => ({ ...c, tool: shortTool(c.tool) })));
+export const MCP_CALLS: McpCall[] = liveArray(() => mcpCalls.map(c => ({ ...c, tool: shortTool(c.tool) })));
 
-export const MCP_TOOLS = liveArray(() => deriveMcpTools(mcpCalls));
+export const MCP_TOOLS: McpTool[] = liveArray(() => deriveMcpTools(mcpCalls));

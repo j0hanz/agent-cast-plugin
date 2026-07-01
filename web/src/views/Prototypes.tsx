@@ -1,14 +1,15 @@
 import { memo, useMemo, useCallback, useState } from 'react';
-import { Main } from '../layout/Shell.jsx';
-import { Icon } from '../components/icons.jsx';
-import { AgentPill, Chips, EmptyState } from '../components/ui.jsx';
-import { useUI } from '../state/ui.js';
-import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, latestScreenshot, SCREENSHOTS, SCREENSHOT_PROTOS, AGENT } from '../data/data.js';
+import { Main } from '../layout/Shell.tsx';
+import { Icon } from '../components/icons.tsx';
+import { AgentPill, Chips, EmptyState } from '../components/ui.tsx';
+import { useUI } from '../state/ui.ts';
+import { cap, deviceIcon, filterPrototypes, filterScreenshots, screenshotSrc, relativeTime, latestScreenshot, SCREENSHOTS, SCREENSHOT_PROTOS, AGENT } from '../data/data.ts';
+import type { Prototype, Screenshot } from '../data/types.ts';
 import styles from './Prototypes.module.css';
 import ui from '../components/ui.module.css';
 
 // ---- Prototype card ----
-const PrototypeCard = memo(({ p }) => {
+const PrototypeCard = memo(({ p }: { p: Prototype }) => {
   const [broken, setBroken] = useState(false);
   const latest = latestScreenshot(SCREENSHOTS.filter(s => s.protoId === p.id));
   const showImg = Boolean(latest) && !broken;
@@ -16,7 +17,7 @@ const PrototypeCard = memo(({ p }) => {
     <a className={styles.card} href={'#/prototype/' + p.id}>
       <div className={styles.thumb}>
         {p.status === 'live' && <span className={styles.liveDot} />}
-        {showImg
+        {showImg && latest
           ? <img className={ui.shotImg} src={screenshotSrc(p.id, latest.ver)} alt={`${p.name} latest capture`} onError={() => setBroken(true)} loading="lazy" decoding="async" />
           : <Icon n={deviceIcon(p.device)} sw={1.6} />}
       </div>
@@ -27,7 +28,7 @@ const PrototypeCard = memo(({ p }) => {
 });
 
 // ---- Screenshot card (inlined from Screenshots view) ----
-const ScreenshotCard = memo(({ s }) => {
+const ScreenshotCard = memo(({ s }: { s: Screenshot }) => {
   const [broken, setBroken] = useState(false);
   return (
     <a className={styles.sc} href={'#/prototype/' + s.protoId}>
@@ -43,7 +44,7 @@ const ScreenshotCard = memo(({ s }) => {
 });
 
 // ---- Sub-tab switcher ----
-const SubTabs = memo(({ active, onChange }) => (
+const SubTabs = memo(({ active, onChange }: { active: string; onChange: (t: string) => void }) => (
   <div className={styles.subtabs} role="group" aria-label="View mode">
     {['Prototypes', 'Screenshots'].map(t => (
       <button key={t} aria-pressed={active === t}
@@ -60,21 +61,16 @@ export function Prototypes() {
   const scQuery  = useUI(s => s.query.screenshots);
   const tab      = useUI(s => s.seg.prototypesTab ?? 'Prototypes');
   const setFilter = useUI(s => s.setFilter);
-  const setQuery  = useUI(s => s.setQuery);
   const setSeg    = useUI(s => s.setSeg);
 
   const list   = useMemo(() => filterPrototypes(filter, query),     [filter, query]);
   const scList = useMemo(() => filterScreenshots(scFilter, scQuery), [scFilter, scQuery]);
 
-  const handleQuery    = useCallback(v  => setQuery('prototypes', v),       [setQuery]);
-  const handleFilter   = useCallback(v  => setFilter('prototypes', v),      [setFilter]);
-  const handleScQuery  = useCallback(v  => setQuery('screenshots', v),      [setQuery]);
-  const handleScFilter = useCallback(v  => setFilter('screenshots', v),     [setFilter]);
-  const handleTab      = useCallback(t  => setSeg('prototypesTab', t),      [setSeg]);
+  const handleFilter   = useCallback((v: string) => setFilter('prototypes', v),      [setFilter]);
+  const handleScFilter = useCallback((v: string) => setFilter('screenshots', v),     [setFilter]);
+  const handleTab      = useCallback((t: string) => setSeg('prototypesTab', t as 'Prototypes' | 'Screenshots'), [setSeg]);
 
   const isProtos = tab === 'Prototypes';
-  const currentQuery  = isProtos ? query  : scQuery;
-  const handleQChange = isProtos ? handleQuery : handleScQuery;
 
   const top = (
     <>

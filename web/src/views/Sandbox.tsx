@@ -1,11 +1,12 @@
 import { memo, useCallback } from 'react';
-import { Main } from '../layout/Shell.jsx';
-import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.jsx';
-import { useUI } from '../state/ui.js';
-import { SESSION, LOG, AGENT, SCREENSHOTS, latestScreenshot } from '../data/data.js';
+import { Main } from '../layout/Shell.tsx';
+import { AgentPill, EmptyState, Panel, Preview, RichText, Seg } from '../components/ui.tsx';
+import { useUI } from '../state/ui.ts';
+import { SESSION, LOG, AGENT, SCREENSHOTS, latestScreenshot } from '../data/data.ts';
+import type { LogEntry, Device } from '../data/types.ts';
 import ui from '../components/ui.module.css';
 
-const LogRow = memo(({ l }) => (
+const LogRow = memo(({ l }: { l: LogEntry }) => (
   <div className={`${ui.logrow} ${l.cur ? ui.cur : ''}`} aria-current={l.cur ? 'step' : undefined}>
     <span className={ui.ts}>{l.ts}</span>
     <span className={ui.msg}><RichText text={l.msg} /></span>
@@ -26,7 +27,7 @@ export function Sandbox() {
   return (
     <Main topbar={top}>
       <div className={ui.dhead}><h1>Live sandbox</h1><span className={`${ui.pill} ${ui.live}`}>Running</span><div className="grow" />
-        <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback(v => setSeg('sandbox', v), [setSeg])} />
+        <Seg opts={['Desktop', 'Tablet', 'Mobile']} value={dev} onChange={useCallback((v: string) => setSeg('sandbox', v as Device), [setSeg])} />
       </div>
       <div className={`${ui.cols} ${ui.stretch}`}>
         <Preview key={`${activeProtoId}:${activeVer}`} id={activeProtoId} ver={activeVer} stage={latest?.stage} />

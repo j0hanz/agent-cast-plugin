@@ -1,15 +1,20 @@
 import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import ui from './ui.module.css';
 import styles from './ErrorBoundary.module.css';
 
+interface Props { children?: ReactNode }
+interface State { error: unknown }
+
 // Error boundaries still require a class — no hook equivalent in React 19.
-export class ErrorBoundary extends Component {
-  state = { error: null };
-  static getDerivedStateFromError(error) { return { error }; }
-  componentDidCatch(error, info) { console.error('UI crash:', error, info); }
-  render() {
+export class ErrorBoundary extends Component<Props, State> {
+  override state: State = { error: null };
+  static getDerivedStateFromError(error: unknown): State { return { error }; }
+  override componentDidCatch(error: unknown, info: ErrorInfo) { console.error('UI crash:', error, info); }
+  override render() {
     if (this.state.error) {
-      const msg = this.state.error?.message || String(this.state.error);
+      const err = this.state.error;
+      const msg = (err instanceof Error ? err.message : undefined) || String(err);
       return (
         <div className={`${ui.empty} ${ui.left}`}>
           <div className={styles.title}>Render error</div>

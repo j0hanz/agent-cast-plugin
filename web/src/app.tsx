@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from 'react';
-import { Sidebar } from './layout/Shell.jsx';
-import { ErrorBoundary } from './components/ErrorBoundary.jsx';
-import { useRoute } from './router.jsx';
+import { Sidebar } from './layout/Shell.tsx';
+import { ErrorBoundary } from './components/ErrorBoundary.tsx';
+import { useRoute } from './router.ts';
 
-const subscribe = (cb) => {
+const subscribe = (cb: () => void) => {
   window.addEventListener('live-data-update', cb);
   return () => window.removeEventListener('live-data-update', cb);
 };

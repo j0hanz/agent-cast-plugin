@@ -1,12 +1,13 @@
 import { memo } from 'react';
-import { Main } from '../layout/Shell.jsx';
-import { AgentPill, EmptyState, Panel } from '../components/ui.jsx';
-import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT, relativeTime } from '../data/data.js';
+import { Main } from '../layout/Shell.tsx';
+import { AgentPill, EmptyState, Panel } from '../components/ui.tsx';
+import { MCP, MCP_TOOLS, MCP_CALLS, SETTINGS, AGENT, relativeTime } from '../data/data.ts';
+import type { KV, McpTool, McpCall, SettingsGroup } from '../data/types.ts';
 import ui from '../components/ui.module.css';
 import styles from './System.module.css';
 
 // ---- MCP rows ----
-const McpToolRow = memo(({ t }) => (
+const McpToolRow = memo(({ t }: { t: McpTool }) => (
   <div className={ui.kv}>
     <span className={ui.v}>{t.name}</span>
     <span className={ui.muted}>{t.calls} calls</span>
@@ -15,7 +16,7 @@ const McpToolRow = memo(({ t }) => (
 
 // Generic display — no per-tool formatting, since the Playwright MCP server
 // is a third-party package this repo doesn't control the tool surface of.
-const McpCallRow = memo(({ c }) => {
+const McpCallRow = memo(({ c }: { c: McpCall }) => {
   const args = JSON.stringify(c.input);
   return (
     <div className={ui.logrow}>
@@ -25,7 +26,7 @@ const McpCallRow = memo(({ c }) => {
   );
 });
 
-const McpStatRow = memo(({ s }) => (
+const McpStatRow = memo(({ s }: { s: KV }) => (
   <div className={ui.kv}>
     <span className={ui.k}>{s.k}</span>
     {s.pill
@@ -36,14 +37,14 @@ const McpStatRow = memo(({ s }) => (
 
 // ---- Settings rows ----
 // No toggles here — nothing in this panel is actually configurable yet.
-const SettingItem = memo(({ it }) => (
+const SettingItem = memo(({ it }: { it: KV }) => (
   <div className={ui.kv}>
     <span className={ui.k}>{it.k}</span>
     <span className={ui.v}>{it.v}</span>
   </div>
 ));
 
-const SettingGroup = memo(({ g }) => (
+const SettingGroup = memo(({ g }: { g: SettingsGroup }) => (
   <Panel title={g.group}>
     {g.items.map(it => <SettingItem key={it.k} it={it} />)}
   </Panel>

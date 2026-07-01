@@ -1,8 +1,8 @@
 // Runnable check for the non-trivial bits (filtering, mock/live parity, derived AGENT). `npm run check`.
 import assert from 'node:assert';
-import { filterPrototypes, filterScreenshots, findingsFor, testStatus, testSummary, deriveLoop, versionsFor, loopFor, relativeTime, deriveAgent, AGENT } from './data.js';
-import * as mock from './mock.js';
-import * as live from './live.js';
+import { filterPrototypes, filterScreenshots, findingsFor, testStatus, testSummary, deriveLoop, versionsFor, loopFor, relativeTime, deriveAgent, AGENT } from './data.ts';
+import * as mock from './mock.ts';
+import * as live from './live.ts';
 
 assert.deepStrictEqual(Object.keys(mock).sort(), Object.keys(live).sort(), 'mock.js and live.js must export the same keys');
 
