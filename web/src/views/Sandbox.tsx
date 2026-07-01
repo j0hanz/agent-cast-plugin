@@ -39,7 +39,7 @@ export function Sandbox() {
         <Seg
           opts={['Desktop', 'Tablet', 'Mobile']}
           value={dev}
-          onChange={useCallback((v: string) => setSeg('sandbox', v as Device), [])}
+          onChange={useCallback((v: Device) => setSeg('sandbox', v), [])}
         />
       </div>
       <div className={`${ui.cols} ${ui.stretch}`}>

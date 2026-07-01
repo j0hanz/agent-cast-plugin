@@ -40,7 +40,7 @@ const FindingRow = memo(({ f }: { f: Finding }) => (
 
 export function Detail({ id }: { id: string }) {
   const segDetail = useUI((s) => s.seg.detail);
-  const handleDevChange = useCallback((v: string) => setSeg('detail', v as Device), []);
+  const handleDevChange = useCallback((v: Device) => setSeg('detail', v), []);
   const p = PROTOTYPES.find((x) => x.id === id);
   if (!p) {
     return (

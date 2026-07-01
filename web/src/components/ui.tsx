@@ -25,23 +25,23 @@ export const AgentPill = memo(({ running, stage }: { running: boolean; stage: st
 
 // ponytail: Native single-select segmented control. One option is always on,
 // matching the behavior of the original ToggleGroup control.
-interface SingleToggleProps {
-  opts: string[];
-  value: string;
-  onChange: (val: string) => void;
+interface SingleToggleProps<T extends string> {
+  opts: readonly T[];
+  value: T;
+  onChange: (val: T) => void;
   className?: string;
   itemClass?: string;
   ariaLabel?: string;
 }
 
-const SingleToggle = ({
+const SingleToggle = <T extends string>({
   opts,
   value,
   onChange,
   className,
   itemClass,
   ariaLabel,
-}: SingleToggleProps) => (
+}: SingleToggleProps<T>) => (
   <div className={className} role="group" aria-label={ariaLabel}>
     {opts.map((o) => (
       <button
@@ -57,15 +57,17 @@ const SingleToggle = ({
   </div>
 );
 
-interface SegProps {
-  opts: string[];
-  value: string;
-  onChange: (val: string) => void;
+interface SegProps<T extends string> {
+  opts: readonly T[];
+  value: T;
+  onChange: (val: T) => void;
   'aria-label'?: string;
 }
-export const Seg = memo((p: SegProps) => (
+// memo() drops the generic signature — cast restores it, SegImpl is still what runs.
+const SegImpl = <T extends string>(p: SegProps<T>) => (
   <SingleToggle {...p} className={styles.seg} ariaLabel={p['aria-label'] ?? 'Select viewport'} />
-));
+);
+export const Seg = memo(SegImpl) as typeof SegImpl;
 
 interface ChipsProps {
   labels: string[];

@@ -87,9 +87,12 @@ const ScreenshotCard = memo(({ s }: { s: Screenshot }) => {
 });
 
 // ---- Sub-tab switcher ----
-const SubTabs = memo(({ active, onChange }: { active: string; onChange: (t: string) => void }) => (
+type SubTab = 'Prototypes' | 'Screenshots';
+const SUB_TABS: readonly SubTab[] = ['Prototypes', 'Screenshots'];
+
+const SubTabs = memo(({ active, onChange }: { active: SubTab; onChange: (t: SubTab) => void }) => (
   <div className={styles.subtabs} role="group" aria-label="View mode">
-    {['Prototypes', 'Screenshots'].map((t) => (
+    {SUB_TABS.map((t) => (
       <button
         key={t}
         aria-pressed={active === t}
@@ -112,10 +115,7 @@ export function Prototypes() {
 
   const handleFilter = useCallback((v: string) => setFilter('prototypes', v), []);
   const handleScFilter = useCallback((v: string) => setFilter('screenshots', v), []);
-  const handleTab = useCallback(
-    (t: string) => setSeg('prototypesTab', t as 'Prototypes' | 'Screenshots'),
-    [],
-  );
+  const handleTab = useCallback((t: SubTab) => setSeg('prototypesTab', t), []);
 
   const isProtos = tab === 'Prototypes';
 
