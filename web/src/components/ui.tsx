@@ -5,9 +5,11 @@ import type { IconName } from './icons.tsx';
 import { screenshotSrc } from '../data/data.ts';
 import styles from './ui.module.css';
 
+const BOLD_TAG_REGEX = /<\/?b>/;
+
 // Assumes well-formed, non-nested, alternating <b>/</b> pairs — not an HTML parser.
 export const RichText = memo(({ text = '' }: { text?: string }) => (
-  <span>{text.split(/<\/?b>/).map((part, i) => (i % 2 ? <b key={i}>{part}</b> : part))}</span>
+  <span>{text.split(BOLD_TAG_REGEX).map((part, i) => (i % 2 ? <b key={i}>{part}</b> : part))}</span>
 ));
 
 export const AgentPill = memo(({ running, stage }: { running: boolean; stage: string }) =>

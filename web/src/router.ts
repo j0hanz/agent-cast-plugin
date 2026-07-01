@@ -40,10 +40,12 @@ export interface RouteMatch {
   props: Record<string, unknown>;
 }
 
+const HASH_CLEAN_REGEX = /^#\/?/;
+
 // Returns { active: navId-to-highlight, Component, props }.
 export function useRoute(): RouteMatch {
   const hash = useHashRoute();
-  const [seg0, seg1] = (hash.replace(/^#\/?/, '') || 'prototypes').split('/');
+  const [seg0, seg1] = (hash.replace(HASH_CLEAN_REGEX, '') || 'prototypes').split('/');
 
   let active: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see rationale above
