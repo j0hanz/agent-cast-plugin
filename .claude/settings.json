@@ -1,5 +1,4 @@
 {
-  "description": "Starts the AgentCast web UI automatically and logs Playwright MCP calls for the dashboard. Mirrored in .claude/settings.json for plain checkouts ($CLAUDE_PROJECT_DIR-anchored); if the plugin is also installed while this repo is open, hooks double-fire — accepted, don't run both.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/start-web.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/hooks/start-web.sh",
             "timeout": 15
           }
         ]
@@ -19,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/log-session.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/hooks/log-session.sh",
             "timeout": 10
           }
         ]
@@ -31,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/log-mcp-call.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/hooks/log-mcp-call.sh",
             "timeout": 10
           }
         ]
@@ -41,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/update-state.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/hooks/update-state.sh",
             "timeout": 10
           }
         ]
