@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Icon } from './icons.tsx';
 import type { IconName } from './icons.tsx';
-import { screenshotSrc } from '../data/data.ts';
+import { screenshotSrc, videoSrc } from '../data/data.ts';
 import styles from './ui.module.css';
 
 const BOLD_TAG_REGEX = /<\/?b>/;
@@ -99,9 +99,15 @@ interface PreviewProps {
   ver?: string;
   stage?: string;
 }
+const PREVIEW_MODES = ['Screenshot', 'Video'] as const;
+type PreviewMode = (typeof PREVIEW_MODES)[number];
+
 export const Preview = memo(({ id, ver, stage }: PreviewProps) => {
   const [broken, setBroken] = useState(false);
-  const showImg = Boolean(ver) && !broken;
+  const [mode, setMode] = useState<PreviewMode>('Screenshot');
+  const [videoBroken, setVideoBroken] = useState(false);
+  const showImg = mode === 'Screenshot' && Boolean(ver) && !broken;
+  const showVideo = mode === 'Video' && Boolean(ver) && !videoBroken;
   return (
     <div className={styles.preview}>
       <div className={styles.chrome}>
@@ -117,14 +123,25 @@ export const Preview = memo(({ id, ver, stage }: PreviewProps) => {
         </div>
       </div>
       <div className={styles.shot}>
-        {ver && !broken && (
+        <div className={styles.modeToggle}>
+          <Seg opts={PREVIEW_MODES} value={mode} onChange={setMode} aria-label="Preview mode" />
+        </div>
+        {showImg && (
           <img
             className={styles.shotImg}
-            src={screenshotSrc(id, ver)}
+            src={screenshotSrc(id, ver!)}
             alt={`${id} screenshot, ${ver}${stage ? `, ${stage}` : ''}`}
             onError={() => setBroken(true)}
             loading="eager"
             decoding="async"
+          />
+        )}
+        {mode === 'Video' && ver && !videoBroken && (
+          <video
+            className={styles.shotImg}
+            src={videoSrc(id, ver)}
+            controls
+            onError={() => setVideoBroken(true)}
           />
         )}
         <div className={styles.cropLT} aria-hidden="true"></div>
@@ -133,11 +150,14 @@ export const Preview = memo(({ id, ver, stage }: PreviewProps) => {
         <div className={styles.cropRB} aria-hidden="true"></div>
         <div className={styles.crosshair} aria-hidden="true"></div>
         <div className={styles.gridOverlay} aria-hidden="true"></div>
-        {!showImg && (
+        {mode === 'Screenshot' && !showImg && (
           <>
             <Icon n="monitor" sw={1.4} />
             <span className={styles.calibrationText}>Screenshot preview</span>
           </>
+        )}
+        {mode === 'Video' && !showVideo && (
+          <span className={styles.calibrationText}>No recording for this version</span>
         )}
       </div>
     </div>

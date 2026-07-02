@@ -251,6 +251,15 @@
   object-fit: cover;
 }
 
+/* Screenshot/Video switch, floated over .shot's top-right corner — .chrome's
+   flex row (dots/url/viewport-indicator) has no spare room for a 3rd control */
+.modeToggle {
+  position: absolute;
+  top: var(--s3);
+  right: var(--s3);
+  z-index: 4;
+}
+
 /* ---------- interactive lift (composed by Prototypes .card / Screenshots .sc) ---------- */
 .lift:hover {
   border-color: var(--accent);

@@ -45,10 +45,14 @@ For each prototype, one pass = one `ver`:
 
 1. **Build** — write/edit the prototype so it renders at a `localhost:5173`
    route.
-2. **Preview** — `mcp__playwright__browser_navigate` to
-   `http://localhost:5173/{route}`. Set the viewport with
-   `mcp__playwright__browser_resize` to match `kind` (desktop 1440×900,
-   tablet 834×1112, mobile 390×844).
+2. **Preview** — Optionally, mirroring the optional `-critique-{ver}`
+   screenshot below, call `mcp__playwright__browser_start_video` with
+   `filename: web/public/artifacts/{protoId}-{ver}.webm` **before**
+   navigating, so any load/transition animation is captured from its first
+   frame — starting it after navigating misses the animation entirely. Then
+   `mcp__playwright__browser_navigate` to `http://localhost:5173/{route}`.
+   Set the viewport with `mcp__playwright__browser_resize` to match `kind`
+   (desktop 1440×900, tablet 834×1112, mobile 390×844).
 3. **Screenshot-critique** — `mcp__playwright__browser_take_screenshot` with
    `filename: web/public/screenshots/{protoId}-{kind}-preview-{ver}.png`, then
    read that image back and critique it against the design intent in
@@ -76,6 +80,12 @@ For each prototype, one pass = one `ver`:
    finding (`target: <its loc>`), capture `-critique-{ver}`, then
    `mcp__playwright__browser_hide_highlight` (omit `target` to hide all)
    before moving on.
+
+   If a recording was started, call `mcp__playwright__browser_stop_video`
+   unconditionally here, whether or not the capture ended up worth keeping.
+   Never call `mcp__playwright__browser_annotate` from this skill — it
+   blocks indefinitely waiting for a human to interact with a Dashboard UI,
+   which will hang an autonomous loop forever.
 
 4. **Refine** — apply the fixes the critique surfaced.
 5. **Test** — verify the fixes with real assertions, then record the run. For

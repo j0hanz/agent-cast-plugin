@@ -63,6 +63,10 @@ export const deviceIcon = (d: Device): IconName => (d === 'Mobile' ? 'mobile' : 
 // files) — write one there with this exact name and it renders, nothing to register.
 export const screenshotSrc = (protoId: string, ver: string): string =>
   `/screenshots/${protoId}-${ver}.png`;
+// Same convention, web/public/artifacts/ (also gitignored, also Vite-served) —
+// existence isn't tracked anywhere; the Preview toggle just tries to load it.
+export const videoSrc = (protoId: string, ver: string): string =>
+  `/artifacts/${protoId}-${ver}.webm`;
 
 // Relative time computed at render/load time from a real timestamp, not a
 // pre-formatted string — so it can't go stale.
