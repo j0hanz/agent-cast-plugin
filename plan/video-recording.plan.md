@@ -206,9 +206,11 @@ playwright-core@1.61.1's internal CDP→ffmpeg glue — an upstream Playwright
 bug, not something fixable in this codebase. This section documents when
 and how to retest it once upstream may have shipped a fix.
 
-**Trigger**: `@playwright/mcp@latest` bundles a `playwright-core` version
-newer than 1.61.1 (check via `npm view @playwright/mcp dependencies` or the
-installed package's `node_modules/playwright-core/package.json`).
+**Trigger**: the `@playwright/mcp` pin in `.mcp.json` is bumped to a version
+bundling a `playwright-core` version newer than 1.61.1 (check via
+`npm view @playwright/mcp@<pin> dependencies`). The current `0.0.77` pin
+already satisfies this condition; TASK-006 of `plan/mcp-hardening.plan.md`
+executes the retest for it.
 
 **Steps**:
 
