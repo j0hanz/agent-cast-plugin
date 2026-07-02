@@ -198,3 +198,35 @@ Validate: `cd web && npm run dev -- --port 5175` (manual browser check, not
 scriptable)
 Expected result: All three behaviors in Action confirmed visually; no
 console errors logged during the toggle interaction.
+
+## Retest trigger (upstream watch)
+
+TASK-001's execution note above root-caused the 0-byte recording bug to
+playwright-core@1.61.1's internal CDP→ffmpeg glue — an upstream Playwright
+bug, not something fixable in this codebase. This section documents when
+and how to retest it once upstream may have shipped a fix.
+
+**Trigger**: `@playwright/mcp@latest` bundles a `playwright-core` version
+newer than 1.61.1 (check via `npm view @playwright/mcp dependencies` or the
+installed package's `node_modules/playwright-core/package.json`).
+
+**Steps**:
+
+1. Run one recording via the frontend-loop Preview stage (per TASK-004's
+   `browser_start_video`/`browser_stop_video` sequence) against any
+   prototype.
+2. Assert the resulting `web/public/artifacts/{protoId}-{ver}.webm` is
+   non-zero bytes (e.g. `test -s web/public/artifacts/{protoId}-{ver}.webm && echo NONZERO`).
+3. Scan the repo root for leaked `*.webm` files — the empirically confirmed
+   multi-tab leak (a second tab open while recording starts writes an extra
+   file to the repo root instead of `web/public/artifacts/`).
+
+**Success path**: If the file is non-zero bytes and no `*.webm` leaked to
+the repo root, the upstream bug is fixed — this closes TASK-001 as fully
+resolved (both REQ-007 path resolution and real frame capture now confirmed
+working).
+
+**Failure path**: If the file is still 0-byte or a leak is still observed,
+link/file the upstream Playwright issue (search first — this may already be
+tracked) and keep this trigger armed for the next `@playwright/mcp`
+version bump.
