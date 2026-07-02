@@ -13,6 +13,7 @@ import type {
   McpCall,
   ConsoleEntry,
   NetworkEntry,
+  SessionQuestion,
 } from './types.ts';
 
 // Minutes-ago offsets so capturedAt (and anything derived from it, e.g.
@@ -230,6 +231,98 @@ export const CONSOLE: ConsoleEntry[] = [
 export const NETWORK: NetworkEntry[] = [
   { ts: ago(0), text: '3. [GET] /api/pricing => [404] Not Found' },
   { ts: ago(9), text: '7. [POST] /api/checkout => [FAILED] net::ERR_CONNECTION_REFUSED' },
+];
+
+// Agent-asked questions, rendered as Zod-validated forms (an extended
+// AskUserQuestion — see sessionSchema.ts). Covers every field type at least
+// once, plus a multi-field question, so every renderer gets exercised.
+export const SESSIONS: SessionQuestion[] = [
+  {
+    id: 'q1',
+    header: 'CTA color',
+    prompt: 'Which accent should the primary CTA use on the pricing page?',
+    ts: ago(1),
+    status: 'pending',
+    fields: [
+      {
+        id: 'accent',
+        type: 'select',
+        label: 'Accent color',
+        options: ['Amber (current)', 'Green', 'Keep as-is'],
+      },
+    ],
+  },
+  {
+    id: 'q2',
+    header: 'Card grid',
+    prompt:
+      'How should the pricing cards lay out on desktop, and which tiers should be highlighted?',
+    ts: ago(3),
+    status: 'pending',
+    fields: [
+      { id: 'columns', type: 'number', label: 'Cards per row', min: 1, max: 6, step: 1 },
+      {
+        id: 'highlighted',
+        type: 'multiselect',
+        label: 'Highlighted tiers',
+        options: ['Starter', 'Pro', 'Team', 'Enterprise'],
+      },
+    ],
+  },
+  {
+    id: 'q3',
+    header: 'Dark mode',
+    prompt: 'Should the settings panel support a light theme toggle, or stay graphite-only?',
+    ts: ago(40),
+    status: 'answered',
+    answeredAt: ago(39),
+    fields: [{ id: 'lightTheme', type: 'boolean', label: 'Add light theme toggle', answer: false }],
+  },
+  {
+    id: 'q4',
+    header: 'Ship target',
+    prompt: "What's the target date to mark checkout-flow ready for release?",
+    ts: ago(95),
+    status: 'answered',
+    answeredAt: ago(94),
+    fields: [{ id: 'shipDate', type: 'date', label: 'Target date', answer: '2026-07-15' }],
+  },
+  {
+    id: 'q5',
+    header: 'Empty copy',
+    prompt: 'Draft the empty-state description for a Sessions feed with nothing asked yet.',
+    ts: ago(140),
+    status: 'answered',
+    answeredAt: ago(138),
+    fields: [
+      {
+        id: 'copy',
+        type: 'textarea',
+        label: 'Empty-state description',
+        minLength: 10,
+        maxLength: 200,
+        answer: "The agent hasn't asked anything this session.",
+      },
+    ],
+  },
+  {
+    id: 'q6',
+    header: 'Headline tone',
+    prompt: 'What tone should the pricing page headline use?',
+    ts: ago(180),
+    status: 'answered',
+    answeredAt: ago(179),
+    fields: [
+      {
+        id: 'tone',
+        type: 'text',
+        label: 'Tone',
+        minLength: 3,
+        maxLength: 80,
+        answer: 'Confident, plain, no hype',
+      },
+    ],
+  },
 ];
 
 // SETTINGS lives in data.ts — identical in mock and live, so one copy covers both.

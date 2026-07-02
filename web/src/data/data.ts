@@ -18,6 +18,8 @@ import type {
   LoopStep,
   SettingsGroup,
   McpCall,
+  SessionQuestion,
+  SessionStatus,
 } from './types.ts';
 import type { IconName } from '../components/icons.tsx';
 
@@ -36,6 +38,7 @@ export const {
   MCP_CALLS,
   CONSOLE,
   NETWORK,
+  SESSIONS,
 } = SRC;
 
 // Identical in mock and live (never actually varies by data source) — one
@@ -125,6 +128,7 @@ export const VIEWPORTS: Record<Device, string> = {
 export const NAV: { id: string; label: string; icon: IconName }[] = [
   { id: 'prototypes', label: 'Prototypes', icon: 'prototypes' },
   { id: 'sandbox', label: 'Sandbox', icon: 'sandbox' },
+  { id: 'sessions', label: 'Sessions', icon: 'sessions' },
   { id: 'tests', label: 'Tests', icon: 'tests' },
 ];
 export const SYSTEM: { id: string; label: string; icon: IconName }[] = [
@@ -222,3 +226,21 @@ export const screenshotProtos = (): string[] => [
   'All',
   ...new Set(SCREENSHOTS.map((s) => s.proto)),
 ];
+
+// Sessions filter/count — same STATUS_OF + optional-list pattern as
+// findingsFor, so the Sessions view can filter a locally-answered-merged
+// list without touching the SESSIONS constant itself.
+export const SESSION_STATUS_OF: Record<string, SessionStatus | null> = {
+  All: null,
+  Pending: 'pending',
+  Answered: 'answered',
+};
+export const filterSessions = (
+  filter = 'All',
+  list: SessionQuestion[] = SESSIONS,
+): SessionQuestion[] => {
+  const want = SESSION_STATUS_OF[filter];
+  return list.filter((q) => !want || q.status === want);
+};
+export const pendingSessions = (list: SessionQuestion[] = SESSIONS): number =>
+  list.filter((q) => q.status === 'pending').length;

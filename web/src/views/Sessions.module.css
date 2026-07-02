@@ -1,0 +1,242 @@
+/* ---------- feed: generous separation between distinct questions ---------- */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.prompt {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--text);
+  line-height: 1.6;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+.meta {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--mut);
+  margin-top: var(--s1);
+  margin-bottom: var(--s3);
+}
+
+/* ---------- answered read-only values ---------- */
+.answers {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- pending form: tight grouping between sibling fields ---------- */
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s0);
+}
+.label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.err {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  color: var(--bad);
+}
+
+/* ---------- text / number / select / date controls ---------- */
+.input,
+.select {
+  width: 100%;
+  max-width: 420px;
+  height: var(--h-control);
+  padding: 0 var(--s2);
+  background: var(--surface-2);
+  color: var(--text);
+  border: 0;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  transition:
+    background var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+.textarea {
+  width: 100%;
+  max-width: 640px;
+  padding: var(--s2);
+  background: var(--surface-2);
+  color: var(--text);
+  border: 0;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 72px;
+  transition:
+    background var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+}
+.input[aria-invalid='true'],
+.select[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  box-shadow: inset 0 0 0 1px rgba(var(--bad-rgb), 0.5);
+}
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b6c0' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--s2) center;
+  background-size: 16px;
+  padding-right: var(--s5);
+}
+
+/* ---------- multiselect: native checkboxes styled as checkable chips ---------- */
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+.checkItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  min-height: 44px;
+  padding: 0 var(--s2);
+  background: var(--surface-2);
+  color: var(--dim);
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+.checkItem input {
+  accent-color: var(--accent);
+}
+.checkItem:has(input:checked) {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.checkItem:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- boolean: real switch built from a visually-hidden checkbox ---------- */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 44px;
+  cursor: pointer;
+  width: fit-content;
+}
+/* Anchored to .toggle (not a distant positioned ancestor) so this sr-only
+   input's hit target actually coincides with the visible switch, and hidden
+   under the decorative track/label so a precise click still lands on it. */
+.toggle input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex: none;
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  transition: background var(--dur) var(--ease);
+}
+.track::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--dim);
+  transition: all var(--dur-md) var(--ease);
+}
+.toggle input:checked + .track {
+  background: var(--accent-soft);
+}
+.toggle input:checked + .track::before {
+  transform: translateX(18px);
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.5);
+}
+.toggle input:focus-visible + .track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.toggleLabel {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--dim);
+}
+
+/* ---------- submit: the system's first committal action, reusing Seg's
+   active-pixel treatment (solid accent fill) rather than a new button style ---------- */
+.submit {
+  margin-top: var(--s3);
+  height: var(--h-control);
+  padding: 0 var(--s4);
+  background: var(--accent);
+  color: var(--bg);
+  border: 0;
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.35);
+  transition:
+    filter var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.submit:hover {
+  filter: brightness(1.08);
+}
+.submit:active {
+  transform: scale(0.96);
+}
+.submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track::before,
+  .submit {
+    transition: none;
+  }
+}

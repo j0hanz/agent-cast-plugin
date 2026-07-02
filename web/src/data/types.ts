@@ -108,3 +108,56 @@ export interface LoopStep {
   state: 'live' | 'done' | '';
   t: string;
 }
+
+// Sessions: agent-asked questions rendered as Zod-validated forms (an
+// extended AskUserQuestion). Field shape carries its own constraints
+// (min/max/length/options) so sessionSchema.ts can build a real runtime
+// validator from it, not just a display hint.
+interface SessionFieldBase {
+  id: string;
+  label: string;
+}
+export interface TextSessionField extends SessionFieldBase {
+  type: 'text' | 'textarea';
+  minLength?: number;
+  maxLength?: number;
+  answer?: string;
+}
+export interface NumberSessionField extends SessionFieldBase {
+  type: 'number';
+  min?: number;
+  max?: number;
+  step?: number;
+  answer?: number;
+}
+export interface ChoiceSessionField extends SessionFieldBase {
+  type: 'select' | 'multiselect';
+  options: string[];
+  answer?: string | string[];
+}
+export interface BooleanSessionField extends SessionFieldBase {
+  type: 'boolean';
+  answer?: boolean;
+}
+export interface DateSessionField extends SessionFieldBase {
+  type: 'date';
+  answer?: string;
+}
+export type SessionField =
+  | TextSessionField
+  | NumberSessionField
+  | ChoiceSessionField
+  | BooleanSessionField
+  | DateSessionField;
+
+export type SessionStatus = 'pending' | 'answered';
+
+export interface SessionQuestion {
+  id: string;
+  header: string;
+  prompt: string;
+  ts: string;
+  status: SessionStatus;
+  answeredAt?: string;
+  fields: SessionField[];
+}

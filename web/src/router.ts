@@ -4,6 +4,7 @@ import { NAV, SYSTEM, PROTOTYPES } from './data/data.ts';
 import { Prototypes } from './views/Prototypes.tsx';
 import { Detail } from './views/Detail.tsx';
 import { Sandbox } from './views/Sandbox.tsx';
+import { Sessions } from './views/Sessions.tsx';
 import { Tests } from './views/Tests.tsx';
 import { System } from './views/System.tsx';
 import { NotFound } from './views/NotFound.tsx';
@@ -11,6 +12,7 @@ import { NotFound } from './views/NotFound.tsx';
 const ROUTES: Record<string, ComponentType> = {
   prototypes: Prototypes,
   sandbox: Sandbox,
+  sessions: Sessions,
   tests: Tests,
   system: System,
 };

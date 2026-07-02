@@ -4,6 +4,7 @@ import type { Device } from '../data/types.ts';
 interface FilterState {
   prototypes: string;
   screenshots: string;
+  sessions: string;
 }
 interface SegState {
   detail: Device | null;
@@ -26,7 +27,7 @@ export const setSeg = <K extends keyof SegState>(group: K, val: SegState[K]) =>
   setState({ seg: { ...state.seg, [group]: val } });
 
 let state: UIState = {
-  filter: { prototypes: 'All', screenshots: 'All' },
+  filter: { prototypes: 'All', screenshots: 'All', sessions: 'All' },
   setFilter,
   seg: { detail: null, sandbox: null, prototypesTab: 'Prototypes' },
   setSeg,

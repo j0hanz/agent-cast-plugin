@@ -33,6 +33,7 @@ import type {
   McpCall,
   ConsoleEntry,
   NetworkEntry,
+  SessionQuestion,
 } from './types.ts';
 
 const warn = (msg: string, err: unknown): void => {
@@ -212,6 +213,12 @@ export const PROTOTYPES: Prototype[] = liveArray(() => {
 // Critique findings the loop appends to web/public/findings.jsonl (item B).
 // Detail filters these to the active prototype's latest version via findingsFor.
 export const FINDINGS: Finding[] = liveArray(() => findingsStore);
+
+// No producer yet — the Sessions view is UI-only this pass (see 2026-07-02
+// design brief). A future hook would log AskUserQuestion-shaped calls the
+// same way log-mcp-call.sh does for Playwright, into a sessions.jsonl this
+// file would parse.
+export const SESSIONS: SessionQuestion[] = [];
 
 // Derived SESSION data
 export const SESSION: KV[] = liveArray(() => {

@@ -65,6 +65,13 @@ const PATHS = {
   tool: (
     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z" />
   ),
+  sessions: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M9 9a3 3 0 0 1 5.2-2 3 3 0 0 1 .8 3c-.5 1-2 1.3-2 2.5" />
+      <path d="M12 16h.01" />
+    </>
+  ),
 };
 
 export type IconName = keyof typeof PATHS;
