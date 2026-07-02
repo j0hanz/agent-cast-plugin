@@ -2,7 +2,7 @@
 # PreToolUse hook: logs session events.
 set -euo pipefail
 
-LOG_DIR="${CLAUDE_PLUGIN_ROOT:-$(pwd)}/web/public"
+LOG_DIR="${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}/web/public"
 LOG_FILE="${LOG_DIR}/log.jsonl"
 
 mkdir -p "$LOG_DIR"

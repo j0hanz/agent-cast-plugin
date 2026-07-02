@@ -2,7 +2,7 @@
 # PostToolUse hook: logs MCP playwright tool call data.
 set -euo pipefail
 
-LOG_DIR="${CLAUDE_PLUGIN_ROOT:-$(pwd)}/web/public"
+LOG_DIR="${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}/web/public"
 LOG_FILE="${LOG_DIR}/mcp-calls.jsonl"
 
 mkdir -p "$LOG_DIR"

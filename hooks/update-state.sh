@@ -2,7 +2,7 @@
 # PostToolUse hook: updates the dashboard screenshot state.
 set -euo pipefail
 
-LOG_DIR="${CLAUDE_PLUGIN_ROOT:-$(pwd)}/web/public"
+LOG_DIR="${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}/web/public"
 STATE_FILE="${LOG_DIR}/state.json"
 
 mkdir -p "$LOG_DIR"
@@ -55,8 +55,8 @@ if [ -n "$FILENAME" ] && [ "$FILENAME" != "null" ]; then
 
     if [ -f "$FILENAME" ]; then
       cp "$FILENAME" "$SERVED"
-    elif [ -f "${CLAUDE_PLUGIN_ROOT:-$(pwd)}/${FILENAME}" ]; then
-      cp "${CLAUDE_PLUGIN_ROOT:-$(pwd)}/${FILENAME}" "$SERVED"
+    elif [ -f "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}/${FILENAME}" ]; then
+      cp "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}/${FILENAME}" "$SERVED"
     elif [ -f "$(pwd)/${FILENAME}" ]; then
       cp "$(pwd)/${FILENAME}" "$SERVED"
     fi
