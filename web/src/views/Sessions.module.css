@@ -108,6 +108,32 @@
   padding-right: var(--s5);
 }
 
+/* ---------- color: compact native swatch, not a full-width text control ---------- */
+.color {
+  width: 64px;
+  height: var(--h-control);
+  padding: 4px;
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: box-shadow var(--dur) var(--ease);
+}
+.color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color::-webkit-color-swatch {
+  border: 0;
+  border-radius: var(--r-xs);
+}
+.color:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+}
+.color[aria-invalid='true'] {
+  box-shadow: inset 0 0 0 1px rgba(var(--bad-rgb), 0.5);
+}
+
 /* ---------- multiselect: native checkboxes styled as checkable chips ---------- */
 .checks {
   display: flex;

@@ -243,14 +243,7 @@ export const SESSIONS: SessionQuestion[] = [
     prompt: 'Which accent should the primary CTA use on the pricing page?',
     ts: ago(1),
     status: 'pending',
-    fields: [
-      {
-        id: 'accent',
-        type: 'select',
-        label: 'Accent color',
-        options: ['Amber (current)', 'Green', 'Keep as-is'],
-      },
-    ],
+    fields: [{ id: 'accent', type: 'color', label: 'Accent color' }],
   },
   {
     id: 'q2',
@@ -322,6 +315,31 @@ export const SESSIONS: SessionQuestion[] = [
         answer: 'Confident, plain, no hype',
       },
     ],
+  },
+  {
+    id: 'q7',
+    header: 'Footer layout',
+    prompt: 'Which footer layout should the marketing site use?',
+    ts: ago(210),
+    status: 'answered',
+    answeredAt: ago(208),
+    fields: [
+      {
+        id: 'layout',
+        type: 'select',
+        label: 'Footer layout',
+        options: ['Three-column', 'Single-column', 'Mega footer'],
+        answer: 'Three-column',
+      },
+    ],
+  },
+  {
+    id: 'q8',
+    header: 'Reference link',
+    prompt: "What's the reference URL for the new empty-state illustration?",
+    ts: ago(5),
+    status: 'pending',
+    fields: [{ id: 'refUrl', type: 'url', label: 'Reference URL' }],
   },
 ];
 

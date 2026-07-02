@@ -189,6 +189,40 @@ const FieldControl = memo(({ field, value, error, onChange, onBlur }: ControlPro
         />
       );
       break;
+    case 'url':
+      control = (
+        <input
+          id={domId}
+          type="url"
+          className={styles.input}
+          value={(value as string | undefined) ?? ''}
+          placeholder="https://…"
+          aria-labelledby={labelId}
+          aria-invalid={!!error}
+          aria-describedby={described}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+        />
+      );
+      break;
+    case 'color':
+      // Browsers sanitize an empty/invalid value to "#000000" for the swatch
+      // regardless — that fallback is display-only, it's never written into
+      // `value`, so an untouched field still validates as unanswered.
+      control = (
+        <input
+          id={domId}
+          type="color"
+          className={styles.color}
+          value={(value as string | undefined) ?? '#000000'}
+          aria-labelledby={labelId}
+          aria-invalid={!!error}
+          aria-describedby={described}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+        />
+      );
+      break;
   }
 
   return (

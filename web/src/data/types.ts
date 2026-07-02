@@ -143,12 +143,22 @@ export interface DateSessionField extends SessionFieldBase {
   type: 'date';
   answer?: string;
 }
+export interface UrlSessionField extends SessionFieldBase {
+  type: 'url';
+  answer?: string;
+}
+export interface ColorSessionField extends SessionFieldBase {
+  type: 'color';
+  answer?: string; // hex, e.g. "#f5a524"
+}
 export type SessionField =
   | TextSessionField
   | NumberSessionField
   | ChoiceSessionField
   | BooleanSessionField
-  | DateSessionField;
+  | DateSessionField
+  | UrlSessionField
+  | ColorSessionField;
 
 export type SessionStatus = 'pending' | 'answered';
 

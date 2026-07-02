@@ -7,6 +7,8 @@
 import { z } from 'zod';
 import type { SessionField } from './types.ts';
 
+const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
+
 export const fieldSchema = (f: SessionField): z.ZodTypeAny => {
   switch (f.type) {
     case 'text':
@@ -32,10 +34,17 @@ export const fieldSchema = (f: SessionField): z.ZodTypeAny => {
     case 'boolean':
       return z.boolean();
     case 'date':
-      return z
-        .string()
-        .min(1)
-        .refine((v) => !Number.isNaN(Date.parse(v)), `${f.label} must be a valid date`);
+      // z.iso.date() enforces the exact YYYY-MM-DD the native <input type="date">
+      // control emits — Date.parse's old refine also accepted loose formats
+      // ("Jan 1, 2020") a real producer should never send.
+      return z.iso.date(`${f.label} must be a valid date (YYYY-MM-DD)`);
+    case 'url':
+      return z.url(`${f.label} must be a valid URL`);
+    case 'color':
+      // No Zod top-level color format — the native <input type="color">
+      // control only ever emits lowercase 6-digit hex, so a plain regex
+      // covers it without a new dependency.
+      return z.string().regex(HEX_COLOR_REGEX, `${f.label} must be a hex color (e.g. #f5a524)`);
   }
 };
 
