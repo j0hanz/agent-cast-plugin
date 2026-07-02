@@ -33,6 +33,8 @@ export interface Finding {
 }
 
 export interface TestRun {
+  protoId: string;
+  ver: string;
   name: string;
   checks: number;
   pass: number;

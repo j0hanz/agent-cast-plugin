@@ -184,7 +184,7 @@ export const testSummary = (
 // (Cause A). deriveLoop maps a stage to the 5 loop steps; loopFor/versionsFor
 // scope it to one prototype. Numeric version sort so v10 > v9. Optional `list`
 // arg keeps them testable in isolation, same pattern as findingsFor.
-export const deriveLoop = (stage?: Stage): LoopStep[] => [
+export const deriveLoop = (stage?: Stage, hasRun = false): LoopStep[] => [
   { name: 'Build', state: 'done', t: 'completed' },
   {
     name: 'Preview',
@@ -196,19 +196,26 @@ export const deriveLoop = (stage?: Stage): LoopStep[] => [
     state: stage === 'critique' ? 'live' : stage === 'final' ? 'done' : '',
     t: stage === 'critique' ? 'running…' : stage === 'final' ? 'completed' : 'queued',
   },
-  { name: 'Refine', state: '', t: 'queued' },
+  {
+    name: 'Refine',
+    state: stage === 'final' && hasRun ? 'done' : '',
+    t: stage === 'final' && hasRun ? 'completed' : 'queued',
+  },
   {
     name: 'Test',
-    state: stage === 'final' ? 'live' : '',
-    t: stage === 'final' ? 'running…' : 'queued',
+    state: stage === 'final' ? (hasRun ? 'done' : 'live') : '',
+    t: stage === 'final' ? (hasRun ? 'completed' : 'running…') : 'queued',
   },
 ];
 export const versionsFor = (id: string, list: Screenshot[] = SCREENSHOTS): string[] =>
   [...new Set(list.filter((s) => s.protoId === id).map((s) => s.ver))].sort(
     (a, b) => versionNum(a) - versionNum(b),
   );
-export const loopFor = (id: string, list: Screenshot[] = SCREENSHOTS): LoopStep[] =>
-  deriveLoop(latestScreenshot(list.filter((s) => s.protoId === id))?.stage);
+export const loopFor = (id: string, list: Screenshot[] = SCREENSHOTS): LoopStep[] => {
+  const latest = latestScreenshot(list.filter((s) => s.protoId === id));
+  const hasRun = TESTS.some((t) => t.protoId === id && t.ver === latest?.ver);
+  return deriveLoop(latest?.stage, hasRun);
+};
 
 // M2: derived from data so filter stays in sync when prototypes are renamed.
 export const screenshotProtos = (): string[] => [
