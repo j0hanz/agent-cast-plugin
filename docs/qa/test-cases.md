@@ -149,6 +149,15 @@ _Precondition: dev server running at `localhost:5173`._
 
 1. From a Detail page, click the "Prototypes" breadcrumb link. **Expected:** returns to `#/prototypes` with any prior filter state intact.
 
+**TC-DETAIL-010** (P1) — Preview mode toggle renders video element
+
+1. On a Detail page, in the Preview panel's mode Seg control (`aria-label="Preview mode"`), click "Video". **Expected:** the screenshot image is replaced by a `<video controls>` element with `src` pointing at `/artifacts/{id}-{ver}.webm` for the version shown (the prototype's latest version); clicking back to "Screenshot" restores the image view.
+
+**TC-DETAIL-011** (P1) — Missing recording fallback is per-version
+
+1. With "Video" mode active and no matching file at `/artifacts/{id}-{ver}.webm` (the default in mock mode, and in live mode for any version without a captured recording). **Expected:** the `<video>` element's `onError` fires (404) and it is replaced by a "No recording for this version" message instead of a broken player.
+2. Repeat on a different prototype/version whose `.webm` does exist. **Expected:** that Detail page's Video mode renders the playable `<video>` element instead of the fallback — confirms the check is scoped to that specific prototype+version (`videoSrc(id, ver)`), not a single global flag.
+
 ---
 
 ## 5. Sandbox view
@@ -176,6 +185,10 @@ _Precondition: dev server running at `localhost:5173`._
 **TC-SANDBOX-006** (P2) — Empty session/log (live mode)
 
 1. In live mode with no `state.json`/`log.jsonl` present, open Sandbox. **Expected:** Session and Log panels each show their own empty state ("No session data", "No log entries") without a crash.
+
+**TC-SANDBOX-007** (P1) — Video toggle for latest capture
+
+1. On Sandbox, click "Video" in the Preview panel's mode Seg control. **Expected:** the same Screenshot↔Video toggle behavior as Detail applies here, scoped to the globally latest capture (`activeProtoId`/`activeVer`); with no matching `.webm` present, "No recording for this version" renders instead of the video element.
 
 ---
 
@@ -236,6 +249,18 @@ _Precondition: dev server running at `localhost:5173`._
 **TC-SYS-005** (P2) — Empty MCP panels (live mode)
 
 1. In live mode before any MCP calls have been logged. **Expected:** Server/Exposed tools/Recent calls each show their own independent empty state, not a shared or missing one.
+
+**TC-SYS-006** (P1) — Console panel lists only error-level entries
+
+1. Open System view, inspect the "Console" panel. **Expected:** count badge and row count equal `CONSOLE.length` — 2 entries in mock mode (`mock.ts`). In live mode, `CONSOLE` is pre-filtered in `live.ts` to keep only error-level lines returned by `browser_console_messages` calls (summary/header lines like "Total messages:"/"Returning N messages" are excluded); there is no filter UI, the panel simply renders whatever `CONSOLE` contains.
+
+**TC-SYS-007** (P1) — Network panel lists only failed/4xx–5xx requests
+
+1. Open System view, inspect the "Network" panel. **Expected:** count badge and row count equal `NETWORK.length` — 2 entries in mock mode (`mock.ts`). In live mode, `NETWORK` is pre-filtered in `live.ts` to keep only lines from `browser_network_requests` calls that end in `[FAILED]` or a 4xx/5xx status; successful requests never appear, and there is no filter UI control — the array itself is the assertion.
+
+**TC-SYS-008** (P2) — Empty Console/Network panels (live mode)
+
+1. In live mode with no console errors or failed network requests logged. **Expected:** Console and Network panels each render their own empty state ("No console errors" / "No failed requests") instead of a shared or missing one. **Note:** not reproducible with current mock fixtures — `mock.ts` populates both `CONSOLE` and `NETWORK` with 2 entries each; this case requires live mode with no error-level console output and no failed requests captured.
 
 ---
 
@@ -321,8 +346,8 @@ _Precondition: dev server running at `localhost:5173`._
 | Priority | Count | Run cadence                                             |
 | -------- | ----- | ------------------------------------------------------- |
 | P0       | 16    | Every change touching `web/src/views` or `web/src/data` |
-| P1       | 31    | Every feature branch before merge                       |
-| P2       | 16    | Before a local "release" checkpoint                     |
+| P1       | 36    | Every feature branch before merge                       |
+| P2       | 17    | Before a local "release" checkpoint                     |
 | P3       | 1     | Opportunistic                                           |
 
-Total: 64 test cases.
+Total: 70 test cases.
