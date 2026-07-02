@@ -33,7 +33,7 @@ AgentCast is a solo-operator instrument panel for an autonomous frontend coding 
 - Cross-browser matrix beyond Chromium + a Firefox spot-check (this is a CSS-only app with no browser-specific APIs beyond `clipboard`/`fetch`)
 - Load/performance testing (single local operator, no concurrency)
 - Text search (removed — filtering is status-chip/proto-chip only; see [test-cases.md](test-cases.md) §2/§3)
-- Finding-highlight screenshots (content baked in by the agent's `browser_highlight` call before capture) are agent-side behavior; dashboard QA covers rendering of screenshots regardless of their content, not whether highlights were correctly placed
+- Finding-highlight placement (agent-side, via `browser_highlight` before capture) — dashboard QA covers screenshot rendering, not highlight accuracy
 
 ## Test Strategy
 

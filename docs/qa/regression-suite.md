@@ -106,16 +106,16 @@ Run every test case in [test-cases.md](test-cases.md) top to bottom, in mock mod
 1. §1 Routing & Navigation (8 cases)
 2. §2 Prototypes tab (6 cases)
 3. §3 Screenshots sub-tab (7 cases)
-4. §4 Detail view (9 cases)
-5. §5 Sandbox view (6 cases)
+4. §4 Detail view (11 cases)
+5. §5 Sandbox view (7 cases)
 6. §6 Tests view (8 cases)
-7. §7 System view (5 cases)
+7. §7 System view (8 cases)
 8. §8 Data source — **both mock and live mode** (5 cases)
 9. §9 Responsive layout at all 4 breakpoints (4 cases)
 10. §10 Accessibility (3 cases)
 11. §11 Error handling (3 cases)
 
-Total: 64 unique test cases, 69 executions (§8's 5 data-source cases run once in mock mode and once in live mode).
+Total: 70 unique test cases, 75 executions (§8's 5 data-source cases run once in mock mode and once in live mode).
 
 ### Pass/Fail Criteria
 
