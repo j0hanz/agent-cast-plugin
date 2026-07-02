@@ -61,12 +61,12 @@ Also re-run Smoke (Prototypes is the default/most-trafficked route).
 
 ### Changed: `web/src/views/Detail.tsx` or `Detail.module.css`
 
-Run: TC-DETAIL-001 → TC-DETAIL-009, TC-NAV-003, TC-NAV-004
+Run: TC-DETAIL-001 → TC-DETAIL-009, TC-DETAIL-010, TC-DETAIL-011, TC-NAV-003, TC-NAV-004
 Integration point: `findingsFor`/`versionsFor`/`loopFor` in `data.ts` — if those changed instead, run this section too.
 
 ### Changed: `web/src/views/Sandbox.tsx`
 
-Run: TC-SANDBOX-001 → TC-SANDBOX-006
+Run: TC-SANDBOX-001 → TC-SANDBOX-006, TC-SANDBOX-007
 
 ### Changed: `web/src/views/Tests.tsx`
 
@@ -75,12 +75,12 @@ Integration point: `testStatus`/`testSummary` in `data.ts` — changes there req
 
 ### Changed: `web/src/views/System.tsx`
 
-Run: TC-SYS-001 → TC-SYS-005
+Run: TC-SYS-001 → TC-SYS-005, TC-SYS-006, TC-SYS-007, TC-SYS-008
 
 ### Changed: `web/src/data/data.ts`, `web/src/data/live.ts`, `web/src/data/mock.ts`, or `web/src/data/types.ts`
 
 This is a shared dependency for every view — run the **full Smoke suite** plus:
-TC-DATA-001 → TC-DATA-005, TC-DETAIL-003, TC-DETAIL-006, TC-TESTS-001, TC-TESTS-008
+TC-DATA-001 → TC-DATA-005, TC-DETAIL-003, TC-DETAIL-006, TC-TESTS-001, TC-TESTS-008, TC-SYS-006, TC-SYS-007
 If `mock.ts`/`live.ts` key parity could be affected, confirm `npm run check` still passes (it asserts this explicitly).
 
 ### Changed: `web/src/state/ui.ts`
@@ -94,7 +94,7 @@ Run: TC-NAV-001 → TC-NAV-008
 ### Changed: `web/src/components/ui.tsx`, `web/src/components/ErrorBoundary.tsx`, or shared CSS (`styles.css`, `ui.module.css`)
 
 Shared components — run **full Smoke** plus:
-TC-A11Y-001 → TC-A11Y-003, TC-ERR-001 → TC-ERR-003, TC-RESP-001 → TC-RESP-004
+TC-A11Y-001 → TC-A11Y-003, TC-ERR-001 → TC-ERR-003, TC-RESP-001 → TC-RESP-004, TC-DETAIL-010, TC-DETAIL-011, TC-SANDBOX-007
 (`Preview`, `Panel`, `Chips`, `Seg`, `AgentPill`, `EmptyState` are used across every view, so a regression here is wide-blast-radius.)
 
 ---
@@ -132,6 +132,7 @@ Total: 64 unique test cases, 69 executions (§8's 5 data-source cases run once i
 Do not re-file these as new bugs; they are documented, pre-existing gaps:
 
 - **TC-PROTO-006** (empty filter-result state) is not reproducible with the current mock fixture set — every status chip has at least one match. Verify only via live mode with a sparse data set.
+- **TC-SYS-008** is not reproducible in mock mode because `mock.ts` hardcodes 2 CONSOLE and 2 NETWORK entries. Verify only via live mode with no console/network activity logged.
 
 ## Suite Maintenance
 
