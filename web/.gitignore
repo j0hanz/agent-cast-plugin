@@ -1,6 +1,7 @@
 node_modules
 dist
 public/screenshots
+public/artifacts
 public/state.json
 public/mcp-calls.jsonl
 public/log.jsonl
