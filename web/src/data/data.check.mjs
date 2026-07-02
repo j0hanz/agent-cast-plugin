@@ -46,6 +46,11 @@ assert.deepStrictEqual(
 
 // Cause A: LOOP + VERSIONS are per-prototype, never global.
 assert.strictEqual(deriveLoop('final').at(-1).state, 'live', 'final stage → Test step live');
+assert.strictEqual(
+  deriveLoop('final', true).at(-1).state,
+  'done',
+  'final stage + hasRun → Test step done',
+);
 assert.strictEqual(deriveLoop('critique')[2].state, 'live', 'critique stage → critique step live');
 assert.strictEqual(deriveLoop('preview')[1].state, 'live', 'preview stage → Preview step live');
 const scoped = [

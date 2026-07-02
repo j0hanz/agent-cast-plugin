@@ -252,6 +252,8 @@ export const TESTS: TestRun[] = liveArray(() => {
     findingsStore.filter((f) => f.sev === 'high').map((f) => `${f.protoId}:${f.ver}`),
   );
   return [...latest.values()].map((t) => ({
+    protoId: t.protoId,
+    ver: t.ver,
     name: t.name,
     checks: t.total,
     pass: t.pass,

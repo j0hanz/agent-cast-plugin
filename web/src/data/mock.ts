@@ -138,12 +138,60 @@ export const LOG: LogEntry[] = [
 ];
 
 export const TESTS: TestRun[] = [
-  { name: 'Checkout flow', checks: 24, pass: 24, total: 24, status: 'passed' },
-  { name: 'Dashboard shell', checks: 18, pass: 18, total: 18, status: 'passed' },
-  { name: 'Pricing page', checks: 16, pass: 14, total: 16, status: 'failed' },
-  { name: 'Settings panel', checks: 20, pass: 17, total: 20, status: 'failed' },
-  { name: 'Landing hero', checks: 22, pass: 0, total: 22, status: 'running' },
-  { name: 'Onboarding', checks: 12, pass: 0, total: 12, status: 'queued' },
+  {
+    protoId: 'checkout-flow',
+    ver: 'v5',
+    name: 'Checkout flow',
+    checks: 24,
+    pass: 24,
+    total: 24,
+    status: 'passed',
+  },
+  {
+    protoId: 'dashboard-shell',
+    ver: 'v3',
+    name: 'Dashboard shell',
+    checks: 18,
+    pass: 18,
+    total: 18,
+    status: 'passed',
+  },
+  {
+    protoId: 'pricing-page',
+    ver: 'v2',
+    name: 'Pricing page',
+    checks: 16,
+    pass: 14,
+    total: 16,
+    status: 'failed',
+  },
+  {
+    protoId: 'settings-panel',
+    ver: 'v2',
+    name: 'Settings panel',
+    checks: 20,
+    pass: 17,
+    total: 20,
+    status: 'failed',
+  },
+  {
+    protoId: 'landing-hero',
+    ver: 'v4',
+    name: 'Landing hero',
+    checks: 22,
+    pass: 0,
+    total: 22,
+    status: 'running',
+  },
+  {
+    protoId: 'onboarding',
+    ver: 'v1',
+    name: 'Onboarding',
+    checks: 12,
+    pass: 0,
+    total: 12,
+    status: 'queued',
+  },
 ];
 
 // Shaped to match live.ts's browser_get_config-derived fields exactly (full
