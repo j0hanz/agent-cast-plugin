@@ -135,7 +135,7 @@ export function System() {
 
         <Panel title="Recent calls">
           {MCP_CALLS.length ? (
-            MCP_CALLS.map((c) => <McpCallRow key={`${c.ts}-${c.tool}`} c={c} />)
+            MCP_CALLS.map((c, i) => <McpCallRow key={`${c.ts}-${i}`} c={c} />)
           ) : (
             <EmptyState
               icon="search"
