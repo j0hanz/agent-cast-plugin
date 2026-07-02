@@ -5,6 +5,23 @@ Status: APPROVED
      noted, not actioned: TASK-005's toggle-vs-.calibrationText overlap is a
      plausible-but-unsimulated CSS layout call, verified visually by TASK-007
      instead; REQ-007 wording tightened for clarity, no functional change. -->
+<!-- TASK-001 execution note (2026-07-02): REQ-007 (path resolution) CONFIRMED
+     true via a real capture — files land at exactly web/public/artifacts/{name}.webm.
+     BUT the actual recording is a 0-byte file every time (5/5 attempts, via both
+     the MCP tool and raw page.screencast calls, on fresh and existing tabs).
+     Root-caused: CDP Page.startScreencast delivers real frames (198 confirmed via
+     a direct test), and playwright-core's bundled ffmpeg-1011 works standalone
+     (correct webm/vp8 muxer/encoder) — so both halves work independently, but
+     playwright-core@1.61.1's internal glue piping CDP frames into ffmpeg produces
+     no output. This is an upstream Playwright bug in this specific build/platform,
+     not fixable in AgentCast's code. Decision: ship TASK-003-007 anyway — the
+     toggle's onError fallback already treats "no video" as a normal state, so the
+     UI is correct and forward-compatible; real captures will start working
+     automatically once the upstream bug is fixed. Multi-tab recording was also
+     confirmed to leak a second file to the repo root (not web/public/artifacts/)
+     when another tab is open while recording starts — matches the low-probability
+     risk already flagged in the design brief, now empirically confirmed rather
+     than just inferred from source. -->
 
 # video-recording — plan
 
